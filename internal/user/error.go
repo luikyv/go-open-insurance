@@ -3,7 +3,7 @@ package user
 import (
 	"net/http"
 
-	"github.com/luikyv/go-opf/internal/opinerr"
+	"github.com/luikyv/go-open-insurance/internal/opinerr"
 )
 
 var (

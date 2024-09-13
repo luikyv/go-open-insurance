@@ -9,6 +9,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// TODO: Make sure this is working as expected.
+
 type GrantSessionManager struct {
 	Collection *mongo.Collection
 }
@@ -25,7 +27,12 @@ func (manager GrantSessionManager) Save(
 ) error {
 	shouldReplace := true
 	filter := bson.D{{Key: "_id", Value: grantSession.ID}}
-	if _, err := manager.Collection.ReplaceOne(ctx, filter, grantSession, &options.ReplaceOptions{Upsert: &shouldReplace}); err != nil {
+	if _, err := manager.Collection.ReplaceOne(
+		ctx,
+		filter,
+		grantSession,
+		&options.ReplaceOptions{Upsert: &shouldReplace},
+	); err != nil {
 		return err
 	}
 
@@ -49,7 +56,10 @@ func (manager GrantSessionManager) SessionByRefreshToken(
 	*goidc.GrantSession,
 	error,
 ) {
-	return manager.getWithFilter(ctx, bson.D{{Key: "refresh_token", Value: token}})
+	return manager.getWithFilter(
+		ctx,
+		bson.D{{Key: "refresh_token", Value: token}},
+	)
 }
 
 func (manager GrantSessionManager) Delete(

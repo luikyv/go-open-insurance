@@ -5,10 +5,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/luikyv/go-oidc/pkg/provider"
-	"github.com/luikyv/go-opf/internal/oidc"
-	"github.com/luikyv/go-opf/internal/opinerr"
-	"github.com/luikyv/go-opf/internal/resp"
-	"github.com/luikyv/go-opf/internal/sec"
+	"github.com/luikyv/go-open-insurance/internal/oidc"
+	"github.com/luikyv/go-open-insurance/internal/opinerr"
+	"github.com/luikyv/go-open-insurance/internal/opinresp"
+	"github.com/luikyv/go-open-insurance/internal/sec"
 )
 
 type Router struct {
@@ -48,42 +48,45 @@ func (r Router) AddRoutesV2(
 
 func (r Router) handlePostV2(ctx *gin.Context, meta sec.Meta) {
 	var req struct {
-		Data requestDataV2 `json:"data"`
+		Data requestData `json:"data"`
 	}
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		resp.WriteError(ctx, opinerr.New("INVALID_REQUEST", http.StatusBadRequest, err.Error()))
+		opinresp.WriteError(ctx, opinerr.New("INVALID_REQUEST", http.StatusBadRequest, err.Error()))
 		return
 	}
 
-	if err := req.Data.validate(); err != nil {
-		resp.WriteError(ctx, err)
+	consent := newConsent(req.Data, meta.ClientID, r.nameSpace)
+	if err := r.service.Create(ctx, meta, consent); err != nil {
+		opinresp.WriteError(ctx, err)
 		return
 	}
 
-	consent := newV2(req.Data, meta.ClientID, r.nameSpace)
-	if err := r.service.Create(ctx, consent, meta); err != nil {
-		resp.WriteError(ctx, err)
-		return
-	}
-
-	ctx.JSON(http.StatusCreated, consent.newResponseV2(r.baseURL))
+	ctx.JSON(http.StatusCreated, consent.response(r.baseURL+apiPrefixConsentsV2))
 }
 
 func (r Router) handleGetV2(ctx *gin.Context, meta sec.Meta) {
 	consentID := ctx.Param("consent_id")
-	consent, err := r.service.Get(ctx, consentID, meta)
+	consent, err := r.service.Get(ctx, meta, consentID)
 	if err != nil {
-		resp.WriteError(ctx, err)
+		opinresp.WriteError(ctx, err)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, consent.newResponseV2(r.baseURL))
+	ctx.JSON(http.StatusOK, consent.response(r.baseURL+apiPrefixConsentsV2))
 }
 
 func (r Router) handleDeleteV2(ctx *gin.Context, meta sec.Meta) {
 	consentID := ctx.Param("consent_id")
-	if err := r.service.Reject(ctx, consentID, meta); err != nil {
-		resp.WriteError(ctx, err)
+	if err := r.service.Reject(
+		ctx,
+		meta,
+		consentID,
+		RejectionInfo{
+			RejectedBy: RejectedByUser,
+			Reason:     RejectionReasonCustomerManuallyRejected,
+		},
+	); err != nil {
+		opinresp.WriteError(ctx, err)
 		return
 	}
 

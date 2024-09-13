@@ -25,7 +25,12 @@ func (manager AuthnSessionManager) Save(
 ) error {
 	shouldUpsert := true
 	filter := bson.D{{Key: "_id", Value: session.ID}}
-	if _, err := manager.Collection.ReplaceOne(ctx, filter, session, &options.ReplaceOptions{Upsert: &shouldUpsert}); err != nil {
+	if _, err := manager.Collection.ReplaceOne(
+		ctx,
+		filter,
+		session,
+		&options.ReplaceOptions{Upsert: &shouldUpsert},
+	); err != nil {
 		return err
 	}
 
@@ -39,7 +44,10 @@ func (manager AuthnSessionManager) SessionByCallbackID(
 	*goidc.AuthnSession,
 	error,
 ) {
-	return manager.getWithFilter(ctx, bson.D{{Key: "callback_id", Value: callbackID}})
+	return manager.getWithFilter(
+		ctx,
+		bson.D{{Key: "callback_id", Value: callbackID}},
+	)
 }
 
 func (manager AuthnSessionManager) SessionByAuthorizationCode(
@@ -49,7 +57,10 @@ func (manager AuthnSessionManager) SessionByAuthorizationCode(
 	*goidc.AuthnSession,
 	error,
 ) {
-	return manager.getWithFilter(ctx, bson.D{{Key: "authorization_code", Value: authorizationCode}})
+	return manager.getWithFilter(
+		ctx,
+		bson.D{{Key: "authorization_code", Value: authorizationCode}},
+	)
 }
 
 func (manager AuthnSessionManager) SessionByReferenceID(

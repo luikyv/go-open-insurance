@@ -25,12 +25,12 @@ const (
 	PermissionPensionPlanWithdrawalsRead   Permission = "PENSION_PLAN_WITHDRAWALS_READ"
 	PermissionPensionPlanClaim             Permission = "PENSION_PLAN_CLAIM"
 
-	PermissionLifePensionPlanRead              Permission = "LIFE_PENSION_PLAN_READ"
-	PermissionLifePensionPlanContractInfoRead  Permission = "LIFE_PENSION_PLAN_CONTRACTINFO_READ"
-	PermissionLifePensionPlanMovementsRead     Permission = "LIFE_PENSION_PLAN_MOVEMENTS_READ"
-	PermissionLifePensionPlanPortabilitiesRead Permission = "LIFE_PENSION_PLAN_PORTABILITIES_READ"
-	PermissionLifePensionPlanWithdrawalsRead   Permission = "LIFE_PENSION_PLAN_WITHDRAWALS_READ"
-	PermissionLifePensionPlanClaim             Permission = "LIFE_PENSION_PLAN_CLAIM"
+	PermissionLifePensionRead              Permission = "LIFE_PENSION_READ"
+	PermissionLifePensionContractInfoRead  Permission = "LIFE_PENSION_CONTRACTINFO_READ"
+	PermissionLifePensionMovementsRead     Permission = "LIFE_PENSION_MOVEMENTS_READ"
+	PermissionLifePensionPortabilitiesRead Permission = "LIFE_PENSION_PORTABILITIES_READ"
+	PermissionLifePensionWithdrawalsRead   Permission = "LIFE_PENSION_WITHDRAWALS_READ"
+	PermissionLifePensionClaim             Permission = "LIFE_PENSION_CLAIM"
 
 	PermissionFinancialAssistanceRead             Permission = "FINANCIAL_ASSISTANCE_READ"
 	PermissionFinancialAssistanceContractInfoRead Permission = "FINANCIAL_ASSISTANCE_CONTRACTINFO_READ"
@@ -41,10 +41,10 @@ const (
 	PermissionDamagesAndPeoplePatrimonialPremiumRead    Permission = "DAMAGES_AND_PEOPLE_PATRIMONIAL_PREMIUM_READ"
 	PermissionDamagesAndPeoplePatrimonialClaimRead      Permission = "DAMAGES_AND_PEOPLE_PATRIMONIAL_CLAIM_READ"
 
-	PermissionDamagesAndPeopleResponsabilityRead           Permission = "DAMAGES_AND_PEOPLE_RESPONSABILITY_READ"
-	PermissionDamagesAndPeopleResponsabilityPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_RESPONSABILITY_POLICYINFO_READ"
-	PermissionDamagesAndPeopleResponsabilityPremiumRead    Permission = "DAMAGES_AND_PEOPLE_RESPONSABILITY_PREMIUM_READ"
-	PermissionDamagesAndPeopleResponsabilityClaimRead      Permission = "DAMAGES_AND_PEOPLE_RESPONSABILITY_CLAIM_READ"
+	PermissionDamagesAndPeopleResponsibilityRead           Permission = "DAMAGES_AND_PEOPLE_RESPONSIBILITY_READ"
+	PermissionDamagesAndPeopleResponsibilityPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_RESPONSIBILITY_POLICYINFO_READ"
+	PermissionDamagesAndPeopleResponsibilityPremiumRead    Permission = "DAMAGES_AND_PEOPLE_RESPONSIBILITY_PREMIUM_READ"
+	PermissionDamagesAndPeopleResponsibilityClaimRead      Permission = "DAMAGES_AND_PEOPLE_RESPONSIBILITY_CLAIM_READ"
 
 	PermissionDamagesAndPeopleTransportRead           Permission = "DAMAGES_AND_PEOPLE_TRANSPORT_READ"
 	PermissionDamagesAndPeopleTransportPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_TRANSPORT_POLICYINFO_READ"
@@ -71,15 +71,15 @@ const (
 	PermissionDamagesAndPeopleHousingPremiumRead    Permission = "DAMAGES_AND_PEOPLE_HOUSING_PREMIUM_READ"
 	PermissionDamagesAndPeopleHousingClaimRead      Permission = "DAMAGES_AND_PEOPLE_HOUSING_CLAIM_READ"
 
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadRead           Permission = "DAMAGES_AND_PEOPLE_HOUSING_READ"
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_HOUSING_POLICYINFO_READ"
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadPremiumRead    Permission = "DAMAGES_AND_PEOPLE_HOUSING_PREMIUM_READ"
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadClaimRead      Permission = "DAMAGES_AND_PEOPLE_HOUSING_CLAIM_READ"
+	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadRead           Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_READ"
+	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_POLICYINFO_READ"
+	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadPremiumRead    Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_PREMIUM_READ"
+	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadClaimRead      Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_CLAIM_READ"
 
-	PermissionDamagesAndPeoplePersonRead           Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_READ"
-	PermissionDamagesAndPeoplePersonPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_POLICYINFO_READ"
-	PermissionDamagesAndPeoplePersonPremiumRead    Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_PREMIUM_READ"
-	PermissionDamagesAndPeoplePersonClaimRead      Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_CLAIM_READ"
+	PermissionDamagesAndPeoplePersonRead           Permission = "DAMAGES_AND_PEOPLE_PERSON_READ"
+	PermissionDamagesAndPeoplePersonPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_PERSON_POLICYINFO_READ"
+	PermissionDamagesAndPeoplePersonPremiumRead    Permission = "DAMAGES_AND_PEOPLE_PERSON_PREMIUM_READ"
+	PermissionDamagesAndPeoplePersonClaimRead      Permission = "DAMAGES_AND_PEOPLE_PERSON_CLAIM_READ"
 
 	PermissionClaimNotificationRequestDamageCreate Permission = "CLAIM_NOTIFICATION_REQUEST_DAMAGE_CREATE"
 
@@ -122,8 +122,8 @@ const (
 	PermissionQuoteHousingLeadCreate Permission = "QUOTE_HOUSING_LEAD_CREATE"
 	PermissionQuoteHousingLeadUpdate Permission = "QUOTE_HOUSING_LEAD_UPDATE"
 
-	PermissionQuoteResponsabilityLeadCreate Permission = "QUOTE_RESPONSABILITY_LEAD_CREATE"
-	PermissionQuoteResponsabilityLeadUpdate Permission = "QUOTE_RESPONSABILITY_LEAD_UPDATE"
+	PermissionQuoteResponsibilityLeadCreate Permission = "QUOTE_RESPONSIBILITY_LEAD_CREATE"
+	PermissionQuoteResponsibilityLeadUpdate Permission = "QUOTE_RESPONSIBILITY_LEAD_UPDATE"
 
 	PermissionQuoteRuralLeadCreate Permission = "QUOTE_RURAL_LEAD_CREATE"
 	PermissionQuoteRuralLeadUpdate Permission = "QUOTE_RURAL_LEAD_UPDATE"
@@ -188,12 +188,12 @@ var permissionsPhase2 = []Permission{
 	PermissionPensionPlanPortabilitiesRead,
 	PermissionPensionPlanWithdrawalsRead,
 	PermissionPensionPlanClaim,
-	PermissionLifePensionPlanRead,
-	PermissionLifePensionPlanContractInfoRead,
-	PermissionLifePensionPlanMovementsRead,
-	PermissionLifePensionPlanPortabilitiesRead,
-	PermissionLifePensionPlanWithdrawalsRead,
-	PermissionLifePensionPlanClaim,
+	PermissionLifePensionRead,
+	PermissionLifePensionContractInfoRead,
+	PermissionLifePensionMovementsRead,
+	PermissionLifePensionPortabilitiesRead,
+	PermissionLifePensionWithdrawalsRead,
+	PermissionLifePensionClaim,
 	PermissionFinancialAssistanceRead,
 	PermissionFinancialAssistanceContractInfoRead,
 	PermissionFinancialAssistanceMovementsRead,
@@ -201,10 +201,10 @@ var permissionsPhase2 = []Permission{
 	PermissionDamagesAndPeoplePatrimonialPolicyInfoRead,
 	PermissionDamagesAndPeoplePatrimonialPremiumRead,
 	PermissionDamagesAndPeoplePatrimonialClaimRead,
-	PermissionDamagesAndPeopleResponsabilityRead,
-	PermissionDamagesAndPeopleResponsabilityPolicyInfoRead,
-	PermissionDamagesAndPeopleResponsabilityPremiumRead,
-	PermissionDamagesAndPeopleResponsabilityClaimRead,
+	PermissionDamagesAndPeopleResponsibilityRead,
+	PermissionDamagesAndPeopleResponsibilityPolicyInfoRead,
+	PermissionDamagesAndPeopleResponsibilityPremiumRead,
+	PermissionDamagesAndPeopleResponsibilityClaimRead,
 	PermissionDamagesAndPeopleTransportRead,
 	PermissionDamagesAndPeopleTransportPolicyInfoRead,
 	PermissionDamagesAndPeopleTransportPremiumRead,
@@ -264,8 +264,8 @@ var permissionsPhase3 = []Permission{
 	PermissionQuoteFinancialRiskLeadUpdate,
 	PermissionQuoteHousingLeadCreate,
 	PermissionQuoteHousingLeadUpdate,
-	PermissionQuoteResponsabilityLeadCreate,
-	PermissionQuoteResponsabilityLeadUpdate,
+	PermissionQuoteResponsibilityLeadCreate,
+	PermissionQuoteResponsibilityLeadUpdate,
 	PermissionQuoteRuralLeadCreate,
 	PermissionQuoteRuralLeadUpdate,
 	PermissionQuoteTransportLeadCreate,
@@ -327,12 +327,12 @@ var (
 	}
 	permissionCategoryLifePensionPlan PermissionCategory = []Permission{
 		PermissionResourcesRead,
-		PermissionLifePensionPlanRead,
-		PermissionLifePensionPlanContractInfoRead,
-		PermissionLifePensionPlanMovementsRead,
-		PermissionLifePensionPlanPortabilitiesRead,
-		PermissionLifePensionPlanWithdrawalsRead,
-		PermissionLifePensionPlanClaim,
+		PermissionLifePensionRead,
+		PermissionLifePensionContractInfoRead,
+		PermissionLifePensionMovementsRead,
+		PermissionLifePensionPortabilitiesRead,
+		PermissionLifePensionWithdrawalsRead,
+		PermissionLifePensionClaim,
 	}
 	permissionCategoryFinancialAssistence PermissionCategory = []Permission{
 		PermissionFinancialAssistanceRead,
@@ -346,12 +346,12 @@ var (
 		PermissionDamagesAndPeoplePatrimonialPremiumRead,
 		PermissionDamagesAndPeoplePatrimonialClaimRead,
 	}
-	permissionCategoryDamagesAndPeopleResponsability PermissionCategory = []Permission{
+	permissionCategoryDamagesAndPeopleResponsibility PermissionCategory = []Permission{
 		PermissionResourcesRead,
-		PermissionDamagesAndPeopleResponsabilityRead,
-		PermissionDamagesAndPeopleResponsabilityPolicyInfoRead,
-		PermissionDamagesAndPeopleResponsabilityPremiumRead,
-		PermissionDamagesAndPeopleResponsabilityClaimRead,
+		PermissionDamagesAndPeopleResponsibilityRead,
+		PermissionDamagesAndPeopleResponsibilityPolicyInfoRead,
+		PermissionDamagesAndPeopleResponsibilityPremiumRead,
+		PermissionDamagesAndPeopleResponsibilityClaimRead,
 	}
 	permissionCategoryDamagesAndPeopleTransport PermissionCategory = []Permission{
 		PermissionResourcesRead,
@@ -456,9 +456,9 @@ var (
 		PermissionQuoteHousingLeadCreate,
 		PermissionQuoteHousingLeadUpdate,
 	}
-	permissionCategoryQuoteResponsabilityLead PermissionCategory = []Permission{
-		PermissionQuoteResponsabilityLeadCreate,
-		PermissionQuoteResponsabilityLeadUpdate,
+	permissionCategoryQuoteResponsibilityLead PermissionCategory = []Permission{
+		PermissionQuoteResponsibilityLeadCreate,
+		PermissionQuoteResponsibilityLeadUpdate,
 	}
 	permissionCategoryQuoteRuralLead PermissionCategory = []Permission{
 		PermissionQuoteRuralLeadCreate,
@@ -526,7 +526,7 @@ var permissionCategories = []PermissionCategory{
 	permissionCategoryLifePensionPlan,
 	permissionCategoryFinancialAssistence,
 	permissionCategoryDamagesAndPeoplePatrimonial,
-	permissionCategoryDamagesAndPeopleResponsability,
+	permissionCategoryDamagesAndPeopleResponsibility,
 	permissionCategoryDamagesAndPeopleTransport,
 	permissionCategoryDamagesAndPeopleFinancialRisks,
 	permissionCategoryDamagesAndPeopleRural,
@@ -547,7 +547,7 @@ var permissionCategories = []PermissionCategory{
 	permissionCategoryQuoteAuto,
 	permissionCategoryQuoteFinancialRiskLead,
 	permissionCategoryQuoteHousingLead,
-	permissionCategoryQuoteResponsabilityLead,
+	permissionCategoryQuoteResponsibilityLead,
 	permissionCategoryQuoteRuralLead,
 	permissionCategoryQuoteTransportLead,
 	permissionCategoryQuotePersonLead,

@@ -1,6 +1,4 @@
-package time
-
-// TODO: Change to timeutil.
+package timeutil
 
 import (
 	"errors"

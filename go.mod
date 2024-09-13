@@ -1,4 +1,4 @@
-module github.com/luikyv/go-opf
+module github.com/luikyv/go-open-insurance
 
 go 1.22.4
 

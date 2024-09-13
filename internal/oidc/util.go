@@ -24,7 +24,7 @@ var (
 	ScopeInsuranceAuto               = goidc.NewScope("insurance-auto")
 	ScopeInsuranceFinancialRisk      = goidc.NewScope("insurance-financial-risk")
 	ScopeInsurancePatrimonial        = goidc.NewScope("insurance-patrimonial")
-	ScopeInsuranceResponsability     = goidc.NewScope("insurance-responsibility")
+	ScopeInsuranceResponsibility     = goidc.NewScope("insurance-responsibility")
 )
 
 var Scopes = []goidc.Scope{
@@ -37,5 +37,5 @@ var Scopes = []goidc.Scope{
 	ScopeInsuranceAuto,
 	ScopeInsuranceFinancialRisk,
 	ScopeInsurancePatrimonial,
-	ScopeInsuranceResponsability,
+	ScopeInsuranceResponsibility,
 }

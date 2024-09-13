@@ -7,15 +7,16 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/go-jose/go-jose/v4"
 	"github.com/luikyv/go-oidc/pkg/goidc"
 	"github.com/luikyv/go-oidc/pkg/provider"
-	"github.com/luikyv/go-opf/internal/authn"
-	"github.com/luikyv/go-opf/internal/consent"
-	"github.com/luikyv/go-opf/internal/oidc"
-	"github.com/luikyv/go-opf/internal/user"
+	"github.com/luikyv/go-open-insurance/internal/authn"
+	"github.com/luikyv/go-open-insurance/internal/consent"
+	"github.com/luikyv/go-open-insurance/internal/oidc"
+	"github.com/luikyv/go-open-insurance/internal/user"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -39,6 +40,7 @@ func openidProvider(
 		provider.WithGrantSessionStorage(oidc.NewGrantSessionManager(db)),
 		provider.WithScopes(oidc.Scopes...),
 		provider.WithMTLS(mtlsHost),
+		provider.WithTLSCertTokenBinding(),
 		provider.WithJAR(jose.PS256),
 		provider.WithJAREncryption("enc_key"),
 		provider.WithJARContentEncryptionAlgs(jose.A256GCM),
@@ -50,6 +52,7 @@ func openidProvider(
 		provider.WithDPoP(jose.PS256, jose.ES256),
 		provider.WithPKCE(goidc.CodeChallengeMethodSHA256),
 		provider.WithRefreshTokenGrant(),
+		provider.WithShouldIssueRefreshTokenFunc(shouldIssueRefreshToken),
 		provider.WithACRs(oidc.ACROpenInsuranceLOA2, oidc.ACROpenInsuranceLOA3),
 		provider.WithDCR(dcrFunc()),
 		provider.WithTokenOptions(tokenOptionFunc(ps256ServerKeyID)),
@@ -78,9 +81,13 @@ func dcrFunc() goidc.HandleDynamicClientFunc {
 	}
 }
 
+func shouldIssueRefreshToken(client *goidc.Client, grantInfo goidc.GrantInfo) bool {
+	return slices.Contains(client.GrantTypes, goidc.GrantRefreshToken)
+}
+
 func tokenOptionFunc(keyID string) goidc.TokenOptionsFunc {
-	return func(client *goidc.Client, scopes string) (goidc.TokenOptions, error) {
-		return goidc.NewJWTTokenOptions(keyID, 600), nil
+	return func(client *goidc.Client, grantInfo goidc.GrantInfo) goidc.TokenOptions {
+		return goidc.NewJWTTokenOptions(keyID, 600)
 	}
 }
 

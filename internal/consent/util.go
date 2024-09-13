@@ -1,20 +1,41 @@
 package consent
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"slices"
 
 	"github.com/google/uuid"
-	"github.com/luikyv/go-opf/internal/opinerr"
-	"github.com/luikyv/go-opf/internal/slice"
+	"github.com/luikyv/go-open-insurance/internal/opinerr"
+	"github.com/luikyv/go-open-insurance/internal/slice"
+	"github.com/luikyv/go-open-insurance/internal/timeutil"
 )
 
 func consentID(nameSpace string) string {
 	return fmt.Sprintf("%s:%s", nameSpace, uuid.NewString())
 }
 
-func validatePermissions(requestedPermissions []Permission) error {
+func validate(ctx context.Context, consent Consent) error {
+	now := timeutil.Now()
+	if now.After(consent.ExpiresAt) {
+		return opinerr.New("INVALID_REQUEST", http.StatusBadRequest,
+			"the expiration time cannot be in the past")
+	}
+
+	if consent.ExpiresAt.After(now.AddYears(1)) {
+		return opinerr.New("INVALID_REQUEST", http.StatusBadRequest,
+			"the expiration time cannot be greater than one year")
+	}
+
+	if err := validatePermissions(ctx, consent.Permissions); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validatePermissions(_ context.Context, requestedPermissions []Permission) error {
 
 	if len(requestedPermissions) < 1 {
 		return opinerr.New("INVALID_PERMISSION", http.StatusBadRequest,
@@ -22,7 +43,7 @@ func validatePermissions(requestedPermissions []Permission) error {
 	}
 
 	if !slice.ContainsAll(permissions, requestedPermissions...) {
-		return opinerr.New("INVALID_PERMISSION", http.StatusBadRequest,
+		return opinerr.New("BAD_PERMISSION", http.StatusBadRequest,
 			"invalid permission")
 	}
 

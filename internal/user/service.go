@@ -1,15 +1,22 @@
 package user
 
-import "slices"
+import (
+	"context"
+	"slices"
+)
 
 type Service struct {
-	storage Storage
+	storage *Storage
 }
 
-func NewService(storage Storage) Service {
+func NewService(storage *Storage) Service {
 	return Service{
 		storage: storage,
 	}
+}
+
+func (s Service) Create(ctx context.Context, user User) error {
+	return s.storage.create(ctx, user)
 }
 
 func (s Service) User(username string) (User, error) {

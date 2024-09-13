@@ -3,6 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/luikyv/go-open-insurance/internal/log"
 )
 
 const (
@@ -16,6 +17,7 @@ func FAPIID() gin.HandlerFunc {
 			interactionID = uuid.NewString()
 		}
 
+		ctx.Set(log.CorrelationIDKey, interactionID)
 		ctx.Header(headerXFAPIInteractionID, interactionID)
 	}
 }

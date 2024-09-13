@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
-	"github.com/luikyv/go-opf/internal/consent"
-	"github.com/luikyv/go-opf/internal/middleware"
-	"github.com/luikyv/go-opf/internal/user"
+	"github.com/luikyv/go-open-insurance/internal/consent"
+	"github.com/luikyv/go-open-insurance/internal/middleware"
+	"github.com/luikyv/go-open-insurance/internal/user"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -57,6 +57,9 @@ func main() {
 	oidcRouter.Any("/*w", gin.WrapH(op.Handler()))
 
 	// Run.
+	if err := loadUsers(userService); err != nil {
+		panic(err)
+	}
 	if err := server.Run(port); err != nil {
 		panic(err)
 	}

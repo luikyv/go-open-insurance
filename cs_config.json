@@ -1,5 +1,5 @@
 {
-    "alias": "go-opf",
+    "alias": "go-open-insurance",
     "server": {
         "discoveryUrl": "https://gopf.localhost/auth/.well-known/openid-configuration"
     },

@@ -60,6 +60,13 @@
         .login-container button:hover {
             background-color: #0056b3;
         }
+        .login-container .cancel-button {
+            background-color: #ccc;
+            color: #000;
+        }
+        .login-container .cancel-button:hover {
+            background-color: #999;
+        }
         .error-message {
             color: red;
             margin-bottom: 15px;
@@ -92,11 +99,16 @@
         <h1>GO Open Insurance</h1>
         <div id="error-message" class="error-message"></div>
         <form action="{{ .BaseURL }}/authorize/{{ .CallbackID }}" method="POST">
+            <input type="hidden" id="loginTrue" name="login" value="true">
             <label for="username">User:</label>
             <input type="text" id="username" name="username" required>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
             <button type="submit">Login</button>
+        </form>
+        <form action="{{ .BaseURL }}/authorize/{{ .CallbackID }}" method="POST">
+            <input type="hidden" id="loginFalse" name="login" value="false">
+            <button type="submit" class="cancel-button">Deny</button>
         </form>
     </div>
 </body>

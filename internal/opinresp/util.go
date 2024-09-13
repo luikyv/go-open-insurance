@@ -1,12 +1,11 @@
-package resp
+package opinresp
 
 import (
 	"errors"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/luikyv/go-opf/internal/opinerr"
-	"github.com/luikyv/go-opf/internal/time"
+	"github.com/luikyv/go-open-insurance/internal/opinerr"
+	"github.com/luikyv/go-open-insurance/internal/timeutil"
 )
 
 type Links struct {
@@ -25,10 +24,10 @@ type Response struct {
 }
 
 type Error struct {
-	Code            string        `json:"code"`
-	Title           string        `json:"title"`
-	Detail          string        `json:"detail"`
-	RequestDateTime time.DateTime `json:"requestDateTime"`
+	Code            string            `json:"code"`
+	Title           string            `json:"title"`
+	Detail          string            `json:"detail"`
+	RequestDateTime timeutil.DateTime `json:"requestDateTime"`
 }
 
 type ResponseError struct {
@@ -36,9 +35,9 @@ type ResponseError struct {
 	Meta   Meta    `json:"meta"`
 }
 
-func newError(code string, description string) ResponseError {
+func newError(err opinerr.Error) ResponseError {
 	return ResponseError{
-		Errors: []Error{{Code: code, Title: description, Detail: description}},
+		Errors: []Error{{Code: err.Code, Title: err.Description, Detail: err.Description}},
 		Meta: Meta{
 			TotalRecords: 1,
 			TotalPages:   1,
@@ -50,14 +49,14 @@ func WriteError(ctx *gin.Context, err error) {
 	var opfErr opinerr.Error
 	if !errors.As(err, &opfErr) {
 		ctx.JSON(
-			http.StatusInternalServerError,
-			newError(opinerr.ErrorInternal.Code, opinerr.ErrorInternal.Description),
+			opinerr.ErrInternal.StatusCode,
+			newError(opinerr.ErrInternal),
 		)
 		return
 	}
 
 	ctx.JSON(
 		opfErr.StatusCode,
-		newError(opfErr.Code, opfErr.Description),
+		newError(opfErr),
 	)
 }
