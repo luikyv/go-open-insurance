@@ -1,0 +1,11 @@
+package: api
+output: api.go
+generate:
+  std-http-server: true
+  strict-server: true
+  models: true
+compatibility:
+  always-prefix-enum-values: true
+output-options:
+  overlay:
+    path: overlay.yml

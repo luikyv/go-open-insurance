@@ -4,9 +4,8 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/luikyv/go-open-insurance/internal/log"
+	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/opinerr"
-	"github.com/luikyv/go-open-insurance/internal/sec"
 	"github.com/luikyv/go-open-insurance/internal/user"
 )
 
@@ -25,45 +24,43 @@ func NewService(userService user.Service, storage Storage) Service {
 func (s Service) Authorize(
 	ctx context.Context,
 	id string,
-	permissions ...Permission,
+	permissions ...api.ConsentPermission,
 ) error {
 
-	log.FromCtx(ctx).Debug("trying to authorize consent",
+	api.Logger(ctx).Debug("trying to authorize consent",
 		slog.String("consent_id", id))
 	consent, err := s.get(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	if consent.Status != StatusAwaitingAuthorisation {
-		log.FromCtx(ctx).Debug("cannot authorize a consent that is not awaiting authorization",
+	if consent.Status != api.ConsentStatusAWAITINGAUTHORISATION {
+		api.Logger(ctx).Debug("cannot authorize a consent that is not awaiting authorization",
 			slog.String("consent_id", id), slog.Any("status", consent.Status))
 		return errInvalidStatus
 	}
 
-	log.FromCtx(ctx).Info("authorizing consent",
+	api.Logger(ctx).Info("authorizing consent",
 		slog.String("consent_id", id))
-	consent.Status = StatusAuthorised
+	consent.Status = api.ConsentStatusAUTHORISED
 	consent.Permissions = permissions
 	return s.save(ctx, consent)
 }
 
 func (s Service) Create(
 	ctx context.Context,
-	meta sec.Meta,
 	consent Consent,
 ) error {
 	if err := s.validate(ctx, consent); err != nil {
 		return err
 	}
 
-	log.FromCtx(ctx).Info("creating consent", slog.String("consent_id", consent.ID))
+	api.Logger(ctx).Info("creating consent", slog.String("consent_id", consent.ID))
 	return s.save(ctx, consent)
 }
 
 func (s Service) Get(
 	ctx context.Context,
-	meta sec.Meta,
 	id string,
 ) (
 	Consent,
@@ -74,9 +71,9 @@ func (s Service) Get(
 		return Consent{}, err
 	}
 
-	if consent.ClientId != meta.ClientID {
-		log.FromCtx(ctx).Debug("client not allowed to fetch the consent",
-			slog.String("client_id", meta.ClientID))
+	clientID := ctx.Value(api.CtxKeyClientID)
+	if clientID != consent.ClientId {
+		api.Logger(ctx).Debug("client not allowed to fetch the consent")
 		return Consent{}, errClientNotAuthorized
 	}
 
@@ -85,20 +82,19 @@ func (s Service) Get(
 
 func (s Service) Reject(
 	ctx context.Context,
-	meta sec.Meta,
 	id string,
 	info RejectionInfo,
 ) error {
-	consent, err := s.Get(ctx, meta, id)
+	consent, err := s.Get(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	if consent.Status == StatusRejected {
+	if consent.Status == api.ConsentStatusREJECTED {
 		return errAlreadyRejected
 	}
 
-	consent.Status = StatusRejected
+	consent.Status = api.ConsentStatusREJECTED
 	consent.RejectionInfo = &info
 	return s.save(ctx, consent)
 }
@@ -108,7 +104,7 @@ func (s Service) save(
 	consent Consent,
 ) error {
 	if err := s.storage.Save(ctx, consent); err != nil {
-		log.FromCtx(ctx).Error("could not save the consent", slog.Any("error", err))
+		api.Logger(ctx).Error("could not save the consent", slog.Any("error", err))
 		return opinerr.ErrInternal
 	}
 	return nil
@@ -117,7 +113,7 @@ func (s Service) save(
 func (s Service) get(ctx context.Context, id string) (Consent, error) {
 	consent, err := s.storage.Get(ctx, id)
 	if err != nil {
-		log.FromCtx(ctx).Debug("could not find the consent", slog.Any("error", err))
+		api.Logger(ctx).Debug("could not find the consent", slog.Any("error", err))
 		return Consent{}, errNotFound
 	}
 
@@ -134,28 +130,28 @@ func (s Service) modify(ctx context.Context, consent *Consent) error {
 
 	// Reject the consent if the time awaiting the user authorization has elapsed.
 	if consent.HasAuthExpired() {
-		log.FromCtx(ctx).Debug("consent awaiting authorization for too long, moving to rejected")
-		consent.Status = StatusRejected
+		api.Logger(ctx).Debug("consent awaiting authorization for too long, moving to rejected")
+		consent.Status = api.ConsentStatusREJECTED
 		consent.RejectionInfo = &RejectionInfo{
-			RejectedBy: RejectedByUser,
-			Reason:     RejectionReasonConsentExpired,
+			RejectedBy: api.ConsentRejectedByUSER,
+			Reason:     api.ConsentRejectedReasonCodeCONSENTEXPIRED,
 		}
 		consentWasModified = true
 	}
 
 	// Reject the consent if it reached the expiration.
 	if consent.IsExpired() {
-		log.FromCtx(ctx).Debug("consent reached expiration, moving to rejected")
-		consent.Status = StatusRejected
+		api.Logger(ctx).Debug("consent reached expiration, moving to rejected")
+		consent.Status = api.ConsentStatusREJECTED
 		consent.RejectionInfo = &RejectionInfo{
-			RejectedBy: RejectedByUser,
-			Reason:     RejectionReasonConsentMaxDateReached,
+			RejectedBy: api.ConsentRejectedByUSER,
+			Reason:     api.ConsentRejectedReasonCodeCONSENTMAXDATEREACHED,
 		}
 		consentWasModified = true
 	}
 
 	if consentWasModified {
-		log.FromCtx(ctx).Debug("the consent was modified")
+		api.Logger(ctx).Debug("the consent was modified")
 		if err := s.save(ctx, *consent); err != nil {
 			return err
 		}
@@ -169,7 +165,7 @@ func (s Service) modify(ctx context.Context, consent *Consent) error {
 // information is compliant.
 func (s Service) validate(ctx context.Context, consent Consent) error {
 	if err := validate(ctx, consent); err != nil {
-		log.FromCtx(ctx).Debug("the consent is not valid", slog.Any("error", err))
+		api.Logger(ctx).Debug("the consent is not valid", slog.Any("error", err))
 	}
 
 	return nil

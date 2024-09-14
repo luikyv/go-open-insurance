@@ -1,3 +1,7 @@
+setup-dev-env:
+	@pre-commit install
+	@go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen@main
+
 start:
 	@docker-compose up -d
 	@cd gopf && go run .
@@ -22,3 +26,7 @@ init-keys:
 	@cat keys/client_one.crt keys/client_two.crt > keys/client_bundle.crt
 
 	@rm keys/req.csr
+
+# TODO: setup.
+generate-models:
+	@oapi-codegen --config=config.yml spec.yml

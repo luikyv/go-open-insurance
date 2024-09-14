@@ -5,25 +5,26 @@ import (
 	"fmt"
 	"net/http"
 	"slices"
+	"time"
 
 	"github.com/google/uuid"
+	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/opinerr"
 	"github.com/luikyv/go-open-insurance/internal/slice"
-	"github.com/luikyv/go-open-insurance/internal/timeutil"
 )
 
-func consentID(nameSpace string) string {
-	return fmt.Sprintf("%s:%s", nameSpace, uuid.NewString())
+func ID() string {
+	return fmt.Sprintf("urn:mockin:%s", uuid.NewString())
 }
 
 func validate(ctx context.Context, consent Consent) error {
-	now := timeutil.Now()
+	now := time.Now().UTC()
 	if now.After(consent.ExpiresAt) {
 		return opinerr.New("INVALID_REQUEST", http.StatusBadRequest,
 			"the expiration time cannot be in the past")
 	}
 
-	if consent.ExpiresAt.After(now.AddYears(1)) {
+	if consent.ExpiresAt.After(now.AddDate(1, 0, 0)) {
 		return opinerr.New("INVALID_REQUEST", http.StatusBadRequest,
 			"the expiration time cannot be greater than one year")
 	}
@@ -35,7 +36,7 @@ func validate(ctx context.Context, consent Consent) error {
 	return nil
 }
 
-func validatePermissions(_ context.Context, requestedPermissions []Permission) error {
+func validatePermissions(_ context.Context, requestedPermissions []api.ConsentPermission) error {
 
 	if len(requestedPermissions) < 1 {
 		return opinerr.New("INVALID_PERMISSION", http.StatusBadRequest,
@@ -65,23 +66,23 @@ func validatePermissions(_ context.Context, requestedPermissions []Permission) e
 	return nil
 }
 
-func validatePermissionsPhase2(requestedPermissions []Permission) error {
+func validatePermissionsPhase2(requestedPermissions []api.ConsentPermission) error {
 
-	if !slices.Contains(requestedPermissions, PermissionResourcesRead) {
+	if !slices.Contains(requestedPermissions, api.ConsentPermissionRESOURCESREAD) {
 		return opinerr.New("INVALID_PERMISSION", http.StatusBadRequest,
-			fmt.Sprintf("the permission %s is required for phase 2", PermissionResourcesRead))
+			fmt.Sprintf("the permission %s is required for phase 2", api.ConsentPermissionRESOURCESREAD))
 	}
 
 	// RESOURCES_READ cannot be the only permission requested.
 	if len(requestedPermissions) == 1 {
 		return opinerr.New("INVALID_PERMISSION", http.StatusBadRequest,
-			fmt.Sprintf("the permission %s cannot be requested alone", PermissionResourcesRead))
+			fmt.Sprintf("the permission %s cannot be requested alone", api.ConsentPermissionRESOURCESREAD))
 	}
 
 	return nil
 }
 
-func validatePermissionsPhase3(requestedPermissions []Permission) error {
+func validatePermissionsPhase3(requestedPermissions []api.ConsentPermission) error {
 	categories := categories(requestedPermissions)
 
 	if len(categories) != 1 {
@@ -97,7 +98,7 @@ func validatePermissionsPhase3(requestedPermissions []Permission) error {
 	return nil
 }
 
-func categories(requestedPermissions []Permission) []PermissionCategory {
+func categories(requestedPermissions []api.ConsentPermission) []PermissionCategory {
 	var categories []PermissionCategory
 	for _, cat := range permissionCategories {
 		for _, p := range requestedPermissions {

@@ -1,17 +1,18 @@
 package authn
 
 import (
+	"context"
 	"fmt"
 	"html/template"
 	"net/http"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/luikyv/go-oidc/pkg/goidc"
+	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/consent"
 	"github.com/luikyv/go-open-insurance/internal/oidc"
-	"github.com/luikyv/go-open-insurance/internal/sec"
-	"github.com/luikyv/go-open-insurance/internal/timeutil"
 	"github.com/luikyv/go-open-insurance/internal/user"
 )
 
@@ -58,6 +59,9 @@ func (a Authenticator) Authenticate(
 	r *http.Request,
 	session *goidc.AuthnSession,
 ) goidc.AuthnStatus {
+	ctx := context.WithValue(r.Context(), api.CtxKeyClientID, session.ClientID)
+	r = r.WithContext(ctx)
+
 	// Set the step ID if it was not set before.
 	if _, ok := session.Store[paramStepID]; !ok {
 		session.StoreParameter(paramStepID, stepIDSetUp)
@@ -103,13 +107,15 @@ func (a Authenticator) setUp(
 
 	consent, err := a.consentService.Get(
 		r.Context(),
-		sec.Meta{
-			ClientID: session.ClientID,
-		},
 		consentID,
 	)
 	if err != nil {
 		session.SetError(err.Error())
+		return goidc.StatusFailure
+	}
+
+	if consent.Status != api.ConsentStatusAWAITINGAUTHORISATION {
+		session.SetError("consent not awaiting authorization")
 		return goidc.StatusFailure
 	}
 
@@ -147,13 +153,10 @@ func (a Authenticator) login(
 		consentID := session.Parameter(paramConsentID).(string)
 		a.consentService.Reject(
 			r.Context(),
-			sec.Meta{
-				ClientID: session.ClientID,
-			},
 			consentID,
 			consent.RejectionInfo{
-				RejectedBy: consent.RejectedByUser,
-				Reason:     consent.RejectionReasonCustomerManuallyRejected,
+				RejectedBy: api.ConsentRejectedByUSER,
+				Reason:     api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREJECTED,
 			},
 		)
 		session.SetError("consent not granted")
@@ -197,9 +200,9 @@ func (a Authenticator) grantConsent(
 
 	r.ParseForm()
 
-	var permissions []consent.Permission
+	var permissions []api.ConsentPermission
 	for _, p := range strings.Split(session.Parameter(paramPermissions).(string), " ") {
-		permissions = append(permissions, consent.Permission(p))
+		permissions = append(permissions, api.ConsentPermission(p))
 	}
 	isConsented := r.PostFormValue(consentFormParam)
 	if isConsented == "" {
@@ -218,13 +221,10 @@ func (a Authenticator) grantConsent(
 	if isConsented != "true" {
 		a.consentService.Reject(
 			r.Context(),
-			sec.Meta{
-				ClientID: session.ClientID,
-			},
 			consentID,
 			consent.RejectionInfo{
-				RejectedBy: consent.RejectedByUser,
-				Reason:     consent.RejectionReasonCustomerManuallyRejected,
+				RejectedBy: api.ConsentRejectedByUSER,
+				Reason:     api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREJECTED,
 			},
 		)
 		session.SetError("consent not granted")
@@ -244,7 +244,7 @@ func (a Authenticator) finishFlow(
 	session.SetUserID(session.Parameter(paramUserID).(string))
 	session.GrantScopes(session.Scopes)
 	session.SetIDTokenClaimACR(oidc.ACROpenInsuranceLOA2)
-	session.SetIDTokenClaimAuthTime(int(timeutil.Now().Unix()))
+	session.SetIDTokenClaimAuthTime(int(time.Now().Unix()))
 
 	if session.Claims != nil {
 		if slices.Contains(session.Claims.IDTokenEssentials(), goidc.ClaimAuthenticationContextReference) {
@@ -271,6 +271,6 @@ func consentID(scopes string) string {
 type authnPage struct {
 	BaseURL     string
 	CallbackID  string
-	Permissions []consent.Permission
+	Permissions []api.ConsentPermission
 	Error       string
 }

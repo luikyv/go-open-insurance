@@ -1,520 +1,358 @@
 package consent
 
-import "slices"
+import (
+	"slices"
 
-const (
-	PermissionResourcesRead Permission = "RESOURCES_READ"
-
-	PermissionCustomersPersonalIdentificationRead Permission = "CUSTOMERS_PERSONAL_IDENTIFICATIONS_READ"
-	PermissionCustomersPersonalQualificationRead  Permission = "CUSTOMERS_PERSONAL_QUALIFICATION_READ"
-	PermissionCustomersPersonalAdditionalInfoRead Permission = "CUSTOMERS_PERSONAL_ADDITIONALINFO_READ"
-
-	PermissionCustomersBusinessIdentificationRead Permission = "CUSTOMERS_BUSINESS_IDENTIFICATIONS_READ"
-	PermissionCustomersBusinessQualificationRead  Permission = "CUSTOMERS_BUSINESS_QUALIFICATION_READ"
-	PermissionCustomersBusinessAdditionalInfoRead Permission = "CUSTOMERS_BUSINESS_ADDITIONALINFO_READ"
-
-	PermissionCapitalizationTitleRead            Permission = "CAPITALIZATION_TITLE_READ"
-	PermissionCapitalizationTitlePlanInfoRead    Permission = "CAPITALIZATION_TITLE_PLANINFO_READ"
-	PermissionCapitalizationTitleEventsRead      Permission = "CAPITALIZATION_TITLE_EVENTS_READ"
-	PermissionCapitalizationTitleSettlementsRead Permission = "CAPITALIZATION_TITLE_SETTLEMENTS_READ"
-
-	PermissionPensionPlanRead              Permission = "PENSION_PLAN_READ"
-	PermissionPensionPlanContractInfoRead  Permission = "PENSION_PLAN_CONTRACTINFO_READ"
-	PermissionPensionPlanMovementsRead     Permission = "PENSION_PLAN_MOVEMENTS_READ"
-	PermissionPensionPlanPortabilitiesRead Permission = "PENSION_PLAN_PORTABILITIES_READ"
-	PermissionPensionPlanWithdrawalsRead   Permission = "PENSION_PLAN_WITHDRAWALS_READ"
-	PermissionPensionPlanClaim             Permission = "PENSION_PLAN_CLAIM"
-
-	PermissionLifePensionRead              Permission = "LIFE_PENSION_READ"
-	PermissionLifePensionContractInfoRead  Permission = "LIFE_PENSION_CONTRACTINFO_READ"
-	PermissionLifePensionMovementsRead     Permission = "LIFE_PENSION_MOVEMENTS_READ"
-	PermissionLifePensionPortabilitiesRead Permission = "LIFE_PENSION_PORTABILITIES_READ"
-	PermissionLifePensionWithdrawalsRead   Permission = "LIFE_PENSION_WITHDRAWALS_READ"
-	PermissionLifePensionClaim             Permission = "LIFE_PENSION_CLAIM"
-
-	PermissionFinancialAssistanceRead             Permission = "FINANCIAL_ASSISTANCE_READ"
-	PermissionFinancialAssistanceContractInfoRead Permission = "FINANCIAL_ASSISTANCE_CONTRACTINFO_READ"
-	PermissionFinancialAssistanceMovementsRead    Permission = "FINANCIAL_ASSISTANCE_MOVEMENTS_READ"
-
-	PermissionDamagesAndPeoplePatrimonialRead           Permission = "DAMAGES_AND_PEOPLE_PATRIMONIAL_READ"
-	PermissionDamagesAndPeoplePatrimonialPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_PATRIMONIAL_POLICYINFO_READ"
-	PermissionDamagesAndPeoplePatrimonialPremiumRead    Permission = "DAMAGES_AND_PEOPLE_PATRIMONIAL_PREMIUM_READ"
-	PermissionDamagesAndPeoplePatrimonialClaimRead      Permission = "DAMAGES_AND_PEOPLE_PATRIMONIAL_CLAIM_READ"
-
-	PermissionDamagesAndPeopleResponsibilityRead           Permission = "DAMAGES_AND_PEOPLE_RESPONSIBILITY_READ"
-	PermissionDamagesAndPeopleResponsibilityPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_RESPONSIBILITY_POLICYINFO_READ"
-	PermissionDamagesAndPeopleResponsibilityPremiumRead    Permission = "DAMAGES_AND_PEOPLE_RESPONSIBILITY_PREMIUM_READ"
-	PermissionDamagesAndPeopleResponsibilityClaimRead      Permission = "DAMAGES_AND_PEOPLE_RESPONSIBILITY_CLAIM_READ"
-
-	PermissionDamagesAndPeopleTransportRead           Permission = "DAMAGES_AND_PEOPLE_TRANSPORT_READ"
-	PermissionDamagesAndPeopleTransportPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_TRANSPORT_POLICYINFO_READ"
-	PermissionDamagesAndPeopleTransportPremiumRead    Permission = "DAMAGES_AND_PEOPLE_TRANSPORT_PREMIUM_READ"
-	PermissionDamagesAndPeopleTransportClaimRead      Permission = "DAMAGES_AND_PEOPLE_TRANSPORT_CLAIM_READ"
-
-	PermissionDamagesAndPeopleFinancialRisksRead           Permission = "DAMAGES_AND_PEOPLE_FINANCIAL_RISKS_READ"
-	PermissionDamagesAndPeopleFinancialRisksPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_FINANCIAL_RISKS_POLICYINFO_READ"
-	PermissionDamagesAndPeopleFinancialRisksPremiumRead    Permission = "DAMAGES_AND_PEOPLE_FINANCIAL_RISKS_PREMIUM_READ"
-	PermissionDamagesAndPeopleFinancialRisksClaimRead      Permission = "DAMAGES_AND_PEOPLE_FINANCIAL_RISKS_CLAIM_READ"
-
-	PermissionDamagesAndPeopleRuralRead           Permission = "DAMAGES_AND_PEOPLE_RURAL_READ"
-	PermissionDamagesAndPeopleRuralPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_RURAL_POLICYINFO_READ"
-	PermissionDamagesAndPeopleRuralPremiumRead    Permission = "DAMAGES_AND_PEOPLE_RURAL_PREMIUM_READ"
-	PermissionDamagesAndPeopleRuralClaimRead      Permission = "DAMAGES_AND_PEOPLE_RURAL_CLAIM_READ"
-
-	PermissionDamagesAndPeopleAutoRead           Permission = "DAMAGES_AND_PEOPLE_AUTO_READ"
-	PermissionDamagesAndPeopleAutoPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_AUTO_POLICYINFO_READ"
-	PermissionDamagesAndPeopleAutoPremiumRead    Permission = "DAMAGES_AND_PEOPLE_AUTO_PREMIUM_READ"
-	PermissionDamagesAndPeopleAutoClaimRead      Permission = "DAMAGES_AND_PEOPLE_AUTO_CLAIM_READ"
-
-	PermissionDamagesAndPeopleHousingRead           Permission = "DAMAGES_AND_PEOPLE_HOUSING_READ"
-	PermissionDamagesAndPeopleHousingPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_HOUSING_POLICYINFO_READ"
-	PermissionDamagesAndPeopleHousingPremiumRead    Permission = "DAMAGES_AND_PEOPLE_HOUSING_PREMIUM_READ"
-	PermissionDamagesAndPeopleHousingClaimRead      Permission = "DAMAGES_AND_PEOPLE_HOUSING_CLAIM_READ"
-
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadRead           Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_READ"
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_POLICYINFO_READ"
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadPremiumRead    Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_PREMIUM_READ"
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadClaimRead      Permission = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD_CLAIM_READ"
-
-	PermissionDamagesAndPeoplePersonRead           Permission = "DAMAGES_AND_PEOPLE_PERSON_READ"
-	PermissionDamagesAndPeoplePersonPolicyInfoRead Permission = "DAMAGES_AND_PEOPLE_PERSON_POLICYINFO_READ"
-	PermissionDamagesAndPeoplePersonPremiumRead    Permission = "DAMAGES_AND_PEOPLE_PERSON_PREMIUM_READ"
-	PermissionDamagesAndPeoplePersonClaimRead      Permission = "DAMAGES_AND_PEOPLE_PERSON_CLAIM_READ"
-
-	PermissionClaimNotificationRequestDamageCreate Permission = "CLAIM_NOTIFICATION_REQUEST_DAMAGE_CREATE"
-
-	PermissionClaimNotificationRequestPersonCreate Permission = "CLAIM_NOTIFICATION_REQUEST_PERSON_CREATE"
-
-	PermissionEndorsementRequestCreate Permission = "ENDORSEMENT_REQUEST_CREATE"
-
-	PermissionQuotePatrimonialLeadCreate Permission = "QUOTE_PATRIMONIAL_LEAD_CREATE"
-	PermissionQuotePatrimonialLeadUpdate Permission = "QUOTE_PATRIMONIAL_LEAD_UPDATE"
-
-	PermissionQuotePatrimonialHomeRead   Permission = "QUOTE_PATRIMONIAL_HOME_READ"
-	PermissionQuotePatrimonialHomeCreate Permission = "QUOTE_PATRIMONIAL_HOME_CREATE"
-	PermissionQuotePatrimonialHomeUpdate Permission = "QUOTE_PATRIMONIAL_HOME_UPDATE"
-
-	PermissionQuotePatrimonialCondominiumRead   Permission = "QUOTE_PATRIMONIAL_CONDOMINIUM_READ"
-	PermissionQuotePatrimonialCondominiumCreate Permission = "QUOTE_PATRIMONIAL_CONDOMINIUM_CREATE"
-	PermissionQuotePatrimonialCondominiumUpdate Permission = "QUOTE_PATRIMONIAL_CONDOMINIUM_UPDATE"
-
-	PermissionQuotePatrimonialBusinessRead   Permission = "QUOTE_PATRIMONIAL_BUSINESS_READ"
-	PermissionQuotePatrimonialBusinessCreate Permission = "QUOTE_PATRIMONIAL_BUSINESS_CREATE"
-	PermissionQuotePatrimonialBusinessUpdate Permission = "QUOTE_PATRIMONIAL_BUSINESS_UPDATE"
-
-	PermissionQuotePatrimonialDiverseRisksRead   Permission = "QUOTE_PATRIMONIAL_DIVERSE_RISKS_READ"
-	PermissionQuotePatrimonialDiverseRisksCreate Permission = "QUOTE_PATRIMONIAL_DIVERSE_RISKS_CREATE"
-	PermissionQuotePatrimonialDiverseRisksUpdate Permission = "QUOTE_PATRIMONIAL_DIVERSE_RISKS_UPDATE"
-
-	PermissionQuoteAcceptanceAndBranchesAbroadLeadCreate Permission = "QUOTE_ACCEPTANCE_AND_BRANCHES_ABROAD_LEAD_CREATE"
-	PermissionQuoteAcceptanceAndBranchesAbroadLeadUpdate Permission = "QUOTE_ACCEPTANCE_AND_BRANCHES_ABROAD_LEAD_UPDATE"
-
-	PermissionQuoteAutoLeadCreate Permission = "QUOTE_AUTO_LEAD_CREATE"
-	PermissionQuoteAutoLeadUpdate Permission = "QUOTE_AUTO_LEAD_UPDATE"
-
-	PermissionQuoteAutoRead   Permission = "QUOTE_AUTO_READ"
-	PermissionQuoteAutoCreate Permission = "QUOTE_AUTO_CREATE"
-	PermissionQuoteAutoUpdate Permission = "QUOTE_AUTO_UPDATE"
-
-	PermissionQuoteFinancialRiskLeadCreate Permission = "QUOTE_FINANCIAL_RISK_LEAD_CREATE"
-	PermissionQuoteFinancialRiskLeadUpdate Permission = "QUOTE_FINANCIAL_RISK_LEAD_UPDATE"
-
-	PermissionQuoteHousingLeadCreate Permission = "QUOTE_HOUSING_LEAD_CREATE"
-	PermissionQuoteHousingLeadUpdate Permission = "QUOTE_HOUSING_LEAD_UPDATE"
-
-	PermissionQuoteResponsibilityLeadCreate Permission = "QUOTE_RESPONSIBILITY_LEAD_CREATE"
-	PermissionQuoteResponsibilityLeadUpdate Permission = "QUOTE_RESPONSIBILITY_LEAD_UPDATE"
-
-	PermissionQuoteRuralLeadCreate Permission = "QUOTE_RURAL_LEAD_CREATE"
-	PermissionQuoteRuralLeadUpdate Permission = "QUOTE_RURAL_LEAD_UPDATE"
-
-	PermissionQuoteTransportLeadCreate Permission = "QUOTE_TRANSPORT_LEAD_CREATE"
-	PermissionQuoteTransportLeadUpdate Permission = "QUOTE_TRANSPORT_LEAD_UPDATE"
-
-	PermissionQuotePersonLeadCreate Permission = "QUOTE_PERSON_LEAD_CREATE"
-	PermissionQuotePersonLeadUpdate Permission = "QUOTE_PERSON_LEAD_UPDATE"
-
-	PermissionQuotePersonLifeRead   Permission = "QUOTE_PERSON_LIFE_READ"
-	PermissionQuotePersonLifeCreate Permission = "QUOTE_PERSON_LIFE_CREATE"
-	PermissionQuotePersonLifeUpdate Permission = "QUOTE_PERSON_LIFE_UPDATE"
-
-	PermissionQuoteTravelRead   Permission = "QUOTE_TRAVEL_READ"
-	PermissionQuoteTravelCreate Permission = "QUOTE_TRAVEL_CREATE"
-	PermissionQuoteTravelUpdate Permission = "QUOTE_TRAVEL_UPDATE"
-
-	PermissionQuoteCapitalizationTitleLeadCreate Permission = "QUOTE_CAPITALIZATION_TITLE_LEAD_CREATE"
-	PermissionQuoteCapitalizationTitleLeadUpdate Permission = "QUOTE_CAPITALIZATION_TITLE_LEAD_UPDATE"
-
-	PermissionQuoteCapitalizationTitleRead   Permission = "QUOTE_CAPITALIZATION_TITLE_READ"
-	PermissionQuoteCapitalizationTitleCreate Permission = "QUOTE_CAPITALIZATION_TITLE_CREATE"
-	PermissionQuoteCapitalizationTitleUpdate Permission = "QUOTE_CAPITALIZATION_TITLE_UPDATE"
-
-	PermissionQuoteCapitalizationTitleRaffleCreate Permission = "QUOTE_CAPITALIZATION_TITLE_RAFFLE_CREATE"
-
-	PermissionContractPensionPlanLeadCreate = "CONTRACT_PENSION_PLAN_LEAD_CREATE"
-	PermissionContractPensionPlanLeadUpdate = "CONTRACT_PENSION_PLAN_LEAD_UPDATE"
-
-	PermissionContractPensionPlanLeadPortabilityCreate = "CONTRACT_PENSION_PLAN_LEAD_PORTABILITY_CREATE"
-	PermissionContractPensionPlanLeadPortabilityUpdate = "CONTRACT_PENSION_PLAN_LEAD_PORTABILITY_UPDATE"
-
-	PermissionContractLifePensionPlanLeadCreate = "CONTRACT_LIFE_PENSION_PLAN_LEAD_CREATE"
-	PermissionContractLifePensionPlanLeadUpdate = "CONTRACT_LIFE_PENSION_PLAN_LEAD_UPDATE"
-
-	PermissionContractLifePensionPlanLeadPortabilityCreate = "CONTRACT_LIFE_PENSION_PLAN_LEAD_PORTABILITY_CREATE"
-	PermissionContractLifePensionPlanLeadPortabilityUpdate = "CONTRACT_LIFE_PENSION_PLAN_LEAD_PORTABILITY_UPDATE"
-
-	PermissionWithdrawalCreate Permission = "PENSION_WITHDRAWAL_CREATE"
-
-	PermissionCapitalizationTitleWithdrawalCreate Permission = "CAPITALIZATION_TITLE_WITHDRAWAL_CREATE"
+	"github.com/luikyv/go-open-insurance/internal/api"
 )
 
 var permissions = append(permissionsPhase2, permissionsPhase3...)
 
-var permissionsPhase2 = []Permission{
-	PermissionResourcesRead,
-	PermissionCustomersPersonalIdentificationRead,
-	PermissionCustomersPersonalQualificationRead,
-	PermissionCustomersPersonalAdditionalInfoRead,
-	PermissionCustomersBusinessIdentificationRead,
-	PermissionCustomersBusinessQualificationRead,
-	PermissionCustomersBusinessAdditionalInfoRead,
-	PermissionCapitalizationTitleRead,
-	PermissionCapitalizationTitlePlanInfoRead,
-	PermissionCapitalizationTitleEventsRead,
-	PermissionCapitalizationTitleSettlementsRead,
-	PermissionPensionPlanRead,
-	PermissionPensionPlanContractInfoRead,
-	PermissionPensionPlanMovementsRead,
-	PermissionPensionPlanPortabilitiesRead,
-	PermissionPensionPlanWithdrawalsRead,
-	PermissionPensionPlanClaim,
-	PermissionLifePensionRead,
-	PermissionLifePensionContractInfoRead,
-	PermissionLifePensionMovementsRead,
-	PermissionLifePensionPortabilitiesRead,
-	PermissionLifePensionWithdrawalsRead,
-	PermissionLifePensionClaim,
-	PermissionFinancialAssistanceRead,
-	PermissionFinancialAssistanceContractInfoRead,
-	PermissionFinancialAssistanceMovementsRead,
-	PermissionDamagesAndPeoplePatrimonialRead,
-	PermissionDamagesAndPeoplePatrimonialPolicyInfoRead,
-	PermissionDamagesAndPeoplePatrimonialPremiumRead,
-	PermissionDamagesAndPeoplePatrimonialClaimRead,
-	PermissionDamagesAndPeopleResponsibilityRead,
-	PermissionDamagesAndPeopleResponsibilityPolicyInfoRead,
-	PermissionDamagesAndPeopleResponsibilityPremiumRead,
-	PermissionDamagesAndPeopleResponsibilityClaimRead,
-	PermissionDamagesAndPeopleTransportRead,
-	PermissionDamagesAndPeopleTransportPolicyInfoRead,
-	PermissionDamagesAndPeopleTransportPremiumRead,
-	PermissionDamagesAndPeopleTransportClaimRead,
-	PermissionDamagesAndPeopleFinancialRisksRead,
-	PermissionDamagesAndPeopleFinancialRisksPolicyInfoRead,
-	PermissionDamagesAndPeopleFinancialRisksPremiumRead,
-	PermissionDamagesAndPeopleFinancialRisksClaimRead,
-	PermissionDamagesAndPeopleRuralRead,
-	PermissionDamagesAndPeopleRuralPolicyInfoRead,
-	PermissionDamagesAndPeopleRuralPremiumRead,
-	PermissionDamagesAndPeopleRuralClaimRead,
-	PermissionDamagesAndPeopleAutoRead,
-	PermissionDamagesAndPeopleAutoPolicyInfoRead,
-	PermissionDamagesAndPeopleAutoPremiumRead,
-	PermissionDamagesAndPeopleAutoClaimRead,
-	PermissionDamagesAndPeopleHousingRead,
-	PermissionDamagesAndPeopleHousingPolicyInfoRead,
-	PermissionDamagesAndPeopleHousingPremiumRead,
-	PermissionDamagesAndPeopleHousingClaimRead,
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadRead,
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadPolicyInfoRead,
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadPremiumRead,
-	PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadClaimRead,
-	PermissionDamagesAndPeoplePersonRead,
-	PermissionDamagesAndPeoplePersonPolicyInfoRead,
-	PermissionDamagesAndPeoplePersonPremiumRead,
-	PermissionDamagesAndPeoplePersonClaimRead,
+var permissionsPhase2 = []api.ConsentPermission{
+	api.ConsentPermissionRESOURCESREAD,
+	api.ConsentPermissionCUSTOMERSPERSONALIDENTIFICATIONSREAD,
+	api.ConsentPermissionCUSTOMERSPERSONALQUALIFICATIONREAD,
+	api.ConsentPermissionCUSTOMERSPERSONALADDITIONALINFOREAD,
+	api.ConsentPermissionCUSTOMERSBUSINESSIDENTIFICATIONSREAD,
+	api.ConsentPermissionCUSTOMERSBUSINESSQUALIFICATIONREAD,
+	api.ConsentPermissionCUSTOMERSBUSINESSADDITIONALINFOREAD,
+	api.ConsentPermissionCAPITALIZATIONTITLEREAD,
+	api.ConsentPermissionCAPITALIZATIONTITLEPLANINFOREAD,
+	api.ConsentPermissionCAPITALIZATIONTITLEEVENTSREAD,
+	api.ConsentPermissionCAPITALIZATIONTITLESETTLEMENTSREAD,
+	api.ConsentPermissionPENSIONPLANREAD,
+	api.ConsentPermissionPENSIONPLANCONTRACTINFOREAD,
+	api.ConsentPermissionPENSIONPLANMOVEMENTSREAD,
+	api.ConsentPermissionPENSIONPLANPORTABILITIESREAD,
+	api.ConsentPermissionPENSIONPLANWITHDRAWALSREAD,
+	api.ConsentPermissionPENSIONPLANCLAIM,
+	api.ConsentPermissionLIFEPENSIONREAD,
+	api.ConsentPermissionLIFEPENSIONCONTRACTINFOREAD,
+	api.ConsentPermissionLIFEPENSIONMOVEMENTSREAD,
+	api.ConsentPermissionLIFEPENSIONPORTABILITIESREAD,
+	api.ConsentPermissionLIFEPENSIONWITHDRAWALSREAD,
+	api.ConsentPermissionLIFEPENSIONCLAIM,
+	api.ConsentPermissionFINANCIALASSISTANCEREAD,
+	api.ConsentPermissionFINANCIALASSISTANCECONTRACTINFOREAD,
+	api.ConsentPermissionFINANCIALASSISTANCEMOVEMENTSREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEPATRIMONIALREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEPATRIMONIALPOLICYINFOREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEPATRIMONIALPREMIUMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEPATRIMONIALCLAIMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLERESPONSIBILITYREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLERESPONSIBILITYPOLICYINFOREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLERESPONSIBILITYPREMIUMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLERESPONSIBILITYCLAIMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLETRANSPORTREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLETRANSPORTPOLICYINFOREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLETRANSPORTPREMIUMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLETRANSPORTCLAIMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEFINANCIALRISKSREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEFINANCIALRISKSPOLICYINFOREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEFINANCIALRISKSPREMIUMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEFINANCIALRISKSCLAIMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLERURALREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLERURALPOLICYINFOREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLERURALPREMIUMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLERURALCLAIMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEAUTOREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEAUTOPOLICYINFOREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEAUTOPREMIUMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEAUTOCLAIMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEHOUSINGREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEHOUSINGPOLICYINFOREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEHOUSINGPREMIUMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEHOUSINGCLAIMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEACCEPTANCEANDBRANCHESABROADREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEACCEPTANCEANDBRANCHESABROADPOLICYINFOREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEACCEPTANCEANDBRANCHESABROADPREMIUMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEACCEPTANCEANDBRANCHESABROADCLAIMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEPERSONREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEPERSONPOLICYINFOREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEPERSONPREMIUMREAD,
+	api.ConsentPermissionDAMAGESANDPEOPLEPERSONCLAIMREAD,
 }
 
-var permissionsPhase3 = []Permission{
-	PermissionClaimNotificationRequestDamageCreate,
-	PermissionClaimNotificationRequestPersonCreate,
-	PermissionEndorsementRequestCreate,
-	PermissionQuotePatrimonialLeadCreate,
-	PermissionQuotePatrimonialLeadUpdate,
-	PermissionQuotePatrimonialHomeRead,
-	PermissionQuotePatrimonialHomeCreate,
-	PermissionQuotePatrimonialHomeUpdate,
-	PermissionQuotePatrimonialCondominiumRead,
-	PermissionQuotePatrimonialCondominiumCreate,
-	PermissionQuotePatrimonialCondominiumUpdate,
-	PermissionQuotePatrimonialBusinessRead,
-	PermissionQuotePatrimonialBusinessCreate,
-	PermissionQuotePatrimonialBusinessUpdate,
-	PermissionQuotePatrimonialDiverseRisksRead,
-	PermissionQuotePatrimonialDiverseRisksCreate,
-	PermissionQuotePatrimonialDiverseRisksUpdate,
-	PermissionQuoteAcceptanceAndBranchesAbroadLeadCreate,
-	PermissionQuoteAcceptanceAndBranchesAbroadLeadUpdate,
-	PermissionQuoteAutoLeadCreate,
-	PermissionQuoteAutoLeadUpdate,
-	PermissionQuoteAutoRead,
-	PermissionQuoteAutoCreate,
-	PermissionQuoteAutoUpdate,
-	PermissionQuoteFinancialRiskLeadCreate,
-	PermissionQuoteFinancialRiskLeadUpdate,
-	PermissionQuoteHousingLeadCreate,
-	PermissionQuoteHousingLeadUpdate,
-	PermissionQuoteResponsibilityLeadCreate,
-	PermissionQuoteResponsibilityLeadUpdate,
-	PermissionQuoteRuralLeadCreate,
-	PermissionQuoteRuralLeadUpdate,
-	PermissionQuoteTransportLeadCreate,
-	PermissionQuoteTransportLeadUpdate,
-	PermissionQuotePersonLeadCreate,
-	PermissionQuotePersonLeadUpdate,
-	PermissionQuotePersonLifeRead,
-	PermissionQuotePersonLifeCreate,
-	PermissionQuotePersonLifeUpdate,
-	PermissionQuoteTravelRead,
-	PermissionQuoteTravelCreate,
-	PermissionQuoteTravelUpdate,
-	PermissionQuoteCapitalizationTitleLeadCreate,
-	PermissionQuoteCapitalizationTitleLeadUpdate,
-	PermissionQuoteCapitalizationTitleRead,
-	PermissionQuoteCapitalizationTitleCreate,
-	PermissionQuoteCapitalizationTitleUpdate,
-	PermissionQuoteCapitalizationTitleRaffleCreate,
-	PermissionContractPensionPlanLeadCreate,
-	PermissionContractPensionPlanLeadUpdate,
-	PermissionContractPensionPlanLeadPortabilityCreate,
-	PermissionContractPensionPlanLeadPortabilityUpdate,
-	PermissionContractLifePensionPlanLeadCreate,
-	PermissionContractLifePensionPlanLeadUpdate,
-	PermissionContractLifePensionPlanLeadPortabilityCreate,
-	PermissionContractLifePensionPlanLeadPortabilityUpdate,
-	PermissionWithdrawalCreate,
-	PermissionCapitalizationTitleWithdrawalCreate,
+var permissionsPhase3 = []api.ConsentPermission{
+	api.ConsentPermissionCLAIMNOTIFICATIONREQUESTDAMAGECREATE,
+	api.ConsentPermissionCLAIMNOTIFICATIONREQUESTPERSONCREATE,
+	api.ConsentPermissionENDORSEMENTREQUESTCREATE,
+	api.ConsentPermissionQUOTEPATRIMONIALLEADCREATE,
+	api.ConsentPermissionQUOTEPATRIMONIALLEADUPDATE,
+	api.ConsentPermissionQUOTEPATRIMONIALHOMEREAD,
+	api.ConsentPermissionQUOTEPATRIMONIALHOMECREATE,
+	api.ConsentPermissionQUOTEPATRIMONIALHOMEUPDATE,
+	api.ConsentPermissionQUOTEPATRIMONIALCONDOMINIUMREAD,
+	api.ConsentPermissionQUOTEPATRIMONIALCONDOMINIUMCREATE,
+	api.ConsentPermissionQUOTEPATRIMONIALCONDOMINIUMUPDATE,
+	api.ConsentPermissionQUOTEPATRIMONIALBUSINESSREAD,
+	api.ConsentPermissionQUOTEPATRIMONIALBUSINESSCREATE,
+	api.ConsentPermissionQUOTEPATRIMONIALBUSINESSUPDATE,
+	api.ConsentPermissionQUOTEPATRIMONIALDIVERSERISKSREAD,
+	api.ConsentPermissionQUOTEPATRIMONIALDIVERSERISKSCREATE,
+	api.ConsentPermissionQUOTEPATRIMONIALDIVERSERISKSUPDATE,
+	api.ConsentPermissionQUOTEACCEPTANCEANDBRANCHESABROADLEADCREATE,
+	api.ConsentPermissionQUOTEACCEPTANCEANDBRANCHESABROADLEADUPDATE,
+	api.ConsentPermissionQUOTEAUTOLEADCREATE,
+	api.ConsentPermissionQUOTEAUTOLEADUPDATE,
+	api.ConsentPermissionQUOTEAUTOREAD,
+	api.ConsentPermissionQUOTEAUTOCREATE,
+	api.ConsentPermissionQUOTEAUTOUPDATE,
+	api.ConsentPermissionQUOTEFINANCIALRISKLEADCREATE,
+	api.ConsentPermissionQUOTEFINANCIALRISKLEADUPDATE,
+	api.ConsentPermissionQUOTEHOUSINGLEADCREATE,
+	api.ConsentPermissionQUOTEHOUSINGLEADUPDATE,
+	api.ConsentPermissionQUOTERESPONSIBILITYLEADCREATE,
+	api.ConsentPermissionQUOTERESPONSIBILITYLEADUPDATE,
+	api.ConsentPermissionQUOTERURALLEADCREATE,
+	api.ConsentPermissionQUOTERURALLEADUPDATE,
+	api.ConsentPermissionQUOTETRANSPORTLEADCREATE,
+	api.ConsentPermissionQUOTETRANSPORTLEADUPDATE,
+	api.ConsentPermissionQUOTEPERSONLEADCREATE,
+	api.ConsentPermissionQUOTEPERSONLEADUPDATE,
+	api.ConsentPermissionQUOTEPERSONLIFEREAD,
+	api.ConsentPermissionQUOTEPERSONLIFECREATE,
+	api.ConsentPermissionQUOTEPERSONLIFEUPDATE,
+	api.ConsentPermissionQUOTEPERSONTRAVELREAD,
+	api.ConsentPermissionQUOTEPERSONTRAVELCREATE,
+	api.ConsentPermissionQUOTEPERSONTRAVELUPDATE,
+	api.ConsentPermissionQUOTECAPITALIZATIONTITLELEADCREATE,
+	api.ConsentPermissionQUOTECAPITALIZATIONTITLELEADUPDATE,
+	api.ConsentPermissionQUOTECAPITALIZATIONTITLEREAD,
+	api.ConsentPermissionQUOTECAPITALIZATIONTITLECREATE,
+	api.ConsentPermissionQUOTECAPITALIZATIONTITLEUPDATE,
+	api.ConsentPermissionQUOTECAPITALIZATIONTITLERAFFLECREATE,
+	api.ConsentPermissionCONTRACTPENSIONPLANLEADCREATE,
+	api.ConsentPermissionCONTRACTPENSIONPLANLEADUPDATE,
+	api.ConsentPermissionCONTRACTPENSIONPLANLEADPORTABILITYCREATE,
+	api.ConsentPermissionCONTRACTPENSIONPLANLEADPORTABILITYUPDATE,
+	api.ConsentPermissionCONTRACTLIFEPENSIONLEADCREATE,
+	api.ConsentPermissionCONTRACTLIFEPENSIONLEADUPDATE,
+	api.ConsentPermissionCONTRACTLIFEPENSIONLEADPORTABILITYCREATE,
+	api.ConsentPermissionCONTRACTLIFEPENSIONLEADPORTABILITYUPDATE,
+	api.ConsentPermissionPENSIONWITHDRAWALCREATE,
+	api.ConsentPermissionCAPITALIZATIONTITLEWITHDRAWALCREATE,
 }
 
 var (
-	permissionCategoryPersonalRegistration PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionCustomersPersonalIdentificationRead,
-		PermissionCustomersPersonalQualificationRead,
-		PermissionCustomersPersonalAdditionalInfoRead,
+	permissionCategoryPersonalRegistration PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionCUSTOMERSPERSONALIDENTIFICATIONSREAD,
+		api.ConsentPermissionCUSTOMERSPERSONALQUALIFICATIONREAD,
+		api.ConsentPermissionCUSTOMERSPERSONALADDITIONALINFOREAD,
 	}
-	permissionCategoryBusinessRegistration PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionCustomersBusinessIdentificationRead,
-		PermissionCustomersBusinessQualificationRead,
-		PermissionCustomersBusinessAdditionalInfoRead,
+	permissionCategoryBusinessRegistration PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionCUSTOMERSBUSINESSIDENTIFICATIONSREAD,
+		api.ConsentPermissionCUSTOMERSBUSINESSQUALIFICATIONREAD,
+		api.ConsentPermissionCUSTOMERSBUSINESSADDITIONALINFOREAD,
 	}
-	permissionCategoryCapitalizationTitle PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionCapitalizationTitleRead,
-		PermissionCapitalizationTitlePlanInfoRead,
-		PermissionCapitalizationTitleEventsRead,
-		PermissionCapitalizationTitleSettlementsRead,
+	permissionCategoryCapitalizationTitle PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionCAPITALIZATIONTITLEREAD,
+		api.ConsentPermissionCAPITALIZATIONTITLEPLANINFOREAD,
+		api.ConsentPermissionCAPITALIZATIONTITLEEVENTSREAD,
+		api.ConsentPermissionCAPITALIZATIONTITLESETTLEMENTSREAD,
 	}
-	permissionCategoryPensionPlan PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionPensionPlanRead,
-		PermissionPensionPlanContractInfoRead,
-		PermissionPensionPlanMovementsRead,
-		PermissionPensionPlanPortabilitiesRead,
-		PermissionPensionPlanWithdrawalsRead,
-		PermissionPensionPlanClaim,
+	permissionCategoryPensionPlan PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionPENSIONPLANREAD,
+		api.ConsentPermissionPENSIONPLANCONTRACTINFOREAD,
+		api.ConsentPermissionPENSIONPLANMOVEMENTSREAD,
+		api.ConsentPermissionPENSIONPLANPORTABILITIESREAD,
+		api.ConsentPermissionPENSIONPLANWITHDRAWALSREAD,
+		api.ConsentPermissionPENSIONPLANCLAIM,
 	}
-	permissionCategoryLifePensionPlan PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionLifePensionRead,
-		PermissionLifePensionContractInfoRead,
-		PermissionLifePensionMovementsRead,
-		PermissionLifePensionPortabilitiesRead,
-		PermissionLifePensionWithdrawalsRead,
-		PermissionLifePensionClaim,
+	permissionCategoryLifePensionPlan PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionLIFEPENSIONREAD,
+		api.ConsentPermissionLIFEPENSIONCONTRACTINFOREAD,
+		api.ConsentPermissionLIFEPENSIONMOVEMENTSREAD,
+		api.ConsentPermissionLIFEPENSIONPORTABILITIESREAD,
+		api.ConsentPermissionLIFEPENSIONWITHDRAWALSREAD,
+		api.ConsentPermissionLIFEPENSIONCLAIM,
 	}
-	permissionCategoryFinancialAssistence PermissionCategory = []Permission{
-		PermissionFinancialAssistanceRead,
-		PermissionFinancialAssistanceContractInfoRead,
-		PermissionFinancialAssistanceMovementsRead,
+	permissionCategoryFinancialAssistence PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionFINANCIALASSISTANCEREAD,
+		api.ConsentPermissionFINANCIALASSISTANCECONTRACTINFOREAD,
+		api.ConsentPermissionFINANCIALASSISTANCEMOVEMENTSREAD,
 	}
-	permissionCategoryDamagesAndPeoplePatrimonial PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionDamagesAndPeoplePatrimonialRead,
-		PermissionDamagesAndPeoplePatrimonialPolicyInfoRead,
-		PermissionDamagesAndPeoplePatrimonialPremiumRead,
-		PermissionDamagesAndPeoplePatrimonialClaimRead,
+	permissionCategoryDamagesAndPeoplePatrimonial PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEPATRIMONIALREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEPATRIMONIALPOLICYINFOREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEPATRIMONIALPREMIUMREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEPATRIMONIALCLAIMREAD,
 	}
-	permissionCategoryDamagesAndPeopleResponsibility PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionDamagesAndPeopleResponsibilityRead,
-		PermissionDamagesAndPeopleResponsibilityPolicyInfoRead,
-		PermissionDamagesAndPeopleResponsibilityPremiumRead,
-		PermissionDamagesAndPeopleResponsibilityClaimRead,
+	permissionCategoryDamagesAndPeopleResponsibility PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLERESPONSIBILITYREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLERESPONSIBILITYPOLICYINFOREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLERESPONSIBILITYPREMIUMREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLERESPONSIBILITYCLAIMREAD,
 	}
-	permissionCategoryDamagesAndPeopleTransport PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionDamagesAndPeopleTransportRead,
-		PermissionDamagesAndPeopleTransportPolicyInfoRead,
-		PermissionDamagesAndPeopleTransportPremiumRead,
-		PermissionDamagesAndPeopleTransportClaimRead,
+	permissionCategoryDamagesAndPeopleTransport PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLETRANSPORTREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLETRANSPORTPOLICYINFOREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLETRANSPORTPREMIUMREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLETRANSPORTCLAIMREAD,
 	}
-	permissionCategoryDamagesAndPeopleFinancialRisks PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionDamagesAndPeopleFinancialRisksRead,
-		PermissionDamagesAndPeopleFinancialRisksPolicyInfoRead,
-		PermissionDamagesAndPeopleFinancialRisksPremiumRead,
-		PermissionDamagesAndPeopleFinancialRisksClaimRead,
+	permissionCategoryDamagesAndPeopleFinancialRisks PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEFINANCIALRISKSREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEFINANCIALRISKSPOLICYINFOREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEFINANCIALRISKSPREMIUMREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEFINANCIALRISKSCLAIMREAD,
 	}
-	permissionCategoryDamagesAndPeopleRural PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionDamagesAndPeopleRuralRead,
-		PermissionDamagesAndPeopleRuralPolicyInfoRead,
-		PermissionDamagesAndPeopleRuralPremiumRead,
-		PermissionDamagesAndPeopleRuralClaimRead,
+	permissionCategoryDamagesAndPeopleRural PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLERURALREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLERURALPOLICYINFOREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLERURALPREMIUMREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLERURALCLAIMREAD,
 	}
-	permissionCategoryDamagesAndPeopleAuto PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionDamagesAndPeopleAutoRead,
-		PermissionDamagesAndPeopleAutoPolicyInfoRead,
-		PermissionDamagesAndPeopleAutoPremiumRead,
-		PermissionDamagesAndPeopleAutoClaimRead,
+	permissionCategoryDamagesAndPeopleAuto PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEAUTOREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEAUTOPOLICYINFOREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEAUTOPREMIUMREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEAUTOCLAIMREAD,
 	}
-	permissionCategoryDamagesAndPeopleHousing PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionDamagesAndPeopleHousingRead,
-		PermissionDamagesAndPeopleHousingPolicyInfoRead,
-		PermissionDamagesAndPeopleHousingPremiumRead,
-		PermissionDamagesAndPeopleHousingClaimRead,
+	permissionCategoryDamagesAndPeopleHousing PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEHOUSINGREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEHOUSINGPOLICYINFOREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEHOUSINGPREMIUMREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEHOUSINGCLAIMREAD,
 	}
-	permissionCategoryDamagesAndPeopleAcceptanceAndBranchesAbroad PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadRead,
-		PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadPolicyInfoRead,
-		PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadPremiumRead,
-		PermissionDamagesAndPeopleAcceptanceAndBranchesAbroadClaimRead,
+	permissionCategoryDamagesAndPeopleAcceptanceAndBranchesAbroad PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEACCEPTANCEANDBRANCHESABROADREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEACCEPTANCEANDBRANCHESABROADPOLICYINFOREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEACCEPTANCEANDBRANCHESABROADPREMIUMREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEACCEPTANCEANDBRANCHESABROADCLAIMREAD,
 	}
-	permissionCategoryDamagesAndPeoplePerson PermissionCategory = []Permission{
-		PermissionResourcesRead,
-		PermissionDamagesAndPeoplePersonRead,
-		PermissionDamagesAndPeoplePersonPolicyInfoRead,
-		PermissionDamagesAndPeoplePersonPremiumRead,
-		PermissionDamagesAndPeoplePersonClaimRead,
+	permissionCategoryDamagesAndPeoplePerson PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionRESOURCESREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEPERSONREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEPERSONPOLICYINFOREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEPERSONPREMIUMREAD,
+		api.ConsentPermissionDAMAGESANDPEOPLEPERSONCLAIMREAD,
 	}
-	permissionCategoryClaimNotificationRequestDamage PermissionCategory = []Permission{
-		PermissionClaimNotificationRequestDamageCreate,
+	permissionCategoryClaimNotificationRequestDamage PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionCLAIMNOTIFICATIONREQUESTDAMAGECREATE,
 	}
-	permissionCategoryClaimNotificationRequestPerson PermissionCategory = []Permission{
-		PermissionClaimNotificationRequestPersonCreate,
+	permissionCategoryClaimNotificationRequestPerson PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionCLAIMNOTIFICATIONREQUESTPERSONCREATE,
 	}
-	permissionCategoryEndorsementRequest PermissionCategory = []Permission{
-		PermissionEndorsementRequestCreate,
+	permissionCategoryEndorsementRequest PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionENDORSEMENTREQUESTCREATE,
 	}
-	permissionCategoryQuotePatrimonialLead PermissionCategory = []Permission{
-		PermissionQuotePatrimonialLeadCreate,
-		PermissionQuotePatrimonialLeadUpdate,
+	permissionCategoryQuotePatrimonialLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEPATRIMONIALLEADCREATE,
+		api.ConsentPermissionQUOTEPATRIMONIALLEADUPDATE,
 	}
-	permissionCategoryQuotePatrimonialHome PermissionCategory = []Permission{
-		PermissionQuotePatrimonialHomeRead,
-		PermissionQuotePatrimonialHomeCreate,
-		PermissionQuotePatrimonialHomeUpdate,
+	permissionCategoryQuotePatrimonialHome PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEPATRIMONIALHOMEREAD,
+		api.ConsentPermissionQUOTEPATRIMONIALHOMECREATE,
+		api.ConsentPermissionQUOTEPATRIMONIALHOMEUPDATE,
 	}
-	permissionCategoryQuotePatrimonialCondominium PermissionCategory = []Permission{
-		PermissionQuotePatrimonialCondominiumRead,
-		PermissionQuotePatrimonialCondominiumCreate,
-		PermissionQuotePatrimonialCondominiumUpdate,
+	permissionCategoryQuotePatrimonialCondominium PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEPATRIMONIALCONDOMINIUMREAD,
+		api.ConsentPermissionQUOTEPATRIMONIALCONDOMINIUMCREATE,
+		api.ConsentPermissionQUOTEPATRIMONIALCONDOMINIUMUPDATE,
 	}
-	permissionCategoryQuotePatrimonialBusiness PermissionCategory = []Permission{
-		PermissionQuotePatrimonialBusinessRead,
-		PermissionQuotePatrimonialBusinessCreate,
-		PermissionQuotePatrimonialBusinessUpdate,
+	permissionCategoryQuotePatrimonialBusiness PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEPATRIMONIALBUSINESSREAD,
+		api.ConsentPermissionQUOTEPATRIMONIALBUSINESSCREATE,
+		api.ConsentPermissionQUOTEPATRIMONIALBUSINESSUPDATE,
 	}
-	permissionCategoryQuotePatrimonialDiverseRisks PermissionCategory = []Permission{
-		PermissionQuotePatrimonialDiverseRisksRead,
-		PermissionQuotePatrimonialDiverseRisksCreate,
-		PermissionQuotePatrimonialDiverseRisksUpdate,
+	permissionCategoryQuotePatrimonialDiverseRisks PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEPATRIMONIALDIVERSERISKSREAD,
+		api.ConsentPermissionQUOTEPATRIMONIALDIVERSERISKSCREATE,
+		api.ConsentPermissionQUOTEPATRIMONIALDIVERSERISKSUPDATE,
 	}
-	permissionCategoryQuoteAcceptanceAndBranchesAbroadLead PermissionCategory = []Permission{
-		PermissionQuoteAcceptanceAndBranchesAbroadLeadCreate,
-		PermissionQuoteAcceptanceAndBranchesAbroadLeadUpdate,
+	permissionCategoryQuoteAcceptanceAndBranchesAbroadLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEACCEPTANCEANDBRANCHESABROADLEADCREATE,
+		api.ConsentPermissionQUOTEACCEPTANCEANDBRANCHESABROADLEADUPDATE,
 	}
-	permissionCategoryQuoteAutoLead PermissionCategory = []Permission{
-		PermissionQuoteAutoCreate,
-		PermissionQuoteAutoUpdate,
+	permissionCategoryQuoteAutoLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEAUTOCREATE,
+		api.ConsentPermissionQUOTEAUTOUPDATE,
 	}
-	permissionCategoryQuoteAuto PermissionCategory = []Permission{
-		PermissionQuoteAutoRead,
-		PermissionQuoteAutoCreate,
-		PermissionQuoteAutoUpdate,
+	permissionCategoryQuoteAuto PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEAUTOREAD,
+		api.ConsentPermissionQUOTEAUTOCREATE,
+		api.ConsentPermissionQUOTEAUTOUPDATE,
 	}
-	permissionCategoryQuoteFinancialRiskLead PermissionCategory = []Permission{
-		PermissionQuoteFinancialRiskLeadCreate,
-		PermissionQuoteFinancialRiskLeadUpdate,
+	permissionCategoryQuoteFinancialRiskLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEFINANCIALRISKLEADCREATE,
+		api.ConsentPermissionQUOTEFINANCIALRISKLEADUPDATE,
 	}
-	permissionCategoryQuoteHousingLead PermissionCategory = []Permission{
-		PermissionQuoteHousingLeadCreate,
-		PermissionQuoteHousingLeadUpdate,
+	permissionCategoryQuoteHousingLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEHOUSINGLEADCREATE,
+		api.ConsentPermissionQUOTEHOUSINGLEADUPDATE,
 	}
-	permissionCategoryQuoteResponsibilityLead PermissionCategory = []Permission{
-		PermissionQuoteResponsibilityLeadCreate,
-		PermissionQuoteResponsibilityLeadUpdate,
+	permissionCategoryQuoteResponsibilityLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTERESPONSIBILITYLEADCREATE,
+		api.ConsentPermissionQUOTERESPONSIBILITYLEADUPDATE,
 	}
-	permissionCategoryQuoteRuralLead PermissionCategory = []Permission{
-		PermissionQuoteRuralLeadCreate,
-		PermissionQuoteRuralLeadUpdate,
+	permissionCategoryQuoteRuralLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTERURALLEADCREATE,
+		api.ConsentPermissionQUOTERURALLEADUPDATE,
 	}
-	permissionCategoryQuoteTransportLead PermissionCategory = []Permission{
-		PermissionQuoteTransportLeadCreate,
-		PermissionQuoteTransportLeadUpdate,
+	permissionCategoryQuoteTransportLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTETRANSPORTLEADCREATE,
+		api.ConsentPermissionQUOTETRANSPORTLEADUPDATE,
 	}
-	permissionCategoryQuotePersonLead PermissionCategory = []Permission{
-		PermissionQuotePersonLeadCreate,
-		PermissionQuotePersonLeadUpdate,
+	permissionCategoryQuotePersonLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEPERSONLEADCREATE,
+		api.ConsentPermissionQUOTEPERSONLEADUPDATE,
 	}
-	permissionCategoryQuotePersonLifeAuto PermissionCategory = []Permission{
-		PermissionQuotePersonLifeRead,
-		PermissionQuotePersonLifeCreate,
-		PermissionQuotePersonLifeUpdate,
+	permissionCategoryQuotePersonLifeAuto PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEPERSONLIFEREAD,
+		api.ConsentPermissionQUOTEPERSONLIFECREATE,
+		api.ConsentPermissionQUOTEPERSONLIFEUPDATE,
 	}
-	permissionCategoryQuoteTravelAuto PermissionCategory = []Permission{
-		PermissionQuoteTravelRead,
-		PermissionQuoteTravelCreate,
-		PermissionQuoteTravelUpdate,
+	permissionCategoryQuoteTravelAuto PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTEPERSONTRAVELREAD,
+		api.ConsentPermissionQUOTEPERSONTRAVELCREATE,
+		api.ConsentPermissionQUOTEPERSONTRAVELUPDATE,
 	}
-	permissionCategoryQuoteCapitalizationTitleLead PermissionCategory = []Permission{
-		PermissionQuoteCapitalizationTitleLeadCreate,
-		PermissionQuoteCapitalizationTitleLeadUpdate,
+	permissionCategoryQuoteCapitalizationTitleLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTECAPITALIZATIONTITLELEADCREATE,
+		api.ConsentPermissionQUOTECAPITALIZATIONTITLELEADUPDATE,
 	}
-	permissionCategoryQuoteCapitalizationTitle PermissionCategory = []Permission{
-		PermissionQuoteCapitalizationTitleRead,
-		PermissionQuoteCapitalizationTitleCreate,
-		PermissionQuoteCapitalizationTitleUpdate,
+	permissionCategoryQuoteCapitalizationTitle PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTECAPITALIZATIONTITLEREAD,
+		api.ConsentPermissionQUOTECAPITALIZATIONTITLECREATE,
+		api.ConsentPermissionQUOTECAPITALIZATIONTITLEUPDATE,
 	}
-	permissionCategoryQuoteCapitalizationTitleRaffle PermissionCategory = []Permission{
-		PermissionQuoteCapitalizationTitleRaffleCreate,
+	permissionCategoryQuoteCapitalizationTitleRaffle PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionQUOTECAPITALIZATIONTITLERAFFLECREATE,
 	}
-	permissionCategoryContractPensionPlanLead PermissionCategory = []Permission{
-		PermissionContractPensionPlanLeadCreate,
-		PermissionContractPensionPlanLeadUpdate,
+	permissionCategoryContractPensionPlanLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionCONTRACTPENSIONPLANLEADCREATE,
+		api.ConsentPermissionCONTRACTPENSIONPLANLEADUPDATE,
 	}
-	permissionCategoryContractPensionPlanLeadPortability PermissionCategory = []Permission{
-		PermissionContractPensionPlanLeadPortabilityCreate,
-		PermissionContractPensionPlanLeadPortabilityUpdate,
+	permissionCategoryContractPensionPlanLeadPortability PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionCONTRACTPENSIONPLANLEADPORTABILITYCREATE,
+		api.ConsentPermissionCONTRACTPENSIONPLANLEADPORTABILITYUPDATE,
 	}
-	permissionCategoryContractLifePensionPlanLead PermissionCategory = []Permission{
-		PermissionContractLifePensionPlanLeadCreate,
-		PermissionContractLifePensionPlanLeadUpdate,
+	permissionCategoryContractLifePensionPlanLead PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionCONTRACTLIFEPENSIONLEADPORTABILITYCREATE,
+		api.ConsentPermissionCONTRACTLIFEPENSIONLEADUPDATE,
 	}
-	permissionCategoryContractLifePensionPlanLeadPortability PermissionCategory = []Permission{
-		PermissionContractLifePensionPlanLeadPortabilityCreate,
-		PermissionContractLifePensionPlanLeadPortabilityUpdate,
+	permissionCategoryContractLifePensionPlanLeadPortability PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionCONTRACTLIFEPENSIONLEADPORTABILITYCREATE,
+		api.ConsentPermissionCONTRACTLIFEPENSIONLEADPORTABILITYUPDATE,
 	}
-	permissionCategoryWithdrawal PermissionCategory = []Permission{
-		PermissionWithdrawalCreate,
+	permissionCategoryPensionWithdrawal PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionPENSIONWITHDRAWALCREATE,
 	}
-	permissionCategoryCapitalizationTitleWithdrawalWithdrawal PermissionCategory = []Permission{
-		PermissionCapitalizationTitleWithdrawalCreate,
+	permissionCategoryCapitalizationTitleWithdrawalWithdrawal PermissionCategory = []api.ConsentPermission{
+		api.ConsentPermissionCAPITALIZATIONTITLEWITHDRAWALCREATE,
 	}
 )
 
@@ -560,14 +398,12 @@ var permissionCategories = []PermissionCategory{
 	permissionCategoryContractPensionPlanLeadPortability,
 	permissionCategoryContractLifePensionPlanLead,
 	permissionCategoryContractLifePensionPlanLeadPortability,
-	permissionCategoryWithdrawal,
+	permissionCategoryPensionWithdrawal,
 	permissionCategoryCapitalizationTitleWithdrawalWithdrawal,
 }
 
-type Permission string
+type PermissionCategory []api.ConsentPermission
 
-type PermissionCategory []Permission
-
-func (pc PermissionCategory) contains(p Permission) bool {
+func (pc PermissionCategory) contains(p api.ConsentPermission) bool {
 	return slices.Contains(pc, p)
 }

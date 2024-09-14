@@ -1,0 +1,12 @@
+overlay: 1.0.0
+info:
+  title: "test"
+  version: 1.0.0
+
+actions:
+- target: "$.components.schemas..*[?(@.format == 'date-time')]"
+  description: Perform a structural overlay, which can be more readable, as it's clear what the shape of the document is
+  update:
+    x-go-type: DateTime
+    # x-go-type-import:
+      # path: github.com/luikyv/go-open-insurance/api
