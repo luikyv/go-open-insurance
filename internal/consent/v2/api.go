@@ -50,7 +50,7 @@ func (s Server) DeleteConsentV2(
 		ctx,
 		request.ConsentId,
 		consent.RejectionInfo{
-			RejectedBy: api.ConsentRejectedByTPP,
+			RejectedBy: api.ConsentRejectedByUSER,
 			Reason:     api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREVOKED,
 		}); err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func newConsent(ctx context.Context, req api.CreateConsentRequestV2) consent.Con
 
 func newResponse(consent consent.Consent, baseURL string) api.ConsentResponseV2 {
 
-	data := api.ConsentResponseDataV2{
+	data := api.ConsentDataV2{
 		ConsentId:            consent.ID,
 		Status:               consent.Status,
 		Permissions:          consent.Permissions,

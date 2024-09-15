@@ -6,4 +6,5 @@ const (
 	CtxKeyCorrelationID ContextKey = "correlation_id"
 	CtxKeyClientID      ContextKey = "client_id"
 	CtxKeySubject       ContextKey = "sub"
+	CtxKeyConsentID     ContextKey = "consent_id"
 )

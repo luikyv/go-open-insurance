@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +15,7 @@ import (
 	"github.com/go-jose/go-jose/v4"
 	"github.com/luikyv/go-oidc/pkg/goidc"
 	"github.com/luikyv/go-oidc/pkg/provider"
+	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/authn"
 	"github.com/luikyv/go-open-insurance/internal/consent"
 	"github.com/luikyv/go-open-insurance/internal/oidc"
@@ -52,13 +55,13 @@ func openidProvider(
 		provider.WithDPoP(jose.PS256, jose.ES256),
 		provider.WithPKCE(goidc.CodeChallengeMethodSHA256),
 		provider.WithRefreshTokenGrant(),
-		provider.WithShouldIssueRefreshTokenFunc(shouldIssueRefreshToken),
+		provider.WithShouldIssueRefreshTokenFunc(shoudIssueRefreshTokenFunc()),
 		provider.WithACRs(oidc.ACROpenInsuranceLOA2, oidc.ACROpenInsuranceLOA3),
-		provider.WithDCR(dcrFunc()),
 		provider.WithTokenOptions(tokenOptionFunc(ps256ServerKeyID)),
 		provider.WithUserInfoEncryption(jose.RSA_OAEP_256),
 		provider.WithStaticClient(client("client_one")),
 		provider.WithStaticClient(client("client_two")),
+		provider.WithHandleGrantFunc(handleGrantFunc(consentService)),
 		provider.WithPolicy(goidc.NewPolicy(
 			"policy",
 			func(r *http.Request, c *goidc.Client, as *goidc.AuthnSession) bool {
@@ -69,20 +72,43 @@ func openidProvider(
 	)
 }
 
-func dcrFunc() goidc.HandleDynamicClientFunc {
-	var scopes []string
-	for _, scope := range oidc.Scopes {
-		scopes = append(scopes, scope.ID)
-	}
-	scopeStr := strings.Join(scopes, " ")
-	return func(r *http.Request, c *goidc.ClientMetaInfo) error {
-		c.ScopeIDs = scopeStr
+func handleGrantFunc(consentService consent.Service) goidc.HandleGrantFunc {
+	return func(r *http.Request, gi *goidc.GrantInfo) error {
+		consentID, ok := ExtractConsentID(gi.ActiveScopes)
+		if !ok {
+			return nil
+		}
+
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, api.CtxKeyClientID, gi.ClientID)
+		consent, err := consentService.Get(ctx, consentID)
+		if err != nil {
+			return err
+		}
+
+		if consent.Status != api.ConsentStatusAUTHORISED {
+			return errors.New("consent is not authorized")
+		}
+
 		return nil
 	}
 }
 
-func shouldIssueRefreshToken(client *goidc.Client, grantInfo goidc.GrantInfo) bool {
-	return slices.Contains(client.GrantTypes, goidc.GrantRefreshToken)
+func ExtractConsentID(scopes string) (string, bool) {
+	scopeSlice := strings.Split(scopes, " ")
+	for _, scope := range scopeSlice {
+		if oidc.ScopeConsent.Matches(scope) {
+			return strings.Replace(scope, "consent:", "", 1), true
+		}
+	}
+
+	return "", false
+}
+
+func shoudIssueRefreshTokenFunc() goidc.ShouldIssueRefreshTokenFunc {
+	return func(client *goidc.Client, grantInfo goidc.GrantInfo) bool {
+		return slices.Contains(client.GrantTypes, goidc.GrantRefreshToken)
+	}
 }
 
 func tokenOptionFunc(keyID string) goidc.TokenOptionsFunc {

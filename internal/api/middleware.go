@@ -91,21 +91,44 @@ func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
 		) {
 			scopes := requiredScopes(operationID)
 			if len(scopes) == 0 {
+				Logger(ctx).Debug("no scopes are required for the request")
 				return f(ctx, w, r, request)
 			}
 
 			tokenInfo := op.TokenInfo(w, r)
 			if !tokenInfo.IsActive {
+				Logger(ctx).Debug("the token is not active")
 				return nil, errInvalidToken
 			}
 
 			tokenScopes := strings.Split(tokenInfo.Scopes, " ")
 			if !areScopesValid(scopes, tokenScopes) {
+				Logger(ctx).Debug("invalid scopes",
+					slog.String("token_scopes", tokenInfo.Scopes))
 				return nil, errTokenMissingScopes
 			}
 
 			ctx = context.WithValue(ctx, CtxKeyClientID, tokenInfo.ClientID)
 			ctx = context.WithValue(ctx, CtxKeySubject, tokenInfo.Subject)
+			return f(ctx, w, r, request)
+		}
+	}
+}
+
+func AuthPermissionMiddleware(op provider.Provider) StrictMiddlewareFunc {
+	return func(
+		f nethttp.StrictHTTPHandlerFunc,
+		operationID string,
+	) nethttp.StrictHTTPHandlerFunc {
+		return func(
+			ctx context.Context,
+			w http.ResponseWriter,
+			r *http.Request,
+			request interface{},
+		) (
+			response interface{},
+			err error,
+		) {
 			return f(ctx, w, r, request)
 		}
 	}
@@ -158,12 +181,10 @@ func newResponseError(err opinerr.Error) ResponseError {
 
 func requiredScopes(operationID string) []goidc.Scope {
 	switch operationID {
-	case "CreateConsentV2":
+	case "CreateConsentV2", "ConsentV2", "DeleteConsentV2":
 		return []goidc.Scope{oidc.ScopeConsents}
-	case "ConsentV2":
-		return []goidc.Scope{oidc.ScopeConsents}
-	case "DeleteConsentV2":
-		return []goidc.Scope{oidc.ScopeConsents}
+	case "PersonalIdentificationsV1":
+		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeCustomers, oidc.ScopeConsent} // TODO: Add customers.
 	default:
 		return nil
 	}

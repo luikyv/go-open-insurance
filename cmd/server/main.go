@@ -9,6 +9,7 @@ import (
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/consent"
 	consentv2 "github.com/luikyv/go-open-insurance/internal/consent/v2"
+	customersv1 "github.com/luikyv/go-open-insurance/internal/customer/v1"
 	"github.com/luikyv/go-open-insurance/internal/user"
 	nethttpmiddleware "github.com/oapi-codegen/nethttp-middleware"
 	"github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
@@ -43,6 +44,7 @@ func main() {
 	// Services.
 	userService := user.NewService(userStorage)
 	consentService := consent.NewService(userService, consentStorage)
+	customerServiceV1 := customersv1.NewService()
 
 	// Provider.
 	op, err := openidProvider(db, userService, consentService,
@@ -52,9 +54,9 @@ func main() {
 	}
 
 	// Server.
-	consentV2Server := consentv2.NewServer(baseURLOPIN, consentService)
 	server := opinServer{
-		Server: consentV2Server,
+		consentV2Server:  consentv2.NewServer(baseURLOPIN, consentService),
+		customerV1Server: customersv1.NewServer(baseURLOPIN, customerServiceV1),
 	}
 	strictHandler := api.NewStrictHandlerWithOptions(
 		server,
@@ -88,7 +90,7 @@ func main() {
 	mux.Handle(apiPrefixOPIN+"/", opinHandler)
 
 	// Run.
-	if err := loadUsers(userService); err != nil {
+	if err := loadMocks(userService, customerServiceV1); err != nil {
 		log.Fatal(err)
 	}
 	s := &http.Server{
@@ -112,8 +114,4 @@ func dbConnection() (*mongo.Database, error) {
 		return nil, err
 	}
 	return conn.Database(databaseSchema), nil
-}
-
-type opinServer struct {
-	consentv2.Server
 }

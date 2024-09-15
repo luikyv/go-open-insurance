@@ -23,6 +23,99 @@ import (
 	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
+// Defines values for AreaCode.
+const (
+	AreaCodeN11 AreaCode = "11"
+	AreaCodeN12 AreaCode = "12"
+	AreaCodeN13 AreaCode = "13"
+	AreaCodeN14 AreaCode = "14"
+	AreaCodeN15 AreaCode = "15"
+	AreaCodeN16 AreaCode = "16"
+	AreaCodeN17 AreaCode = "17"
+	AreaCodeN18 AreaCode = "18"
+	AreaCodeN19 AreaCode = "19"
+	AreaCodeN21 AreaCode = "21"
+	AreaCodeN22 AreaCode = "22"
+	AreaCodeN24 AreaCode = "24"
+	AreaCodeN27 AreaCode = "27"
+	AreaCodeN28 AreaCode = "28"
+	AreaCodeN31 AreaCode = "31"
+	AreaCodeN32 AreaCode = "32"
+	AreaCodeN33 AreaCode = "33"
+	AreaCodeN34 AreaCode = "34"
+	AreaCodeN35 AreaCode = "35"
+	AreaCodeN37 AreaCode = "37"
+	AreaCodeN38 AreaCode = "38"
+	AreaCodeN41 AreaCode = "41"
+	AreaCodeN42 AreaCode = "42"
+	AreaCodeN43 AreaCode = "43"
+	AreaCodeN44 AreaCode = "44"
+	AreaCodeN45 AreaCode = "45"
+	AreaCodeN46 AreaCode = "46"
+	AreaCodeN47 AreaCode = "47"
+	AreaCodeN48 AreaCode = "48"
+	AreaCodeN49 AreaCode = "49"
+	AreaCodeN51 AreaCode = "51"
+	AreaCodeN53 AreaCode = "53"
+	AreaCodeN54 AreaCode = "54"
+	AreaCodeN55 AreaCode = "55"
+	AreaCodeN61 AreaCode = "61"
+	AreaCodeN62 AreaCode = "62"
+	AreaCodeN63 AreaCode = "63"
+	AreaCodeN64 AreaCode = "64"
+	AreaCodeN65 AreaCode = "65"
+	AreaCodeN66 AreaCode = "66"
+	AreaCodeN67 AreaCode = "67"
+	AreaCodeN68 AreaCode = "68"
+	AreaCodeN69 AreaCode = "69"
+	AreaCodeN71 AreaCode = "71"
+	AreaCodeN73 AreaCode = "73"
+	AreaCodeN74 AreaCode = "74"
+	AreaCodeN75 AreaCode = "75"
+	AreaCodeN77 AreaCode = "77"
+	AreaCodeN79 AreaCode = "79"
+	AreaCodeN81 AreaCode = "81"
+	AreaCodeN82 AreaCode = "82"
+	AreaCodeN83 AreaCode = "83"
+	AreaCodeN84 AreaCode = "84"
+	AreaCodeN85 AreaCode = "85"
+	AreaCodeN86 AreaCode = "86"
+	AreaCodeN87 AreaCode = "87"
+	AreaCodeN88 AreaCode = "88"
+	AreaCodeN89 AreaCode = "89"
+	AreaCodeN91 AreaCode = "91"
+	AreaCodeN92 AreaCode = "92"
+	AreaCodeN93 AreaCode = "93"
+	AreaCodeN94 AreaCode = "94"
+	AreaCodeN95 AreaCode = "95"
+	AreaCodeN96 AreaCode = "96"
+	AreaCodeN97 AreaCode = "97"
+	AreaCodeN98 AreaCode = "98"
+	AreaCodeN99 AreaCode = "99"
+	AreaCodeNA  AreaCode = "NA"
+)
+
+// Defines values for CivilStatusCode.
+const (
+	CivilStatusCodeCASADO                CivilStatusCode = "CASADO"
+	CivilStatusCodeDIVORCIADO            CivilStatusCode = "DIVORCIADO"
+	CivilStatusCodeOUTROS                CivilStatusCode = "OUTROS"
+	CivilStatusCodeSEPARADOJUDICIALMENTE CivilStatusCode = "SEPARADO_JUDICIALMENTE"
+	CivilStatusCodeSOLTEIRO              CivilStatusCode = "SOLTEIRO"
+	CivilStatusCodeUNIAOESTAVEL          CivilStatusCode = "UNIAO_ESTAVEL"
+	CivilStatusCodeVIUVO                 CivilStatusCode = "VIUVO"
+)
+
+// Defines values for ConsentDataV2ClaimNotificationInformationDocumentType.
+const (
+	ConsentDataV2ClaimNotificationInformationDocumentTypeAPOLICEFROTAAUTOMOVEL      ConsentDataV2ClaimNotificationInformationDocumentType = "APOLICE_FROTA_AUTOMOVEL"
+	ConsentDataV2ClaimNotificationInformationDocumentTypeAPOLICEINDIVIDUAL          ConsentDataV2ClaimNotificationInformationDocumentType = "APOLICE_INDIVIDUAL"
+	ConsentDataV2ClaimNotificationInformationDocumentTypeAPOLICEINDIVIDUALAUTOMOVEL ConsentDataV2ClaimNotificationInformationDocumentType = "APOLICE_INDIVIDUAL_AUTOMOVEL"
+	ConsentDataV2ClaimNotificationInformationDocumentTypeBILHETE                    ConsentDataV2ClaimNotificationInformationDocumentType = "BILHETE"
+	ConsentDataV2ClaimNotificationInformationDocumentTypeCERTIFICADO                ConsentDataV2ClaimNotificationInformationDocumentType = "CERTIFICADO"
+	ConsentDataV2ClaimNotificationInformationDocumentTypeCERTIFICADOAUTOMOVEL       ConsentDataV2ClaimNotificationInformationDocumentType = "CERTIFICADO_AUTOMOVEL"
+)
+
 // Defines values for ConsentPermission.
 const (
 	ConsentPermissionCAPITALIZATIONTITLEEVENTSREAD                             ConsentPermission = "CAPITALIZATION_TITLE_EVENTS_READ"
@@ -164,22 +257,43 @@ const (
 	ConsentRejectedReasonCodeINTERNALSECURITYREASON   ConsentRejectedReasonCode = "INTERNAL_SECURITY_REASON"
 )
 
-// Defines values for ConsentResponseDataV2ClaimNotificationInformationDocumentType.
-const (
-	ConsentResponseDataV2ClaimNotificationInformationDocumentTypeAPOLICEFROTAAUTOMOVEL      ConsentResponseDataV2ClaimNotificationInformationDocumentType = "APOLICE_FROTA_AUTOMOVEL"
-	ConsentResponseDataV2ClaimNotificationInformationDocumentTypeAPOLICEINDIVIDUAL          ConsentResponseDataV2ClaimNotificationInformationDocumentType = "APOLICE_INDIVIDUAL"
-	ConsentResponseDataV2ClaimNotificationInformationDocumentTypeAPOLICEINDIVIDUALAUTOMOVEL ConsentResponseDataV2ClaimNotificationInformationDocumentType = "APOLICE_INDIVIDUAL_AUTOMOVEL"
-	ConsentResponseDataV2ClaimNotificationInformationDocumentTypeBILHETE                    ConsentResponseDataV2ClaimNotificationInformationDocumentType = "BILHETE"
-	ConsentResponseDataV2ClaimNotificationInformationDocumentTypeCERTIFICADO                ConsentResponseDataV2ClaimNotificationInformationDocumentType = "CERTIFICADO"
-	ConsentResponseDataV2ClaimNotificationInformationDocumentTypeCERTIFICADOAUTOMOVEL       ConsentResponseDataV2ClaimNotificationInformationDocumentType = "CERTIFICADO_AUTOMOVEL"
-)
-
 // Defines values for ConsentStatus.
 const (
 	ConsentStatusAUTHORISED            ConsentStatus = "AUTHORISED"
 	ConsentStatusAWAITINGAUTHORISATION ConsentStatus = "AWAITING_AUTHORISATION"
 	ConsentStatusCONSUMED              ConsentStatus = "CONSUMED"
 	ConsentStatusREJECTED              ConsentStatus = "REJECTED"
+)
+
+// Defines values for CountrySubDivision.
+const (
+	CountrySubDivisionAC CountrySubDivision = "AC"
+	CountrySubDivisionAL CountrySubDivision = "AL"
+	CountrySubDivisionAM CountrySubDivision = "AM"
+	CountrySubDivisionAP CountrySubDivision = "AP"
+	CountrySubDivisionBA CountrySubDivision = "BA"
+	CountrySubDivisionCE CountrySubDivision = "CE"
+	CountrySubDivisionDF CountrySubDivision = "DF"
+	CountrySubDivisionES CountrySubDivision = "ES"
+	CountrySubDivisionGO CountrySubDivision = "GO"
+	CountrySubDivisionMA CountrySubDivision = "MA"
+	CountrySubDivisionMG CountrySubDivision = "MG"
+	CountrySubDivisionMS CountrySubDivision = "MS"
+	CountrySubDivisionMT CountrySubDivision = "MT"
+	CountrySubDivisionPA CountrySubDivision = "PA"
+	CountrySubDivisionPB CountrySubDivision = "PB"
+	CountrySubDivisionPE CountrySubDivision = "PE"
+	CountrySubDivisionPI CountrySubDivision = "PI"
+	CountrySubDivisionPR CountrySubDivision = "PR"
+	CountrySubDivisionRJ CountrySubDivision = "RJ"
+	CountrySubDivisionRN CountrySubDivision = "RN"
+	CountrySubDivisionRO CountrySubDivision = "RO"
+	CountrySubDivisionRR CountrySubDivision = "RR"
+	CountrySubDivisionRS CountrySubDivision = "RS"
+	CountrySubDivisionSC CountrySubDivision = "SC"
+	CountrySubDivisionSE CountrySubDivision = "SE"
+	CountrySubDivisionSP CountrySubDivision = "SP"
+	CountrySubDivisionTO CountrySubDivision = "TO"
 )
 
 // Defines values for CreateConsentRequestV2DataClaimNotificationInformationDocumentType.
@@ -200,6 +314,49 @@ const (
 	EndorsementTypeINCLUSAO     EndorsementType = "INCLUSAO"
 )
 
+// Defines values for FiliationType.
+const (
+	FiliationTypeMAE         FiliationType = "MAE"
+	FiliationTypePAI         FiliationType = "PAI"
+	FiliationTypeSEMFILIACAO FiliationType = "SEM_FILIACAO"
+)
+
+// Defines values for PersonalDocumentType.
+const (
+	PersonalDocumentTypeCNH                 PersonalDocumentType = "CNH"
+	PersonalDocumentTypeNIF                 PersonalDocumentType = "NIF"
+	PersonalDocumentTypeOUTROS              PersonalDocumentType = "OUTROS"
+	PersonalDocumentTypeRG                  PersonalDocumentType = "RG"
+	PersonalDocumentTypeRNE                 PersonalDocumentType = "RNE"
+	PersonalDocumentTypeSEMOUTROSDOCUMENTOS PersonalDocumentType = "SEM_OUTROS_DOCUMENTOS"
+)
+
+// Defines values for ProcuratorsNatureBusiness.
+const (
+	ProcuratorsNatureBusinessNAOSEAPLICA        ProcuratorsNatureBusiness = "NAO_SE_APLICA"
+	ProcuratorsNatureBusinessPROCURADOR         ProcuratorsNatureBusiness = "PROCURADOR"
+	ProcuratorsNatureBusinessREPRESENTANTELEGAL ProcuratorsNatureBusiness = "REPRESENTANTE_LEGAL"
+)
+
+// Defines values for ProcuratorsNaturePersonal.
+const (
+	ProcuratorsNaturePersonalNAOSEAPLICA        ProcuratorsNaturePersonal = "NAO_SE_APLICA"
+	ProcuratorsNaturePersonalPROCURADOR         ProcuratorsNaturePersonal = "PROCURADOR"
+	ProcuratorsNaturePersonalREPRESENTANTELEGAL ProcuratorsNaturePersonal = "REPRESENTANTE_LEGAL"
+)
+
+// Defines values for ProductServiceType.
+const (
+	ProductServiceTypeMICROSSEGUROS                   ProductServiceType = "MICROSSEGUROS"
+	ProductServiceTypePLANOSDEPREVIDENCIACOMPLEMENTAR ProductServiceType = "PLANOS_DE_PREVIDENCIA_COMPLEMENTAR"
+	ProductServiceTypeSEGUROSDEDANOS                  ProductServiceType = "SEGUROS_DE_DANOS"
+	ProductServiceTypeSEGUROSDEPESSOAS                ProductServiceType = "SEGUROS_DE_PESSOAS"
+	ProductServiceTypeTITULOSDECAPITALIZACAO          ProductServiceType = "TITULOS_DE_CAPITALIZACAO"
+)
+
+// AreaCode defines model for AreaCode.
+type AreaCode string
+
 // BusinessEntity defines model for BusinessEntity.
 type BusinessEntity struct {
 	Document struct {
@@ -207,6 +364,37 @@ type BusinessEntity struct {
 		Rel            string `json:"rel"`
 	} `json:"document"`
 }
+
+// CivilStatusCode defines model for CivilStatusCode.
+type CivilStatusCode string
+
+// ConsentDataV2 defines model for ConsentDataV2.
+type ConsentDataV2 struct {
+	ClaimNotificationInformation *struct {
+		// DocumentType Tipo de Documento Emitido.
+		DocumentType          ConsentDataV2ClaimNotificationInformationDocumentType `json:"documentType"`
+		GroupCertificateId    *string                                               `json:"groupCertificateId,omitempty"`
+		OccurrenceDate        openapi_types.Date                                    `json:"occurrenceDate"`
+		OccurrenceDescription string                                                `json:"occurrenceDescription"`
+		OccurrenceTime        *string                                               `json:"occurrenceTime,omitempty"`
+		PolicyNumber          string                                                `json:"policyNumber"`
+	} `json:"claimNotificationInformation,omitempty"`
+	ConsentId              string   `json:"consentId"`
+	CreationDateTime       DateTime `json:"creationDateTime"`
+	EndorsementInformation *struct {
+		EndorsementType    EndorsementType `json:"endorsementType"`
+		PolicyNumber       string          `json:"policyNumber"`
+		RequestDescription string          `json:"requestDescription"`
+	} `json:"endorsementInformation,omitempty"`
+	ExpirationDateTime   DateTime            `json:"expirationDateTime"`
+	Permissions          []ConsentPermission `json:"permissions"`
+	Rejection            *ConsentRejection   `json:"rejection,omitempty"`
+	Status               ConsentStatus       `json:"status"`
+	StatusUpdateDateTime DateTime            `json:"statusUpdateDateTime"`
+}
+
+// ConsentDataV2ClaimNotificationInformationDocumentType Tipo de Documento Emitido.
+type ConsentDataV2ClaimNotificationInformationDocumentType string
 
 // ConsentPermission defines model for ConsentPermission.
 type ConsentPermission string
@@ -229,43 +417,18 @@ type ConsentRejection struct {
 	RejectedBy ConsentRejectedBy     `json:"rejectedBy"`
 }
 
-// ConsentResponseDataV2 defines model for ConsentResponseDataV2.
-type ConsentResponseDataV2 struct {
-	ClaimNotificationInformation *struct {
-		// DocumentType Tipo de Documento Emitido.
-		DocumentType          ConsentResponseDataV2ClaimNotificationInformationDocumentType `json:"documentType"`
-		GroupCertificateId    *string                                                       `json:"groupCertificateId,omitempty"`
-		OccurrenceDate        openapi_types.Date                                            `json:"occurrenceDate"`
-		OccurrenceDescription string                                                        `json:"occurrenceDescription"`
-		OccurrenceTime        *string                                                       `json:"occurrenceTime,omitempty"`
-		PolicyNumber          string                                                        `json:"policyNumber"`
-	} `json:"claimNotificationInformation,omitempty"`
-	ConsentId              string   `json:"consentId"`
-	CreationDateTime       DateTime `json:"creationDateTime"`
-	EndorsementInformation *struct {
-		EndorsementType    EndorsementType `json:"endorsementType"`
-		PolicyNumber       string          `json:"policyNumber"`
-		RequestDescription string          `json:"requestDescription"`
-	} `json:"endorsementInformation,omitempty"`
-	ExpirationDateTime   DateTime            `json:"expirationDateTime"`
-	Permissions          []ConsentPermission `json:"permissions"`
-	Rejection            *ConsentRejection   `json:"rejection,omitempty"`
-	Status               ConsentStatus       `json:"status"`
-	StatusUpdateDateTime DateTime            `json:"statusUpdateDateTime"`
-}
-
-// ConsentResponseDataV2ClaimNotificationInformationDocumentType Tipo de Documento Emitido.
-type ConsentResponseDataV2ClaimNotificationInformationDocumentType string
-
 // ConsentResponseV2 defines model for ConsentResponseV2.
 type ConsentResponseV2 struct {
-	Data  ConsentResponseDataV2 `json:"data"`
-	Links *Links                `json:"links,omitempty"`
-	Meta  *Meta                 `json:"meta,omitempty"`
+	Data  ConsentDataV2 `json:"data"`
+	Links *Links        `json:"links,omitempty"`
+	Meta  *Meta         `json:"meta,omitempty"`
 }
 
 // ConsentStatus defines model for ConsentStatus.
 type ConsentStatus string
+
+// CountrySubDivision Enumeração referente a cada sigla da unidade da federação que identifica o estado ou o distrito federal, no qual o endereço está localizado. p.ex. 'AC'. São consideradas apenas as siglas para os estados brasileiros
+type CountrySubDivision string
 
 // CreateConsentRequestV2 defines model for CreateConsentRequestV2.
 type CreateConsentRequestV2 struct {
@@ -293,6 +456,19 @@ type CreateConsentRequestV2 struct {
 // CreateConsentRequestV2DataClaimNotificationInformationDocumentType defines model for CreateConsentRequestV2.Data.ClaimNotificationInformation.DocumentType.
 type CreateConsentRequestV2DataClaimNotificationInformationDocumentType string
 
+// CustomerEmail defines model for CustomerEmail.
+type CustomerEmail struct {
+	Email *string `json:"email,omitempty"`
+}
+
+// CustomerPhone defines model for CustomerPhone.
+type CustomerPhone struct {
+	AreaCode           *AreaCode `json:"areaCode,omitempty"`
+	CountryCallingCode *string   `json:"countryCallingCode,omitempty"`
+	Number             *string   `json:"number,omitempty"`
+	PhoneExtension     *string   `json:"phoneExtension,omitempty"`
+}
+
 // EndorsementType defines model for EndorsementType.
 type EndorsementType string
 
@@ -303,6 +479,9 @@ type Error struct {
 	RequestDateTime DateTime `json:"requestDateTime"`
 	Title           string   `json:"title"`
 }
+
+// FiliationType Tipo de filiação.
+type FiliationType string
 
 // Links defines model for Links.
 type Links struct {
@@ -327,6 +506,131 @@ type Meta struct {
 	TotalRecords int32 `json:"totalRecords"`
 }
 
+// OtherPersonalDocuments defines model for OtherPersonalDocuments.
+type OtherPersonalDocuments struct {
+	// Country País do(s) documento(s) estrangeiro(s) de identificação.
+	Country *string `json:"country,omitempty"`
+
+	// ExpirationDate Data de vigência do documento de registro - conforme especificação RFC-3339.
+	ExpirationDate *openapi_types.Date `json:"expirationDate,omitempty"`
+
+	// Number Numero/codigo do(s) documento(s) de identificacao. Obrigatorio desde que a participante possua a informacao
+	Number *string `json:"number,omitempty"`
+
+	// Type Tipo do(s) documento(s) estrangeiro(s) de identificação
+	Type *string `json:"type,omitempty"`
+}
+
+// PersonalContact Conjunto de informações referentes às formas para contatar o cliente.
+type PersonalContact struct {
+	// Emails Lista e-mails de contato
+	Emails *[]CustomerEmail `json:"emails,omitempty"`
+
+	// Phones Lista com telefones de contato da pessoa natural
+	Phones *[]CustomerPhone `json:"phones,omitempty"`
+
+	// PostalAddresses Lista de endereços da pessoa natural
+	PostalAddresses []PersonalPostalAddress `json:"postalAddresses"`
+}
+
+// PersonalDocumentType Tipo do(s) documento(s) de identificação.
+type PersonalDocumentType string
+
+// PersonalDocuments defines model for PersonalDocuments.
+type PersonalDocuments = []struct {
+	DocumentTypeOthers *string `json:"documentTypeOthers,omitempty"`
+
+	// ExpirationDate Data de validade do(s) documento(s) de identificação - Se aplicável.
+	ExpirationDate *openapi_types.Date `json:"expirationDate,omitempty"`
+
+	// IssueLocation Local de emissão - Se aplicável.
+	IssueLocation *string               `json:"issueLocation,omitempty"`
+	Number        *string               `json:"number,omitempty"`
+	Type          *PersonalDocumentType `json:"type,omitempty"`
+}
+
+// PersonalIdentificationDataV1 defines model for PersonalIdentificationDataV1.
+type PersonalIdentificationDataV1 struct {
+	BirthDate             *openapi_types.Date `json:"birthDate,omitempty"`
+	BrandName             string              `json:"brandName"`
+	CivilName             string              `json:"civilName"`
+	CivilStatusCode       *CivilStatusCode    `json:"civilStatusCode,omitempty"`
+	CivilStatusCodeOthers *string             `json:"civilStatusCodeOthers,omitempty"`
+	CompanyInfo           struct {
+		CnpjNumber string `json:"cnpjNumber"`
+		Name       string `json:"name"`
+	} `json:"companyInfo"`
+
+	// Contact Conjunto de informações referentes às formas para contatar o cliente.
+	Contact   PersonalContact    `json:"contact"`
+	CpfNumber string             `json:"cpfNumber"`
+	Documents *PersonalDocuments `json:"documents,omitempty"`
+	Filiation *struct {
+		// CivilName Nome civil completo da pessoa relativa à filiação.
+		// (Direito fundamental da pessoa, o nome civil é aquele atribuído à pessoa natural desde o registro de seu nascimento,
+		// com o qual será identificada por toda a sua vida, bem como após a sua morte).
+		CivilName *string `json:"civilName,omitempty"`
+
+		// Type Tipo de filiação.
+		Type *FiliationType `json:"type,omitempty"`
+	} `json:"filiation,omitempty"`
+	HasBrazilianNationality *bool `json:"hasBrazilianNationality"`
+
+	// IdentificationDetails Informações referente ao cônjuge.
+	IdentificationDetails *struct {
+		// CivilName Nome civil completo da pessoa natural (Direito fundamental da pessoa, o nome civil é aquele atribuído à pessoa natural desde o registro de seu nascimento, com o qual será identificada por toda a sua vida, bem como após a sua morte)
+		CivilName *string `json:"civilName,omitempty"`
+
+		// CpfNumber Número completo do CPF. Atributo que corresponde às informações mínimas exigidas pela Regulamentação em vigor. O CPF é o Cadastro de Pessoa natural.  Ele é um documento feito pela Receita Federal e serve para identificar os contribuintes. O CPF é uma numeração com 11 dígitos, que só mudam por decisão judicial. O documento é emitido pela receita federal
+		// Condicional a seleção de true em hasBrazilianNationality
+		CpfNumber *string `json:"cpfNumber,omitempty"`
+	} `json:"identificationDetails,omitempty"`
+	OtherDocuments         *OtherPersonalDocuments `json:"otherDocuments,omitempty"`
+	OtherNationalitiesInfo *string                 `json:"otherNationalitiesInfo,omitempty"`
+	PersonalId             *string                 `json:"personalId,omitempty"`
+	Sex                    *string                 `json:"sex,omitempty"`
+	SocialName             *string                 `json:"socialName,omitempty"`
+	UpdateDateTime         DateTime                `json:"updateDateTime"`
+}
+
+// PersonalIdentificationResponseV1 defines model for PersonalIdentificationResponseV1.
+type PersonalIdentificationResponseV1 struct {
+	Data  []PersonalIdentificationDataV1 `json:"data"`
+	Links Links                          `json:"links"`
+	Meta  Meta                           `json:"meta"`
+}
+
+// PersonalPostalAddress defines model for PersonalPostalAddress.
+type PersonalPostalAddress struct {
+	// AdditionalInfo Alguns logradouros ainda necessitam ser especificados por meio de complemento.
+	AdditionalInfo *string `json:"additionalInfo,omitempty"`
+	Address        string  `json:"address"`
+
+	// Country Código do pais de acordo com o código “alpha3” do ISO-3166.
+	Country string `json:"country"`
+
+	// CountrySubDivision Enumeração referente a cada sigla da unidade da federação que identifica o estado ou o distrito federal, no qual o endereço está localizado. p.ex. 'AC'. São consideradas apenas as siglas para os estados brasileiros
+	CountrySubDivision CountrySubDivision `json:"countrySubDivision"`
+
+	// DistrictName Bairro é uma comunidade ou região localizada em uma cidade ou município de acordo com as suas subdivisões geográficas.
+	DistrictName *string `json:"districtName,omitempty"`
+
+	// PostCode Código de Endereçamento Postal: Composto por um conjunto numérico de oito dígitos, o objetivo principal do CEP é orientar e acelerar o encaminhamento, o tratamento e a entrega de objetos postados nos Correios, por meio da sua atribuição a localidades, logradouros, unidades dos Correios, serviços, órgãos públicos, empresas e edifícios. p.ex. '01311000'.
+	PostCode string `json:"postCode"`
+
+	// TownName Localidade: O nome da localidade corresponde à designação da cidade ou município no qual o endereço está localizado.
+	TownName string `json:"townName"`
+}
+
+// ProcuratorsNatureBusiness Natureza dos poderes vigentes de representante
+type ProcuratorsNatureBusiness string
+
+// ProcuratorsNaturePersonal Natureza dos poderes vigentes de representante
+type ProcuratorsNaturePersonal string
+
+// ProductServiceType Tipos de produtos.
+type ProductServiceType string
+
 // ResponseError defines model for ResponseError.
 type ResponseError struct {
 	Errors []Error `json:"errors"`
@@ -350,6 +654,9 @@ type ServerInterface interface {
 
 	// (GET /consents/v2/consents/{consentId})
 	ConsentV2(w http.ResponseWriter, r *http.Request, consentId ConsentId)
+
+	// (GET /customers/v1/personal/identifications)
+	PersonalIdentificationsV1(w http.ResponseWriter, r *http.Request)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -416,6 +723,20 @@ func (siw *ServerInterfaceWrapper) ConsentV2(w http.ResponseWriter, r *http.Requ
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ConsentV2(w, r, consentId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PersonalIdentificationsV1 operation middleware
+func (siw *ServerInterfaceWrapper) PersonalIdentificationsV1(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PersonalIdentificationsV1(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -542,6 +863,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("POST "+options.BaseURL+"/consents/v2/consents", wrapper.CreateConsentV2)
 	m.HandleFunc("DELETE "+options.BaseURL+"/consents/v2/consents/{consentId}", wrapper.DeleteConsentV2)
 	m.HandleFunc("GET "+options.BaseURL+"/consents/v2/consents/{consentId}", wrapper.ConsentV2)
+	m.HandleFunc("GET "+options.BaseURL+"/customers/v1/personal/identifications", wrapper.PersonalIdentificationsV1)
 
 	return m
 }
@@ -596,6 +918,22 @@ func (response ConsentV2200JSONResponse) VisitConsentV2Response(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PersonalIdentificationsV1RequestObject struct {
+}
+
+type PersonalIdentificationsV1ResponseObject interface {
+	VisitPersonalIdentificationsV1Response(w http.ResponseWriter) error
+}
+
+type PersonalIdentificationsV1200JSONResponse PersonalIdentificationResponseV1
+
+func (response PersonalIdentificationsV1200JSONResponse) VisitPersonalIdentificationsV1Response(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 
@@ -607,6 +945,9 @@ type StrictServerInterface interface {
 
 	// (GET /consents/v2/consents/{consentId})
 	ConsentV2(ctx context.Context, request ConsentV2RequestObject) (ConsentV2ResponseObject, error)
+
+	// (GET /customers/v1/personal/identifications)
+	PersonalIdentificationsV1(ctx context.Context, request PersonalIdentificationsV1RequestObject) (PersonalIdentificationsV1ResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -721,47 +1062,116 @@ func (sh *strictHandler) ConsentV2(w http.ResponseWriter, r *http.Request, conse
 	}
 }
 
+// PersonalIdentificationsV1 operation middleware
+func (sh *strictHandler) PersonalIdentificationsV1(w http.ResponseWriter, r *http.Request) {
+	var request PersonalIdentificationsV1RequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PersonalIdentificationsV1(ctx, request.(PersonalIdentificationsV1RequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PersonalIdentificationsV1")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PersonalIdentificationsV1ResponseObject); ok {
+		if err := validResponse.VisitPersonalIdentificationsV1Response(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"vTpgEjdt5QNOpzZCXKb//jcAAP//I3ADnUhVAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
