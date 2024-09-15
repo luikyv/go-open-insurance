@@ -6,8 +6,6 @@ import (
 	"github.com/luikyv/go-open-insurance/internal/api"
 )
 
-var permissions = append(permissionsPhase2, permissionsPhase3...)
-
 var permissionsPhase2 = []api.ConsentPermission{
 	api.ConsentPermissionRESOURCESREAD,
 	api.ConsentPermissionCUSTOMERSPERSONALIDENTIFICATIONSREAD,

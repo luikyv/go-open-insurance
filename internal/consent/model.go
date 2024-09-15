@@ -62,33 +62,13 @@ func (c Consent) IsExpired() bool {
 	return c.Status == api.ConsentStatusAUTHORISED && now.After(c.ExpiresAt)
 }
 
-// func (c Consent) response(baseURL string) opinresp.Response {
-// 	var rejection *rejectionResponseData
-// 	if c.RejectionInfo != nil {
-// 		rejection = &rejectionResponseData{}
-// 		rejection.RejectedBy = c.RejectionInfo.RejectedBy
-// 		rejection.Reason.Code = c.RejectionInfo.Reason
-// 	}
+func (c Consent) IsAuthorized() bool {
+	return c.Status == api.ConsentStatusAUTHORISED
+}
 
-// 	return opinresp.Response{
-// 		Data: responseData{
-// 			ConsentID:            c.ID,
-// 			CreationDateTime:     c.CreatedAt,
-// 			Status:               c.Status,
-// 			StatusUpdateDateTime: c.CreatedAt,
-// 			Permissions:          c.Permissions,
-// 			ExpirationDateTime:   c.ExpiresAt,
-// 			Rejection:            rejection,
-// 		},
-// 		Meta: opinresp.Meta{
-// 			TotalRecords: 1,
-// 			TotalPages:   1,
-// 		},
-// 		Links: opinresp.Links{
-// 			Self: fmt.Sprintf("%s/consents/%s", baseURL, c.ID),
-// 		},
-// 	}
-// }
+func (c Consent) HasPermissions(permissions []api.ConsentPermission) bool {
+	return containsAll(c.Permissions, permissions...)
+}
 
 type RejectionInfo struct {
 	RejectedBy api.ConsentRejectedBy         `json:"rejected_by"`

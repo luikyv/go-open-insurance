@@ -51,7 +51,7 @@ func (s Server) DeleteConsentV2(
 		request.ConsentId,
 		consent.RejectionInfo{
 			RejectedBy: api.ConsentRejectedByUSER,
-			Reason:     api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREVOKED,
+			Reason:     api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREJECTED,
 		}); err != nil {
 		return nil, err
 	}

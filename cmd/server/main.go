@@ -17,8 +17,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// TODO: Error middleware, validation middleware.
-
 const (
 	databaseSchema           = "gopin"
 	databaseStringConnection = "mongodb://admin:password@localhost:27018"
@@ -61,9 +59,10 @@ func main() {
 	strictHandler := api.NewStrictHandlerWithOptions(
 		server,
 		[]nethttp.StrictHTTPMiddlewareFunc{
+			api.CacheControlMiddleware(),
+			api.AuthPermissionMiddleware(consentService.VerifyPermissions),
 			api.AuthScopeMiddleware(op),
 			api.FAPIIDMiddleware(),
-			api.CacheControlMiddleware(),
 		},
 		api.StrictHTTPServerOptions{
 			ResponseErrorHandlerFunc: api.ResponseErrorMiddleware,

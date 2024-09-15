@@ -99,6 +99,26 @@ func (s Service) Reject(
 	return s.save(ctx, consent)
 }
 
+func (s Service) VerifyPermissions(
+	ctx context.Context,
+	id string,
+	permissions ...api.ConsentPermission,
+) error {
+	consent, err := s.Get(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if !consent.IsAuthorized() {
+		return errInvalidStatus
+	}
+
+	if !consent.HasPermissions(permissions) {
+		return errInvalidPermissions
+	}
+	return nil
+}
+
 func (s Service) save(
 	ctx context.Context,
 	consent Consent,

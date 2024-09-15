@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/opinerr"
-	"github.com/luikyv/go-open-insurance/internal/slice"
 )
 
 func ID() string {
@@ -38,8 +37,8 @@ func validate(ctx context.Context, consent Consent) error {
 
 func validatePermissions(_ context.Context, requestedPermissions []api.ConsentPermission) error {
 
-	isPhase2 := slice.ContainsAny(permissionsPhase2, requestedPermissions...)
-	isPhase3 := slice.ContainsAny(permissionsPhase3, requestedPermissions...)
+	isPhase2 := containsAny(permissionsPhase2, requestedPermissions...)
+	isPhase3 := containsAny(permissionsPhase3, requestedPermissions...)
 	if isPhase2 && isPhase3 {
 		return opinerr.New("INVALID_PERMISSION", http.StatusUnprocessableEntity,
 			"cannot request permission from phase 2 and 3 in the same request")
@@ -80,7 +79,7 @@ func validatePermissionsPhase3(requestedPermissions []api.ConsentPermission) err
 			"permissions of different phase 3 categories were requested")
 	}
 
-	if !slice.ContainsAll(requestedPermissions, categories[0]...) {
+	if !containsAll(requestedPermissions, categories[0]...) {
 		return opinerr.New("INVALID_PERMISSION", http.StatusBadRequest,
 			"all the permission from one category must be requested")
 	}
@@ -99,4 +98,24 @@ func categories(requestedPermissions []api.ConsentPermission) []PermissionCatego
 	}
 
 	return categories
+}
+
+func containsAll[T comparable](superSet []T, subSet ...T) bool {
+	for _, t := range subSet {
+		if !slices.Contains(superSet, t) {
+			return false
+		}
+	}
+
+	return true
+}
+
+func containsAny[T comparable](superSet []T, subSet ...T) bool {
+	for _, t := range subSet {
+		if slices.Contains(superSet, t) {
+			return true
+		}
+	}
+
+	return false
 }

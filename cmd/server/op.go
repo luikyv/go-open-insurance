@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -86,7 +87,7 @@ func handleGrantFunc(consentService consent.Service) goidc.HandleGrantFunc {
 			return err
 		}
 
-		if consent.Status != api.ConsentStatusAUTHORISED {
+		if !consent.IsAuthorized() {
 			return errors.New("consent is not authorized")
 		}
 
@@ -159,18 +160,18 @@ func privateJWKS(filePath string) jose.JSONWebKeySet {
 	absPath, _ := filepath.Abs(filePath)
 	jwksFile, err := os.Open(absPath)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err)
 	}
 	defer jwksFile.Close()
 
 	jwksBytes, err := io.ReadAll(jwksFile)
 	if err != nil {
-		panic(err.Error())
+		log.Fatal(err)
 	}
 
 	var jwks jose.JSONWebKeySet
 	if err := json.Unmarshal(jwksBytes, &jwks); err != nil {
-		panic(err.Error())
+		log.Fatal(err)
 	}
 
 	return jwks

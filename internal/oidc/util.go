@@ -39,3 +39,12 @@ var Scopes = []goidc.Scope{
 	ScopeInsurancePatrimonial,
 	ScopeInsuranceResponsibility,
 }
+
+func ConsentID(scopes string) (string, bool) {
+	for _, s := range strings.Split(scopes, " ") {
+		if ScopeConsent.Matches(s) {
+			return strings.Replace(s, "consent:", "", 1), true
+		}
+	}
+	return "", false
+}

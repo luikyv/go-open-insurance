@@ -13,6 +13,8 @@ var (
 		"the consent is already rejected")
 	errInvalidStatus = opinerr.New("INVALID_STATUS", http.StatusBadRequest,
 		"invalid consent status")
+	errInvalidPermissions = opinerr.New("INVALID_PERMISSIONS", http.StatusBadRequest,
+		"invalid consent permissions")
 	errClientNotAuthorized = opinerr.New("UNAUTHORIZED", http.StatusForbidden,
 		"client not authorized to perform this operation")
 )

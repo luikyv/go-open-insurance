@@ -99,8 +99,8 @@ func (a Authenticator) setUp(
 	r *http.Request,
 	session *goidc.AuthnSession,
 ) goidc.AuthnStatus {
-	consentID := consentID(session.Scopes)
-	if consentID == "" {
+	consentID, ok := oidc.ConsentID(session.Scopes)
+	if !ok {
 		session.SetError("missing consent ID")
 		return goidc.StatusFailure
 	}
@@ -257,15 +257,6 @@ func (a Authenticator) finishFlow(
 	}
 
 	return goidc.StatusSuccess
-}
-
-func consentID(scopes string) string {
-	for _, s := range strings.Split(scopes, " ") {
-		if oidc.ScopeConsent.Matches(s) {
-			return strings.Replace(s, "consent:", "", 1)
-		}
-	}
-	return ""
 }
 
 type authnPage struct {

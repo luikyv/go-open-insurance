@@ -3,8 +3,6 @@ package user
 import (
 	"context"
 	"errors"
-
-	"github.com/luikyv/go-open-insurance/internal/slice"
 )
 
 type Storage struct {
@@ -18,7 +16,7 @@ func NewStorage() *Storage {
 }
 
 func (st *Storage) create(_ context.Context, user User) error {
-	_, ok := slice.FindFirst(st.users, func(u User) bool {
+	_, ok := findFirst(st.users, func(u User) bool {
 		return u.UserName == user.UserName
 	})
 
@@ -31,7 +29,7 @@ func (st *Storage) create(_ context.Context, user User) error {
 }
 
 func (st *Storage) user(username string) (User, error) {
-	user, ok := slice.FindFirst(st.users, func(user User) bool {
+	user, ok := findFirst(st.users, func(user User) bool {
 		return user.UserName == username
 	})
 	if !ok {
@@ -41,7 +39,7 @@ func (st *Storage) user(username string) (User, error) {
 }
 
 func (st *Storage) userByCPF(cpf string) (User, error) {
-	user, ok := slice.FindFirst(st.users, func(user User) bool {
+	user, ok := findFirst(st.users, func(user User) bool {
 		return user.CPF == cpf
 	})
 	if !ok {
@@ -49,4 +47,14 @@ func (st *Storage) userByCPF(cpf string) (User, error) {
 	}
 
 	return user, nil
+}
+
+func findFirst[T any](elements []T, condition func(t T) bool) (T, bool) {
+	for _, e := range elements {
+		if condition(e) {
+			return e, true
+		}
+	}
+
+	return *new(T), false
 }
