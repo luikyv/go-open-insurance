@@ -4,8 +4,10 @@ generate:
   std-http-server: true
   strict-server: true
   models: true
+  embedded-spec: true
 compatibility:
   always-prefix-enum-values: true
 output-options:
+  skip-prune: true
   overlay:
     path: overlay.yml

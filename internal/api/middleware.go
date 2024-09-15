@@ -2,6 +2,9 @@ package api
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -10,6 +13,7 @@ import (
 	"github.com/luikyv/go-oidc/pkg/provider"
 	"github.com/luikyv/go-open-insurance/internal/oidc"
 	"github.com/luikyv/go-open-insurance/internal/opinerr"
+	nethttpmiddleware "github.com/oapi-codegen/nethttp-middleware"
 	"github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
 
@@ -24,47 +28,50 @@ var (
 	errTokenMissingScopes = opinerr.New("UNAUTHORISED", http.StatusUnauthorized, "token missing scopes")
 )
 
-func FAPIIDMiddleware(
-	f nethttp.StrictHTTPHandlerFunc,
-	operationID string,
-) nethttp.StrictHTTPHandlerFunc {
+func FAPIIDMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 	return func(
-		ctx context.Context,
-		w http.ResponseWriter,
-		r *http.Request,
-		request interface{},
-	) (
-		response interface{},
-		err error,
-	) {
-		interactionID := r.Header.Get(headerXFAPIInteractionID)
-		if _, err := uuid.Parse(interactionID); err != nil {
-			interactionID = uuid.NewString()
-		}
+		f nethttp.StrictHTTPHandlerFunc,
+		operationID string,
+	) nethttp.StrictHTTPHandlerFunc {
+		return func(
+			ctx context.Context,
+			w http.ResponseWriter,
+			r *http.Request,
+			request interface{},
+		) (
+			response interface{},
+			err error,
+		) {
+			interactionID := r.Header.Get(headerXFAPIInteractionID)
+			if _, err := uuid.Parse(interactionID); err != nil {
+				interactionID = uuid.NewString()
+			}
 
-		w.Header().Add(headerXFAPIInteractionID, interactionID)
-		ctx = context.WithValue(ctx, CtxKeyCorrelationID, interactionID)
-		return f(ctx, w, r, request)
+			w.Header().Add(headerXFAPIInteractionID, interactionID)
+			ctx = context.WithValue(ctx, CtxKeyCorrelationID, interactionID)
+			return f(ctx, w, r, request)
+		}
 	}
 }
 
-func CacheControlMiddleware(
-	f nethttp.StrictHTTPHandlerFunc,
-	operationID string,
-) nethttp.StrictHTTPHandlerFunc {
+func CacheControlMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 	return func(
-		ctx context.Context,
-		w http.ResponseWriter,
-		r *http.Request,
-		request interface{},
-	) (
-		response interface{},
-		err error,
-	) {
-
-		w.Header().Add(headerCacheControl, "no-cache, no-store")
-		w.Header().Add(headerPragma, "no-cache")
-		return f(ctx, w, r, request)
+		f nethttp.StrictHTTPHandlerFunc,
+		operationID string,
+	) nethttp.StrictHTTPHandlerFunc {
+		return func(
+			ctx context.Context,
+			w http.ResponseWriter,
+			r *http.Request,
+			request interface{},
+		) (
+			response interface{},
+			err error,
+		) {
+			w.Header().Add(headerCacheControl, "no-cache, no-store")
+			w.Header().Add(headerPragma, "no-cache")
+			return f(ctx, w, r, request)
+		}
 	}
 }
 
@@ -104,8 +111,49 @@ func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
 	}
 }
 
-func ErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) {
+func ValidationErrorHandler() nethttpmiddleware.ErrorHandler {
+	return func(w http.ResponseWriter, message string, statusCode int) {
+		opinErr := opinerr.New("INVALID_REQUEST", http.StatusBadRequest, message)
+		w.WriteHeader(opinErr.StatusCode)
+		_ = json.NewEncoder(w).Encode(newResponseError(opinErr))
+	}
+}
 
+func ResponseErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) {
+	var opinErr opinerr.Error
+	if !errors.As(err, &opinErr) {
+		Logger(r.Context()).Error("unexpected error", slog.Any("error", err))
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode(opinerr.ErrInternal)
+	}
+
+	w.WriteHeader(opinErr.StatusCode)
+	_ = json.NewEncoder(w).Encode(newResponseError(opinErr))
+}
+
+func newResponseError(err opinerr.Error) ResponseError {
+	title := err.Description
+	if len(title) > 255 {
+		title = title[:255]
+	}
+
+	detail := err.Description
+	if len(detail) > 2048 {
+		detail = detail[:2048]
+	}
+	return ResponseError{
+		Errors: []Error{
+			{
+				Code:   err.Code,
+				Title:  title,
+				Detail: detail,
+			},
+		},
+		Meta: &Meta{
+			TotalRecords: 1,
+			TotalPages:   1,
+		},
+	}
 }
 
 func requiredScopes(operationID string) []goidc.Scope {

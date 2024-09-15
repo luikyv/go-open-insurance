@@ -22,6 +22,7 @@ func (err Error) Error() string {
 func New(code string, status int, description string) Error {
 	return Error{
 		Code:        code,
+		StatusCode:  status,
 		Description: description,
 	}
 }

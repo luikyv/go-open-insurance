@@ -166,6 +166,7 @@ func (s Service) modify(ctx context.Context, consent *Consent) error {
 func (s Service) validate(ctx context.Context, consent Consent) error {
 	if err := validate(ctx, consent); err != nil {
 		api.Logger(ctx).Debug("the consent is not valid", slog.Any("error", err))
+		return err
 	}
 
 	return nil

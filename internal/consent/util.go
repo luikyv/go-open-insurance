@@ -38,16 +38,6 @@ func validate(ctx context.Context, consent Consent) error {
 
 func validatePermissions(_ context.Context, requestedPermissions []api.ConsentPermission) error {
 
-	if len(requestedPermissions) < 1 {
-		return opinerr.New("INVALID_PERMISSION", http.StatusBadRequest,
-			"at least one permission must be requested")
-	}
-
-	if !slice.ContainsAll(permissions, requestedPermissions...) {
-		return opinerr.New("BAD_PERMISSION", http.StatusBadRequest,
-			"invalid permission")
-	}
-
 	isPhase2 := slice.ContainsAny(permissionsPhase2, requestedPermissions...)
 	isPhase3 := slice.ContainsAny(permissionsPhase3, requestedPermissions...)
 	if isPhase2 && isPhase3 {

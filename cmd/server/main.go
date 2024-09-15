@@ -10,6 +10,7 @@ import (
 	"github.com/luikyv/go-open-insurance/internal/consent"
 	consentv2 "github.com/luikyv/go-open-insurance/internal/consent/v2"
 	"github.com/luikyv/go-open-insurance/internal/user"
+	nethttpmiddleware "github.com/oapi-codegen/nethttp-middleware"
 	"github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -51,7 +52,6 @@ func main() {
 	}
 
 	// Server.
-	mux := http.NewServeMux()
 	consentV2Server := consentv2.NewServer(baseURLOPIN, consentService)
 	server := opinServer{
 		Server: consentV2Server,
@@ -60,15 +60,32 @@ func main() {
 		server,
 		[]nethttp.StrictHTTPMiddlewareFunc{
 			api.AuthScopeMiddleware(op),
+			api.FAPIIDMiddleware(),
+			api.CacheControlMiddleware(),
 		},
 		api.StrictHTTPServerOptions{
-			RequestErrorHandlerFunc:  api.ErrorMiddleware, // TODO: middleware for validation
-			ResponseErrorHandlerFunc: api.ErrorMiddleware,
+			ResponseErrorHandlerFunc: api.ResponseErrorMiddleware,
 		},
 	)
 
-	api.HandlerFromMuxWithBaseURL(strictHandler, mux, apiPrefixOPIN)
+	opinMux := http.NewServeMux()
+	api.HandlerFromMux(strictHandler, opinMux)
+	// Add a validation middleware for open insurance requests.
+	swagger, err := api.GetSwagger()
+	if err != nil {
+		log.Fatal(err)
+	}
+	opinHandler := nethttpmiddleware.OapiRequestValidatorWithOptions(
+		swagger,
+		&nethttpmiddleware.Options{
+			ErrorHandler: api.ValidationErrorHandler(),
+		},
+	)(opinMux)
+	opinHandler = http.StripPrefix(apiPrefixOPIN, opinHandler)
+
+	mux := http.NewServeMux()
 	mux.Handle(apiPrefixOIDC+"/", op.Handler())
+	mux.Handle(apiPrefixOPIN+"/", opinHandler)
 
 	// Run.
 	if err := loadUsers(userService); err != nil {
