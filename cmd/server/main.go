@@ -21,8 +21,8 @@ const (
 	databaseSchema           = "gopin"
 	databaseStringConnection = "mongodb://admin:password@localhost:27018"
 	port                     = "80"
-	host                     = "https://gopin.localhost"
-	mtlsHost                 = "https://matls-gopin.localhost"
+	host                     = "https://gopin.local"
+	mtlsHost                 = "https://matls-gopin.local"
 	apiPrefixOIDC            = "/auth"
 	baseURLOIDC              = host + apiPrefixOIDC
 	apiPrefixOPIN            = "/open-insurance"

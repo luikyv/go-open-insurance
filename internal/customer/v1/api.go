@@ -66,13 +66,17 @@ func newPersonalIdentificationsResponse(
 	baseURL string,
 	identifications []api.PersonalIdentificationDataV1,
 ) api.PersonalIdentificationResponseV1 {
+	totalPages := 1
+	if len(identifications) == 0 {
+		totalPages = 0
+	}
 	resp := api.PersonalIdentificationResponseV1{
 		Data: identifications,
 		Links: api.Links{
 			Self: fmt.Sprintf("%s/customers/v1/personal/identifications", baseURL),
 		},
 		Meta: api.Meta{
-			TotalPages:   1,
+			TotalPages:   int32(totalPages),
 			TotalRecords: int32(len(identifications)),
 		},
 	}

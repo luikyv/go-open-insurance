@@ -164,7 +164,7 @@ func (s Service) modify(ctx context.Context, consent *Consent) error {
 		api.Logger(ctx).Debug("consent reached expiration, moving to rejected")
 		consent.Status = api.ConsentStatusREJECTED
 		consent.RejectionInfo = &RejectionInfo{
-			RejectedBy: api.ConsentRejectedByUSER,
+			RejectedBy: api.ConsentRejectedByASPSP,
 			Reason:     api.ConsentRejectedReasonCodeCONSENTMAXDATEREACHED,
 		}
 		consentWasModified = true

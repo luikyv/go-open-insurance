@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -75,7 +74,7 @@ func openidProvider(
 
 func handleGrantFunc(consentService consent.Service) goidc.HandleGrantFunc {
 	return func(r *http.Request, gi *goidc.GrantInfo) error {
-		consentID, ok := ExtractConsentID(gi.ActiveScopes)
+		consentID, ok := oidc.ConsentID(gi.ActiveScopes)
 		if !ok {
 			return nil
 		}
@@ -88,22 +87,12 @@ func handleGrantFunc(consentService consent.Service) goidc.HandleGrantFunc {
 		}
 
 		if !consent.IsAuthorized() {
-			return errors.New("consent is not authorized")
+			return goidc.NewError(goidc.ErrorCodeInvalidRequest,
+				"consent is not authorized")
 		}
 
 		return nil
 	}
-}
-
-func ExtractConsentID(scopes string) (string, bool) {
-	scopeSlice := strings.Split(scopes, " ")
-	for _, scope := range scopeSlice {
-		if oidc.ScopeConsent.Matches(scope) {
-			return strings.Replace(scope, "consent:", "", 1), true
-		}
-	}
-
-	return "", false
 }
 
 func shoudIssueRefreshTokenFunc() goidc.ShouldIssueRefreshTokenFunc {
