@@ -28,5 +28,5 @@ func (s Service) UserByCPF(cpf string) (User, error) {
 }
 
 func (s Service) UserBelongsToCompany(user User, businessCNPJ string) bool {
-	return slices.Contains(user.Companies, businessCNPJ)
+	return slices.Contains(user.CompanyCNPJs, businessCNPJ)
 }

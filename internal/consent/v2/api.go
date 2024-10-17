@@ -45,14 +45,20 @@ func (s Server) DeleteConsentV2(
 	api.DeleteConsentV2ResponseObject,
 	error,
 ) {
+	c, err := s.service.Get(ctx, request.ConsentId)
+	if err != nil {
+		return nil, err
+	}
 
-	if err := s.service.Reject(
-		ctx,
-		request.ConsentId,
-		consent.RejectionInfo{
-			RejectedBy: api.ConsentRejectedByUSER,
-			Reason:     api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREVOKED,
-		}); err != nil {
+	reason := api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREJECTED
+	if c.IsAuthorized() {
+		reason = api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREVOKED
+	}
+
+	if err := s.service.Reject(ctx, c, consent.RejectionInfo{
+		RejectedBy: api.ConsentRejectedByUSER,
+		Reason:     reason,
+	}); err != nil {
 		return nil, err
 	}
 

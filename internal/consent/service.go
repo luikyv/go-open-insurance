@@ -3,6 +3,7 @@ package consent
 import (
 	"context"
 	"log/slog"
+	"net/http"
 
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/opinerr"
@@ -37,7 +38,8 @@ func (s Service) Authorize(
 	if consent.Status != api.ConsentStatusAWAITINGAUTHORISATION {
 		api.Logger(ctx).Debug("cannot authorize a consent that is not awaiting authorization",
 			slog.String("consent_id", id), slog.Any("status", consent.Status))
-		return errInvalidStatus
+		return opinerr.New("INVALID_STATUS", http.StatusBadRequest,
+			"invalid consent status")
 	}
 
 	api.Logger(ctx).Info("authorizing consent",
@@ -74,13 +76,14 @@ func (s Service) Get(
 	clientID := ctx.Value(api.CtxKeyClientID)
 	if clientID != consent.ClientId {
 		api.Logger(ctx).Debug("client not allowed to fetch the consent")
-		return Consent{}, errClientNotAuthorized
+		return Consent{}, opinerr.New("UNAUTHORIZED", http.StatusForbidden,
+			"client not authorized to perform this operation")
 	}
 
 	return consent, nil
 }
 
-func (s Service) Reject(
+func (s Service) RejectByID(
 	ctx context.Context,
 	id string,
 	info RejectionInfo,
@@ -90,8 +93,17 @@ func (s Service) Reject(
 		return err
 	}
 
+	return s.Reject(ctx, consent, info)
+}
+
+func (s Service) Reject(
+	ctx context.Context,
+	consent Consent,
+	info RejectionInfo,
+) error {
 	if consent.Status == api.ConsentStatusREJECTED {
-		return errAlreadyRejected
+		return opinerr.New("INVALID_OPERATION", http.StatusBadRequest,
+			"the consent is already rejected")
 	}
 
 	consent.Status = api.ConsentStatusREJECTED
@@ -110,11 +122,13 @@ func (s Service) VerifyPermissions(
 	}
 
 	if !consent.IsAuthorized() {
-		return errInvalidStatus
+		return opinerr.New("INVALID_STATUS", http.StatusBadRequest,
+			"invalid consent status")
 	}
 
 	if !consent.HasPermissions(permissions) {
-		return errInvalidPermissions
+		return opinerr.New("INVALID_PERMISSIONS", http.StatusBadRequest,
+			"invalid consent permissions")
 	}
 	return nil
 }
@@ -134,7 +148,8 @@ func (s Service) get(ctx context.Context, id string) (Consent, error) {
 	consent, err := s.storage.Get(ctx, id)
 	if err != nil {
 		api.Logger(ctx).Debug("could not find the consent", slog.Any("error", err))
-		return Consent{}, errNotFound
+		return Consent{}, opinerr.New("NOT_FOUND", http.StatusNotFound,
+			"could not find the consent")
 	}
 
 	if err := s.modify(ctx, &consent); err != nil {

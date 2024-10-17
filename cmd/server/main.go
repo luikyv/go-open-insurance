@@ -9,6 +9,7 @@ import (
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/consent"
 	consentv2 "github.com/luikyv/go-open-insurance/internal/consent/v2"
+	"github.com/luikyv/go-open-insurance/internal/customer"
 	customersv1 "github.com/luikyv/go-open-insurance/internal/customer/v1"
 	"github.com/luikyv/go-open-insurance/internal/user"
 	nethttpmiddleware "github.com/oapi-codegen/nethttp-middleware"
@@ -19,7 +20,7 @@ import (
 
 const (
 	databaseSchema           = "gopin"
-	databaseStringConnection = "mongodb://admin:password@localhost:27018"
+	databaseStringConnection = "mongodb://localhost:27017/gopin"
 	port                     = "80"
 	host                     = "https://gopin.local"
 	mtlsHost                 = "https://matls-gopin.local"
@@ -42,7 +43,7 @@ func main() {
 	// Services.
 	userService := user.NewService(userStorage)
 	consentService := consent.NewService(userService, consentStorage)
-	customerServiceV1 := customersv1.NewService()
+	customerService := customer.NewService()
 
 	// Provider.
 	op, err := openidProvider(db, userService, consentService,
@@ -54,7 +55,7 @@ func main() {
 	// Server.
 	server := opinServer{
 		consentV2Server:  consentv2.NewServer(baseURLOPIN, consentService),
-		customerV1Server: customersv1.NewServer(baseURLOPIN, customerServiceV1),
+		customerV1Server: customersv1.NewServer(baseURLOPIN, customerService),
 	}
 	strictHandler := api.NewStrictHandlerWithOptions(
 		server,
@@ -89,7 +90,7 @@ func main() {
 	mux.Handle(apiPrefixOPIN+"/", opinHandler)
 
 	// Run.
-	if err := loadMocks(userService, customerServiceV1); err != nil {
+	if err := loadMocks(userService, customerService); err != nil {
 		log.Fatal(err)
 	}
 	s := &http.Server{

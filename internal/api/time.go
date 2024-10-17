@@ -1,8 +1,11 @@
 package api
 
+// TODO: Move this.
 import (
 	"encoding/json"
 	"time"
+
+	openapi_types "github.com/oapi-codegen/runtime/types"
 )
 
 const DateTimeFormat = "2006-01-02T15:04:05Z"
@@ -45,5 +48,21 @@ func (d *DateTime) UnmarshalText(data []byte) error {
 func NewDateTime(t time.Time) DateTime {
 	return DateTime{
 		Time: t,
+	}
+}
+
+func NewDate(t time.Time) openapi_types.Date {
+	return openapi_types.Date{
+		Time: t,
+	}
+}
+
+func DateTimeNow() DateTime {
+	return NewDateTime(time.Now().UTC())
+}
+
+func DateNow() openapi_types.Date {
+	return openapi_types.Date{
+		Time: time.Now().UTC(),
 	}
 }

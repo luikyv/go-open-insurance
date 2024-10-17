@@ -3,14 +3,13 @@ services:
   mongodb:
     image: mongo:latest
     ports:
-      - 27018:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=password
+      - 27017:27017
     volumes:
       - mongo-data:/data/db
 
   mongo-express:
+    profiles:
+      - opin
     image: mongo-express:latest
     restart: always
     ports:
@@ -21,6 +20,8 @@ services:
       - ME_CONFIG_MONGODB_SERVER=mongodb
   
   reverse-proxy:
+    profiles:
+      - opin
     image: nginx:latest
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
@@ -31,6 +32,67 @@ services:
     ports:
       - 443:443
 
+  cs-httpd:
+    profiles:
+      - conformance
+    build:
+      context: ./conformance-suite/httpd
+      dockerfile: Dockerfile-static
+    ports:
+     - "8443:8443"
+    volumes:
+     - ./conformance-suite/src/main/resources/:/usr/local/apache2/htdocs/
+    depends_on:
+     - cs-server
+
+  cs-server:
+    profiles:
+      - conformance
+    hostname: server
+    image: openjdk:17-jdk-slim
+    build:
+      context: ./conformance-suite/server-dev
+    ports:
+     - "9999:9999"
+    volumes:
+     - ./conformance-suite/target/:/server/
+    command: >
+      java
+      -Xdebug -Xrunjdwp:transport=dt_socket,address=*:9999,server=y,suspend=n
+      -jar /server/libopin.jar
+      -Djdk.tls.maxHandshakeMessageSize=65536
+      --fintechlabs.base_url=https://localhost.emobix.co.uk:8443
+      --fintechlabs.base_mtls_url=https://localhost.emobix.co.uk:8444
+      --fintechlabs.devmode=true
+      --fintechlabs.startredir=true
+    links:
+     - mongodb:mongodb
+    depends_on:
+     - mongodb
+    logging:
+      # limit logs retained on host
+      driver: "json-file"
+      options:
+        max-size: "500k"
+        max-file: "5"
+    extra_hosts:
+      # Requests to gopin.local and matls-gopin.local are forwarded to the
+      # docker host where the open insurance server is running.
+      - gopin.local:host-gateway
+      - matls-gopin.local:host-gateway
+
+  cs-builder:
+    profiles:
+      - build
+    image: maven:3-openjdk-17
+    volumes:
+      - maven-cache:/root/.m2
+      - ./conformance-suite:/usr/src/mymaven
+    working_dir: /usr/src/mymaven
+    command: mvn -B clean package -DskipTests=true
+
 volumes:
+  maven-cache:
+    driver: local
   mongo-data:
     driver: local

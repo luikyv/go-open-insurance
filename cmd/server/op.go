@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"slices"
@@ -23,6 +27,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const (
+	headerClientCert = "X-Client-Cert"
+)
+
 func openidProvider(
 	db *mongo.Database,
 	userService user.Service,
@@ -35,27 +43,29 @@ func openidProvider(
 	authenticator := authn.New(userService, consentService, host+prefix)
 	ps256ServerKeyID := "ps256_key"
 	return provider.New(
+		goidc.ProfileOpenID,
 		host,
 		privateJWKS("../../keys/server_jwks.json"),
 		provider.WithPathPrefix(prefix),
 		provider.WithClientStorage(oidc.NewClientManager(db)),
 		provider.WithAuthnSessionStorage(oidc.NewAuthnSessionManager(db)),
 		provider.WithGrantSessionStorage(oidc.NewGrantSessionManager(db)),
+		provider.WithTokenAuthnMethods(goidc.ClientAuthnPrivateKeyJWT),
 		provider.WithScopes(oidc.Scopes...),
-		provider.WithMTLS(mtlsHost),
+		provider.WithMTLS(mtlsHost, clientCertFunc),
 		provider.WithTLSCertTokenBinding(),
 		provider.WithJAR(jose.PS256),
-		provider.WithJAREncryption("enc_key"),
+		provider.WithJAREncryption(jose.RSA_OAEP),
 		provider.WithJARContentEncryptionAlgs(jose.A256GCM),
-		provider.WithJARM(ps256ServerKeyID),
-		provider.WithPrivateKeyJWTAuthn(jose.PS256),
+		provider.WithJARM(jose.PS256),
+		provider.WithPrivateKeyJWTSignatureAlgs(jose.PS256),
 		provider.WithIssuerResponseParameter(),
 		provider.WithClaimsParameter(),
 		provider.WithClaims(goidc.ClaimEmail, goidc.ClaimEmailVerified),
-		provider.WithDPoP(jose.PS256, jose.ES256),
 		provider.WithPKCE(goidc.CodeChallengeMethodSHA256),
-		provider.WithRefreshTokenGrant(),
-		provider.WithShouldIssueRefreshTokenFunc(shoudIssueRefreshTokenFunc()),
+		provider.WithAuthorizationCodeGrant(),
+		provider.WithImplicitGrant(),
+		provider.WithRefreshTokenGrant(shoudIssueRefreshTokenFunc(), 600),
 		provider.WithACRs(oidc.ACROpenInsuranceLOA2, oidc.ACROpenInsuranceLOA3),
 		provider.WithTokenOptions(tokenOptionFunc(ps256ServerKeyID)),
 		provider.WithUserInfoEncryption(jose.RSA_OAEP_256),
@@ -69,6 +79,9 @@ func openidProvider(
 			},
 			authenticator.Authenticate,
 		)),
+		provider.WithHandleErrorFunc(func(r *http.Request, err error) {
+			log.Println(err)
+		}),
 	)
 }
 
@@ -102,7 +115,7 @@ func shoudIssueRefreshTokenFunc() goidc.ShouldIssueRefreshTokenFunc {
 }
 
 func tokenOptionFunc(keyID string) goidc.TokenOptionsFunc {
-	return func(client *goidc.Client, grantInfo goidc.GrantInfo) goidc.TokenOptions {
+	return func(grantInfo goidc.GrantInfo) goidc.TokenOptions {
 		return goidc.NewJWTTokenOptions(keyID, 600)
 	}
 }
@@ -123,8 +136,8 @@ func client(clientID string) *goidc.Client {
 	return &goidc.Client{
 		ID: clientID,
 		ClientMetaInfo: goidc.ClientMetaInfo{
-			AuthnMethod: goidc.ClientAuthnPrivateKeyJWT,
-			ScopeIDs:    strings.Join(scopes, " "),
+			TokenAuthnMethod: goidc.ClientAuthnPrivateKeyJWT,
+			ScopeIDs:         strings.Join(scopes, " "),
 			RedirectURIs: []string{
 				"https://localhost.emobix.co.uk:8443/test/a/gopin/callback",
 			},
@@ -164,4 +177,29 @@ func privateJWKS(filePath string) jose.JSONWebKeySet {
 	}
 
 	return jwks
+}
+
+func clientCertFunc(r *http.Request) (*x509.Certificate, error) {
+	rawClientCert := r.Header.Get(headerClientCert)
+	if rawClientCert == "" {
+		return nil, errors.New("the client certificate was not informed")
+	}
+
+	// Apply URL decoding.
+	rawClientCert, err := url.QueryUnescape(rawClientCert)
+	if err != nil {
+		return nil, fmt.Errorf("could not url decode the client certificate: %w", err)
+	}
+
+	clientCertPEM, _ := pem.Decode([]byte(rawClientCert))
+	if clientCertPEM == nil {
+		return nil, errors.New("could not decode the client certificate")
+	}
+
+	clientCert, err := x509.ParseCertificate(clientCertPEM.Bytes)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse the client certificate: %w", err)
+	}
+
+	return clientCert, nil
 }

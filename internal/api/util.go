@@ -12,6 +12,16 @@ func requiredPermissions(operationID string) []ConsentPermission {
 			ConsentPermissionRESOURCESREAD,
 			ConsentPermissionCUSTOMERSPERSONALIDENTIFICATIONSREAD,
 		}
+	case "PersonalQualificationsV1":
+		return []ConsentPermission{
+			ConsentPermissionRESOURCESREAD,
+			ConsentPermissionCUSTOMERSPERSONALQUALIFICATIONREAD,
+		}
+	case "PersonalComplimentaryInfoV1":
+		return []ConsentPermission{
+			ConsentPermissionRESOURCESREAD,
+			ConsentPermissionCUSTOMERSPERSONALADDITIONALINFOREAD,
+		}
 	default:
 		return nil
 	}
@@ -21,7 +31,8 @@ func requiredScopes(operationID string) []goidc.Scope {
 	switch operationID {
 	case "CreateConsentV2", "ConsentV2", "DeleteConsentV2":
 		return []goidc.Scope{oidc.ScopeConsents}
-	case "PersonalIdentificationsV1":
+	case "PersonalIdentificationsV1", "PersonalQualificationsV1",
+		"PersonalComplimentaryInfoV1":
 		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent}
 	default:
 		return nil

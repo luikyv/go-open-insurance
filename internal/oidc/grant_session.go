@@ -74,6 +74,10 @@ func (manager GrantSessionManager) Delete(
 	return nil
 }
 
+func (m GrantSessionManager) DeleteByAuthorizationCode(context.Context, string) error {
+	return nil
+}
+
 func (manager GrantSessionManager) getWithFilter(
 	ctx context.Context,
 	filter any,

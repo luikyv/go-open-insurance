@@ -151,7 +151,7 @@ func (a Authenticator) login(
 
 	if isLogin != "true" {
 		consentID := session.Parameter(paramConsentID).(string)
-		a.consentService.Reject(
+		a.consentService.RejectByID(
 			r.Context(),
 			consentID,
 			consent.RejectionInfo{
@@ -219,7 +219,7 @@ func (a Authenticator) grantConsent(
 	consentID := session.Parameter(paramConsentID).(string)
 
 	if isConsented != "true" {
-		a.consentService.Reject(
+		a.consentService.RejectByID(
 			r.Context(),
 			consentID,
 			consent.RejectionInfo{
@@ -247,11 +247,11 @@ func (a Authenticator) finishFlow(
 	session.SetIDTokenClaimAuthTime(int(time.Now().Unix()))
 
 	if session.Claims != nil {
-		if slices.Contains(session.Claims.IDTokenEssentials(), goidc.ClaimAuthenticationContextReference) {
+		if slices.Contains(session.Claims.IDTokenEssentials(), goidc.ClaimACR) {
 			session.SetIDTokenClaimACR(oidc.ACROpenInsuranceLOA2)
 		}
 
-		if slices.Contains(session.Claims.UserInfoEssentials(), goidc.ClaimAuthenticationContextReference) {
+		if slices.Contains(session.Claims.UserInfoEssentials(), goidc.ClaimACR) {
 			session.SetUserInfoClaimACR(oidc.ACROpenInsuranceLOA2)
 		}
 	}

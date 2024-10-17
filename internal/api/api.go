@@ -321,6 +321,32 @@ const (
 	FiliationTypeSEMFILIACAO FiliationType = "SEM_FILIACAO"
 )
 
+// Defines values for IncomeFrequency.
+const (
+	IncomeFrequencyANUAL      IncomeFrequency = "ANUAL"
+	IncomeFrequencyBIMESTRAL  IncomeFrequency = "BIMESTRAL"
+	IncomeFrequencyDIARIA     IncomeFrequency = "DIARIA"
+	IncomeFrequencyMENSAL     IncomeFrequency = "MENSAL"
+	IncomeFrequencyQUINZENAL  IncomeFrequency = "QUINZENAL"
+	IncomeFrequencySEMANAL    IncomeFrequency = "SEMANAL"
+	IncomeFrequencySEMESTRAL  IncomeFrequency = "SEMESTRAL"
+	IncomeFrequencyTRIMESTRAL IncomeFrequency = "TRIMESTRAL"
+)
+
+// Defines values for LifePensionPlanApplicability.
+const (
+	LifePensionPlanApplicabilityNAO         LifePensionPlanApplicability = "NAO"
+	LifePensionPlanApplicabilityNAOSEAPLICA LifePensionPlanApplicability = "NAO_SE_APLICA"
+	LifePensionPlanApplicabilitySIM         LifePensionPlanApplicability = "SIM"
+)
+
+// Defines values for OcupationCodeType.
+const (
+	OcupationCodeTypeCBO    OcupationCodeType = "CBO"
+	OcupationCodeTypeOUTROS OcupationCodeType = "OUTROS"
+	OcupationCodeTypeRFB    OcupationCodeType = "RFB"
+)
+
 // Defines values for PersonalDocumentType.
 const (
 	PersonalDocumentTypeCNH                 PersonalDocumentType = "CNH"
@@ -329,6 +355,14 @@ const (
 	PersonalDocumentTypeRG                  PersonalDocumentType = "RG"
 	PersonalDocumentTypeRNE                 PersonalDocumentType = "RNE"
 	PersonalDocumentTypeSEMOUTROSDOCUMENTOS PersonalDocumentType = "SEM_OUTROS_DOCUMENTOS"
+)
+
+// Defines values for PoliticalExposure.
+const (
+	PoliticalExposureNAOEXPOSTO                                   PoliticalExposure = "NAO_EXPOSTO"
+	PoliticalExposurePESSOAPOLITICAMENTEEXPOSTAPPE                PoliticalExposure = "PESSOA_POLITICAMENTE_EXPOSTA_PPE"
+	PoliticalExposurePESSOAPROXIMAAPESSOAPOLITICAMENTEEXPOSTAPPEE PoliticalExposure = "PESSOA_PROXIMA_A_PESSOA_POLITICAMENTE_EXPOSTA_PPEE"
+	PoliticalExposureSEMINFORMACAO                                PoliticalExposure = "SEM_INFORMACAO"
 )
 
 // Defines values for ProcuratorsNatureBusiness.
@@ -367,6 +401,12 @@ type BusinessEntity struct {
 
 // CivilStatusCode defines model for CivilStatusCode.
 type CivilStatusCode string
+
+// CompanyInfo defines model for CompanyInfo.
+type CompanyInfo struct {
+	CnpjNumber string `json:"cnpjNumber"`
+	Name       string `json:"name"`
+}
 
 // ConsentDataV2 defines model for ConsentDataV2.
 type ConsentDataV2 struct {
@@ -480,8 +520,62 @@ type Error struct {
 	Title           string   `json:"title"`
 }
 
+// Filiation defines model for Filiation.
+type Filiation struct {
+	// CivilName Nome civil completo da pessoa relativa à filiação.
+	// (Direito fundamental da pessoa, o nome civil é aquele atribuído à pessoa natural desde o registro de seu nascimento,
+	// com o qual será identificada por toda a sua vida, bem como após a sua morte).
+	CivilName *string `json:"civilName,omitempty"`
+
+	// Type Tipo de filiação.
+	Type *FiliationType `json:"type,omitempty"`
+}
+
 // FiliationType Tipo de filiação.
 type FiliationType string
+
+// IdentificationDetails Informações referente ao cônjuge.
+type IdentificationDetails struct {
+	// CivilName Nome civil completo da pessoa natural (Direito fundamental da pessoa, o nome civil é aquele atribuído à pessoa natural desde o registro de seu nascimento, com o qual será identificada por toda a sua vida, bem como após a sua morte)
+	CivilName *string `json:"civilName,omitempty"`
+
+	// CpfNumber Número completo do CPF. Atributo que corresponde às informações mínimas exigidas pela Regulamentação em vigor. O CPF é o Cadastro de Pessoa natural.  Ele é um documento feito pela Receita Federal e serve para identificar os contribuintes. O CPF é uma numeração com 11 dígitos, que só mudam por decisão judicial. O documento é emitido pela receita federal
+	// Condicional a seleção de true em hasBrazilianNationality
+	CpfNumber *string `json:"cpfNumber,omitempty"`
+}
+
+// IncomeFrequency Frequência da renda informada.
+type IncomeFrequency string
+
+// InformedPatrimony defines model for InformedPatrimony.
+type InformedPatrimony struct {
+	// Amount Valor do patrimônio
+	Amount *string `json:"amount"`
+
+	// Currency Moeda referente ao valor do patrimônio, segundo modelo ISO-4217.
+	Currency *string `json:"currency,omitempty"`
+
+	// Year Ano de referência do patrimônio, conforme especificação RFC-3339.
+	Year *string `json:"year,omitempty"`
+}
+
+// InformedRevenue defines model for InformedRevenue.
+type InformedRevenue struct {
+	// Amount Valor do rendimento
+	Amount *string `json:"amount"`
+
+	// Currency Moeda referente ao valor da renda, segundo modelo ISO-4217.
+	Currency *string `json:"currency,omitempty"`
+
+	// Date Data de referência da renda, conforme especificação RFC-3339.
+	Date *openapi_types.Date `json:"date,omitempty"`
+
+	// IncomeFrequency Frequência da renda informada.
+	IncomeFrequency *IncomeFrequency `json:"incomeFrequency,omitempty"`
+}
+
+// LifePensionPlanApplicability Condição de proponente qualificado, aplicável à contratação de planos de previdência e vida por sobrevivência
+type LifePensionPlanApplicability string
 
 // Links defines model for Links.
 type Links struct {
@@ -506,6 +600,24 @@ type Meta struct {
 	TotalRecords int32 `json:"totalRecords"`
 }
 
+// Ocupation Objeto agrupador de informações relativas ocupação da pessoa natural
+type Ocupation struct {
+	// Details Ocupação
+	Details *string `json:"details,omitempty"`
+
+	// OccupationCode Código da ocupação
+	OccupationCode *string `json:"occupationCode,omitempty"`
+
+	// OccupationCodeType Tipo de código da ocupação
+	OccupationCodeType *OcupationCodeType `json:"occupationCodeType,omitempty"`
+
+	// OccupationCodeTypeOthers Descricao do tipo de codigo da ocupacao quando for informada a opcao OUTROS
+	OccupationCodeTypeOthers *string `json:"occupationCodeTypeOthers,omitempty"`
+}
+
+// OcupationCodeType Tipo de código da ocupação
+type OcupationCodeType string
+
 // OtherPersonalDocuments defines model for OtherPersonalDocuments.
 type OtherPersonalDocuments struct {
 	// Country País do(s) documento(s) estrangeiro(s) de identificação.
@@ -519,6 +631,27 @@ type OtherPersonalDocuments struct {
 
 	// Type Tipo do(s) documento(s) estrangeiro(s) de identificação
 	Type *string `json:"type,omitempty"`
+}
+
+// PersonalComplimentaryInfoData Objeto que reúne as informações relativas ao relacionamento do cliente junto à Instituição. Considera-se relacionamento as informações que permitam conhecer desde quando a pessoa consultada é cliente da instituição, bem como um indicador dos produtos e serviços que ela consome atualmente e seus representantes
+type PersonalComplimentaryInfoData struct {
+	ProductsServices []ProductService `json:"productsServices"`
+
+	// RelationshipBeginning Campo deve ser preenchido com a data da apólice/contrato vigente mais antiga (caso haja contrato vigente)
+	RelationshipBeginning *openapi_types.Date `json:"relationshipBeginning,omitempty"`
+
+	// StartDate Data mais antiga de inicio de relacionamento, considerando todos os contratos (vigentes e nao vigentes). Os contratos nao vigentes considerados devem contemplar, no minimo o periodo indicado na Tabela 22.
+	StartDate openapi_types.Date `json:"startDate"`
+
+	// UpdateDateTime Data e hora da atualização do bloco de Relacionamento, conforme especificação RFC-3339, formato UTC.
+	UpdateDateTime DateTime `json:"updateDateTime"`
+}
+
+// PersonalComplimentaryInfoResponseV1 defines model for PersonalComplimentaryInfoResponseV1.
+type PersonalComplimentaryInfoResponseV1 struct {
+	Data  []PersonalComplimentaryInfoData `json:"data"`
+	Links Links                           `json:"links"`
+	Meta  Meta                            `json:"meta"`
 }
 
 // PersonalContact Conjunto de informações referentes às formas para contatar o cliente.
@@ -549,42 +682,26 @@ type PersonalDocuments = []struct {
 	Type          *PersonalDocumentType `json:"type,omitempty"`
 }
 
-// PersonalIdentificationDataV1 defines model for PersonalIdentificationDataV1.
-type PersonalIdentificationDataV1 struct {
+// PersonalIdentificationData defines model for PersonalIdentificationData.
+type PersonalIdentificationData struct {
 	BirthDate             *openapi_types.Date `json:"birthDate,omitempty"`
 	BrandName             string              `json:"brandName"`
 	CivilName             string              `json:"civilName"`
 	CivilStatusCode       *CivilStatusCode    `json:"civilStatusCode,omitempty"`
 	CivilStatusCodeOthers *string             `json:"civilStatusCodeOthers,omitempty"`
-	CompanyInfo           struct {
-		CnpjNumber string `json:"cnpjNumber"`
-		Name       string `json:"name"`
-	} `json:"companyInfo"`
+	CompanyInfo           CompanyInfo         `json:"companyInfo"`
 
 	// Contact Conjunto de informações referentes às formas para contatar o cliente.
 	Contact   PersonalContact    `json:"contact"`
 	CpfNumber string             `json:"cpfNumber"`
 	Documents *PersonalDocuments `json:"documents,omitempty"`
-	Filiation *struct {
-		// CivilName Nome civil completo da pessoa relativa à filiação.
-		// (Direito fundamental da pessoa, o nome civil é aquele atribuído à pessoa natural desde o registro de seu nascimento,
-		// com o qual será identificada por toda a sua vida, bem como após a sua morte).
-		CivilName *string `json:"civilName,omitempty"`
 
-		// Type Tipo de filiação.
-		Type *FiliationType `json:"type,omitempty"`
-	} `json:"filiation,omitempty"`
-	HasBrazilianNationality *bool `json:"hasBrazilianNationality"`
+	// Filiation Tipo de filiação.
+	Filiation               *FiliationType `json:"filiation,omitempty"`
+	HasBrazilianNationality *bool          `json:"hasBrazilianNationality"`
 
 	// IdentificationDetails Informações referente ao cônjuge.
-	IdentificationDetails *struct {
-		// CivilName Nome civil completo da pessoa natural (Direito fundamental da pessoa, o nome civil é aquele atribuído à pessoa natural desde o registro de seu nascimento, com o qual será identificada por toda a sua vida, bem como após a sua morte)
-		CivilName *string `json:"civilName,omitempty"`
-
-		// CpfNumber Número completo do CPF. Atributo que corresponde às informações mínimas exigidas pela Regulamentação em vigor. O CPF é o Cadastro de Pessoa natural.  Ele é um documento feito pela Receita Federal e serve para identificar os contribuintes. O CPF é uma numeração com 11 dígitos, que só mudam por decisão judicial. O documento é emitido pela receita federal
-		// Condicional a seleção de true em hasBrazilianNationality
-		CpfNumber *string `json:"cpfNumber,omitempty"`
-	} `json:"identificationDetails,omitempty"`
+	IdentificationDetails  *IdentificationDetails  `json:"identificationDetails,omitempty"`
 	OtherDocuments         *OtherPersonalDocuments `json:"otherDocuments,omitempty"`
 	OtherNationalitiesInfo *string                 `json:"otherNationalitiesInfo,omitempty"`
 	PersonalId             *string                 `json:"personalId,omitempty"`
@@ -595,9 +712,9 @@ type PersonalIdentificationDataV1 struct {
 
 // PersonalIdentificationResponseV1 defines model for PersonalIdentificationResponseV1.
 type PersonalIdentificationResponseV1 struct {
-	Data  []PersonalIdentificationDataV1 `json:"data"`
-	Links Links                          `json:"links"`
-	Meta  Meta                           `json:"meta"`
+	Data  []PersonalIdentificationData `json:"data"`
+	Links Links                        `json:"links"`
+	Meta  Meta                         `json:"meta"`
 }
 
 // PersonalPostalAddress defines model for PersonalPostalAddress.
@@ -622,11 +739,63 @@ type PersonalPostalAddress struct {
 	TownName string `json:"townName"`
 }
 
+// PersonalProcurator defines model for PersonalProcurator.
+type PersonalProcurator struct {
+	// CivilName (Caso Natureza dos poderes vigentes de representante for “Representante legal” ou “Procurador”) Nome ou razão social do representante
+	CivilName *string `json:"civilName,omitempty"`
+
+	// CpfNumber (Caso Natureza dos poderes vigentes de representante for “Representante legal” ou “Procurador”) CPF do representante
+	CpfNumber *string `json:"cpfNumber,omitempty"`
+
+	// Nature Natureza dos poderes vigentes de representante
+	Nature ProcuratorsNaturePersonal `json:"nature"`
+
+	// SocialName (Caso Natureza dos poderes vigentes de representante for “Representante legal” ou “Procurador”) Nome social do representante
+	SocialName *string `json:"socialName,omitempty"`
+}
+
+// PersonalQualificationData defines model for PersonalQualificationData.
+type PersonalQualificationData struct {
+	InformedPatrimony *InformedPatrimony `json:"informedPatrimony,omitempty"`
+	InformedRevenue   *InformedRevenue   `json:"informedRevenue,omitempty"`
+
+	// LifePensionPlans Condição de proponente qualificado, aplicável à contratação de planos de previdência e vida por sobrevivência
+	LifePensionPlans  LifePensionPlanApplicability `json:"lifePensionPlans"`
+	Occupation        *[]Ocupation                 `json:"occupation,omitempty"`
+	PepIdentification PoliticalExposure            `json:"pepIdentification"`
+	UpdateDateTime    DateTime                     `json:"updateDateTime"`
+}
+
+// PersonalQualificationResponseV1 defines model for PersonalQualificationResponseV1.
+type PersonalQualificationResponseV1 struct {
+	Data  []PersonalQualificationData `json:"data"`
+	Links Links                       `json:"links"`
+	Meta  Meta                        `json:"meta"`
+}
+
+// PoliticalExposure defines model for PoliticalExposure.
+type PoliticalExposure string
+
 // ProcuratorsNatureBusiness Natureza dos poderes vigentes de representante
 type ProcuratorsNatureBusiness string
 
 // ProcuratorsNaturePersonal Natureza dos poderes vigentes de representante
 type ProcuratorsNaturePersonal string
+
+// ProductService Lista de todos os contratos vigentes e não vigentes.
+type ProductService struct {
+	// Contract Lista de todos os numeros dos contratos vigentes e nao vigentes. Os contratos nao vigentes considerados devem contemplar, no minimo o periodo indicado na Tabela 22.
+	Contract string `json:"contract"`
+
+	// InsuranceLineCode Indicar para cada contrato, caso aplicável, o código do ramo, conforme listagem de códigos definida em regulamentação específica sobre contabilização em ramos. Obs - Caso tipo de produto do contrato for “Seguros de Danos”
+	InsuranceLineCode *string `json:"insuranceLineCode,omitempty"`
+
+	// Procurators Lista dos representantes. De preenchimento obrigatório se houver representante.
+	Procurators *[]PersonalProcurator `json:"procurators,omitempty"`
+
+	// Type Tipos de produtos.
+	Type ProductServiceType `json:"type"`
+}
 
 // ProductServiceType Tipos de produtos.
 type ProductServiceType string
@@ -655,8 +824,14 @@ type ServerInterface interface {
 	// (GET /consents/v2/consents/{consentId})
 	ConsentV2(w http.ResponseWriter, r *http.Request, consentId ConsentId)
 
+	// (GET /customers/v1/personal/complimentary-information)
+	PersonalComplimentaryInfoV1(w http.ResponseWriter, r *http.Request)
+
 	// (GET /customers/v1/personal/identifications)
 	PersonalIdentificationsV1(w http.ResponseWriter, r *http.Request)
+
+	// (GET /customers/v1/personal/qualifications)
+	PersonalQualificationsV1(w http.ResponseWriter, r *http.Request)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -732,11 +907,39 @@ func (siw *ServerInterfaceWrapper) ConsentV2(w http.ResponseWriter, r *http.Requ
 	handler.ServeHTTP(w, r)
 }
 
+// PersonalComplimentaryInfoV1 operation middleware
+func (siw *ServerInterfaceWrapper) PersonalComplimentaryInfoV1(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PersonalComplimentaryInfoV1(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // PersonalIdentificationsV1 operation middleware
 func (siw *ServerInterfaceWrapper) PersonalIdentificationsV1(w http.ResponseWriter, r *http.Request) {
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PersonalIdentificationsV1(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PersonalQualificationsV1 operation middleware
+func (siw *ServerInterfaceWrapper) PersonalQualificationsV1(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PersonalQualificationsV1(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -863,7 +1066,9 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("POST "+options.BaseURL+"/consents/v2/consents", wrapper.CreateConsentV2)
 	m.HandleFunc("DELETE "+options.BaseURL+"/consents/v2/consents/{consentId}", wrapper.DeleteConsentV2)
 	m.HandleFunc("GET "+options.BaseURL+"/consents/v2/consents/{consentId}", wrapper.ConsentV2)
+	m.HandleFunc("GET "+options.BaseURL+"/customers/v1/personal/complimentary-information", wrapper.PersonalComplimentaryInfoV1)
 	m.HandleFunc("GET "+options.BaseURL+"/customers/v1/personal/identifications", wrapper.PersonalIdentificationsV1)
+	m.HandleFunc("GET "+options.BaseURL+"/customers/v1/personal/qualifications", wrapper.PersonalQualificationsV1)
 
 	return m
 }
@@ -918,6 +1123,22 @@ func (response ConsentV2200JSONResponse) VisitConsentV2Response(w http.ResponseW
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PersonalComplimentaryInfoV1RequestObject struct {
+}
+
+type PersonalComplimentaryInfoV1ResponseObject interface {
+	VisitPersonalComplimentaryInfoV1Response(w http.ResponseWriter) error
+}
+
+type PersonalComplimentaryInfoV1200JSONResponse PersonalComplimentaryInfoResponseV1
+
+func (response PersonalComplimentaryInfoV1200JSONResponse) VisitPersonalComplimentaryInfoV1Response(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type PersonalIdentificationsV1RequestObject struct {
 }
 
@@ -928,6 +1149,22 @@ type PersonalIdentificationsV1ResponseObject interface {
 type PersonalIdentificationsV1200JSONResponse PersonalIdentificationResponseV1
 
 func (response PersonalIdentificationsV1200JSONResponse) VisitPersonalIdentificationsV1Response(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PersonalQualificationsV1RequestObject struct {
+}
+
+type PersonalQualificationsV1ResponseObject interface {
+	VisitPersonalQualificationsV1Response(w http.ResponseWriter) error
+}
+
+type PersonalQualificationsV1200JSONResponse PersonalQualificationResponseV1
+
+func (response PersonalQualificationsV1200JSONResponse) VisitPersonalQualificationsV1Response(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(200)
 
@@ -946,8 +1183,14 @@ type StrictServerInterface interface {
 	// (GET /consents/v2/consents/{consentId})
 	ConsentV2(ctx context.Context, request ConsentV2RequestObject) (ConsentV2ResponseObject, error)
 
+	// (GET /customers/v1/personal/complimentary-information)
+	PersonalComplimentaryInfoV1(ctx context.Context, request PersonalComplimentaryInfoV1RequestObject) (PersonalComplimentaryInfoV1ResponseObject, error)
+
 	// (GET /customers/v1/personal/identifications)
 	PersonalIdentificationsV1(ctx context.Context, request PersonalIdentificationsV1RequestObject) (PersonalIdentificationsV1ResponseObject, error)
+
+	// (GET /customers/v1/personal/qualifications)
+	PersonalQualificationsV1(ctx context.Context, request PersonalQualificationsV1RequestObject) (PersonalQualificationsV1ResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -1062,6 +1305,30 @@ func (sh *strictHandler) ConsentV2(w http.ResponseWriter, r *http.Request, conse
 	}
 }
 
+// PersonalComplimentaryInfoV1 operation middleware
+func (sh *strictHandler) PersonalComplimentaryInfoV1(w http.ResponseWriter, r *http.Request) {
+	var request PersonalComplimentaryInfoV1RequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PersonalComplimentaryInfoV1(ctx, request.(PersonalComplimentaryInfoV1RequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PersonalComplimentaryInfoV1")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PersonalComplimentaryInfoV1ResponseObject); ok {
+		if err := validResponse.VisitPersonalComplimentaryInfoV1Response(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // PersonalIdentificationsV1 operation middleware
 func (sh *strictHandler) PersonalIdentificationsV1(w http.ResponseWriter, r *http.Request) {
 	var request PersonalIdentificationsV1RequestObject
@@ -1086,92 +1353,141 @@ func (sh *strictHandler) PersonalIdentificationsV1(w http.ResponseWriter, r *htt
 	}
 }
 
+// PersonalQualificationsV1 operation middleware
+func (sh *strictHandler) PersonalQualificationsV1(w http.ResponseWriter, r *http.Request) {
+	var request PersonalQualificationsV1RequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PersonalQualificationsV1(ctx, request.(PersonalQualificationsV1RequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PersonalQualificationsV1")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PersonalQualificationsV1ResponseObject); ok {
+		if err := validResponse.VisitPersonalQualificationsV1Response(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"vTpgEjdt5QNOpzZCXKb//jcAAP//I3ADnUhVAAA=",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

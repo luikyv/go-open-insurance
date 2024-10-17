@@ -6,34 +6,6 @@ import (
 	"github.com/luikyv/go-open-insurance/internal/api"
 )
 
-type Status string
-
-const (
-	StatusAuthorised            Status = "AUTHORISED"
-	StatusAwaitingAuthorisation Status = "AWAITING_AUTHORISATION"
-	StatusRejected              Status = "REJECTED"
-	StatusConsumed              Status = "CONSUMED"
-)
-
-type RejectionReason string
-
-const (
-	RejectionReasonConsentExpired                RejectionReason = "CONSENT_EXPIRED"
-	RejectionReasonCustomerManuallyRejected      RejectionReason = "CUSTOMER_MANUALLY_REJECTED"
-	RejectionReasonCustomerManuallyRevoked       RejectionReason = "CUSTOMER_MANUALLY_REVOKED"
-	RejectionReasonConsentMaxDateReached         RejectionReason = "CONSENT_MAX_DATE_REACHED"
-	RejectionReasonConsentTechnicalIssue         RejectionReason = "CONSENT_TECHNICAL_ISSUE"
-	RejectionReasonConsentInternalSecurityReason RejectionReason = "INTERNAL_SECURITY_REASON"
-)
-
-type RejectedBy string
-
-const (
-	RejectedByUser  RejectedBy = "USER"
-	RejectedByASPSP RejectedBy = "ASPSP"
-	RejectedByTPP   RejectedBy = "TPP"
-)
-
 type Consent struct {
 	ID            string                  `bson:"_id"`
 	Status        api.ConsentStatus       `bson:"status"`

@@ -22,15 +22,6 @@ const (
 	headerPragma             = "Pragma"
 )
 
-var (
-	errInvalidToken = opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
-		"invalid token")
-	errTokenMissingScopes = opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
-		"token missing scopes")
-	errInvalidConsent = opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
-		"invalid consent")
-)
-
 func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
 	return func(
 		f nethttp.StrictHTTPHandlerFunc,
@@ -51,17 +42,19 @@ func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
 				return f(ctx, w, r, request)
 			}
 
-			tokenInfo := op.TokenInfo(w, r)
-			if !tokenInfo.IsActive {
+			tokenInfo, err := op.TokenInfo(w, r)
+			if err != nil {
 				Logger(ctx).Debug("the token is not active")
-				return nil, errInvalidToken
+				return nil, opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
+					"invalid token")
 			}
 
 			tokenScopes := strings.Split(tokenInfo.Scopes, " ")
 			if !areScopesValid(scopes, tokenScopes) {
 				Logger(ctx).Debug("invalid scopes",
 					slog.String("token_scopes", tokenInfo.Scopes))
-				return nil, errTokenMissingScopes
+				return nil, opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
+					"token missing scopes")
 			}
 
 			ctx = context.WithValue(ctx, CtxKeyClientID, tokenInfo.ClientID)
@@ -107,7 +100,8 @@ func AuthPermissionMiddleware(
 			if err := verifyPermissions(ctx, consentID, permissions...); err != nil {
 				Logger(ctx).Debug("the consent is not valid for the request",
 					slog.Any("error", err))
-				return nil, errInvalidConsent
+				return nil, opinerr.New("FORBIDDEN", http.StatusForbidden,
+					"invalid consent")
 			}
 
 			return f(ctx, w, r, request)
@@ -174,10 +168,13 @@ func ResponseErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) 
 	var opinErr opinerr.Error
 	if !errors.As(err, &opinErr) {
 		Logger(r.Context()).Error("unexpected error", slog.Any("error", err))
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
 		_ = json.NewEncoder(w).Encode(opinerr.ErrInternal)
+		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(opinErr.StatusCode)
 	_ = json.NewEncoder(w).Encode(newResponseError(opinErr))
 }

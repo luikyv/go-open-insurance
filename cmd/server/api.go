@@ -52,3 +52,23 @@ func (s opinServer) PersonalIdentificationsV1(
 ) {
 	return s.customerV1Server.PersonalIdentificationsV1(ctx, request)
 }
+
+func (s opinServer) PersonalQualificationsV1(
+	ctx context.Context,
+	request api.PersonalQualificationsV1RequestObject,
+) (
+	api.PersonalQualificationsV1ResponseObject,
+	error,
+) {
+	return s.customerV1Server.PersonalQualificationsV1(ctx, request)
+}
+
+func (s opinServer) PersonalComplimentaryInfoV1(
+	ctx context.Context,
+	request api.PersonalComplimentaryInfoV1RequestObject,
+) (
+	api.PersonalComplimentaryInfoV1ResponseObject,
+	error,
+) {
+	return s.customerV1Server.PersonalComplimentaryInfoV1(ctx, request)
+}

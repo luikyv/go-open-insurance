@@ -26,3 +26,8 @@ keys/*.key
 keys/*.crt
 
 logs/
+
+## Random files
+conformance-suite/
+*.zip
+*.bkp
