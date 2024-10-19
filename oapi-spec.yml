@@ -59,6 +59,79 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PersonalComplimentaryInfoResponseV1"
+  /resources/v2/resources:
+    get:
+      description: Método para obter a lista de recursos mantidos pelo cliente na instituição transmissora e para as quais ele tenha fornecido consentimento.
+      summary: Obtém a lista de recursos consentidos pelo cliente.
+      operationId: ResourcesV2
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+          '200':
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ResourcesResponseV2"
+  /insurance-capitalization-title/v1/insurance-capitalization-title/plans:
+    get:
+      summary: Obtem a lista de identificação de InsuranceCapitalizationTitle
+      description: "Método para obter a lista de identificação de InsuranceCapitalizationTitle"
+      operationId: CapitalizationTitlePlansV1
+      parameters:
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapitalizationTitlePlansResponseV1"
+  /insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/plan-info:
+    get:
+      summary: Obtém as informações gerais do plano identificado por {planId}
+      description: "Método para obter as informações gerais do plano"
+      operationId: CapitalizationTitlePlanInfoV1
+      parameters:
+        - $ref: "#/components/parameters/planId"
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapitalizationTitlePlanInfoResponseV1"
+  /insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/events:
+    get:
+      summary: Obtém os dados de eventos do plano identificado por {planId}
+      description: "Método para obter os dados de sorteios e resgates associados ao plano"
+      operationId: CapitalizationTitleEventsV1
+      parameters:
+        - $ref: "#/components/parameters/planId"
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          description: Dados de ResponseInsuranceCapitalizationTitleEvent obtidos com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapitalizationTitleEventsResponseV1"
+  /insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/settlements:
+    get:
+      summary: Obtém os dados de liquidações do plano identificado por {planId}
+      description: "Método para obter os dados de liquidações do plano."
+      operationId: CapitalizationTitleSettlementsV1
+      parameters:
+        - $ref: "#/components/parameters/planId"
+        - $ref: '#/components/parameters/pageNumber'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          description: Dados de ResponseInsuranceCapitalizationTitleSettlement obtidos com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CapitalizationTitleSettlementsResponseV1"
 components:
   schemas:
     ResponseError:
@@ -1214,6 +1287,788 @@ components:
       example: PROCURADOR
       description: |
         Natureza dos poderes vigentes de representante
+    ResourcesResponseV2:
+      type: object
+      required:
+        - data
+        - links
+        - meta
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceData'
+          minItems: 0
+          description: Lista de recursos e seus respectivos status.
+        links:
+          $ref: '#/components/schemas/Links'
+        meta:
+          $ref: '#/components/schemas/Meta'
+      additionalProperties: false
+    ResourceData:
+      type: object
+      required:
+        - resourceId
+        - type
+        - status
+      properties:
+        resourceId:
+          type: string
+          description: |
+            Identifica o recurso reportado pelo participante do Open Insurance, no caso de:
+            Produtos de Titulos de Capitalização: policyNumber ou certificateNumber
+            Produtos de Previdência: certificateNumber
+            Produtos de Danos e Pessoas (independente do ramo e torná-lo como obrigatório): policyNumber ou certificateNumber
+          minLength: 1
+          maxLength: 100
+          pattern: '^[a-zA-Z0-9][a-zA-Z0-9\-]{0,99}$'
+          example: 25cac914-d8ae-6789-b215-650a6215820d
+        type:
+          $ref: '#/components/schemas/ResourceType'
+        status:
+          $ref: '#/components/schemas/ResourceStatus'
+      additionalProperties: false
+    ResourceType:
+      type: string
+      enum:
+        - CUSTOMERS_PERSONAL_IDENTIFICATIONS
+        - CUSTOMERS_PERSONAL_QUALIFICATION
+        - CUSTOMERS_PERSONAL_ADDITIONALINFO
+        - CUSTOMERS_BUSINESS_IDENTIFICATIONS
+        - CUSTOMERS_BUSINESS_QUALIFICATION
+        - CUSTOMERS_BUSINESS_ADDITIONALINFO                 
+        - CAPITALIZATION_TITLES
+        - PENSION_PLAN
+        - LIFE_PENSION
+        - FINANCIAL_ASSISTANCE
+        - DAMAGES_AND_PEOPLE_PATRIMONIAL
+        - DAMAGES_AND_PEOPLE_RESPONSIBILITY
+        - DAMAGES_AND_PEOPLE_TRANSPORT
+        - DAMAGES_AND_PEOPLE_FINANCIAL_RISKS
+        - DAMAGES_AND_PEOPLE_RURAL
+        - DAMAGES_AND_PEOPLE_AUTO
+        - DAMAGES_AND_PEOPLE_HOUSING
+        - DAMAGES_AND_PEOPLE_PERSON
+        - DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD
+        - CLAIM_NOTIFICATION
+        - ENDORSEMENT
+        - QUOTE_PATRIMONIAL
+        - QUOTE_ACCEPTANCE_AND_BRANCHES_ABROAD
+        - QUOTE_AUTO
+        - QUOTE_FINANCIAL_RISK
+        - QUOTE_HOUSING
+        - QUOTE_RESPONSIBILITY
+        - QUOTE_RURAL
+        - QUOTE_TRANSPORT
+        - QUOTE_PERSON
+        - QUOTE_CAPITALIZATION_TITLE
+        - CONTRACT_LIFE_PENSION
+        - CONTRACT_PENSION_PLAN
+        - PENSION_WITHDRAWAL
+        - CAPITALIZATION_TITLE_WITHDRAWAL
+      description: |
+        Tipo de recurso (vide Enum):
+        - CUSTOMERS_PERSONAL_IDENTIFICATIONS: Informações de identificação PF
+        - CUSTOMERS_PERSONAL_QUALIFICATION: Informações de qualificação PF                    
+        - CUSTOMERS_PERSONAL_ADDITIONALINFO: Informações complementares PF
+        - CUSTOMERS_BUSINESS_IDENTIFICATIONS: Informações de identificação PJ
+        - CUSTOMERS_BUSINESS_QUALIFICATION: Informações de qualificação PJ
+        - CUSTOMERS_BUSINESS_ADDITIONALINFO: Informações complementares PJ
+        - CAPITALIZATION_TITLES: Produtos de Titulos de Capitalização
+        - PENSION_PLAN: Produtos de Previdência Risco
+        - LIFE_PENSION: Produtos de Previdência Sobrevivência
+        - FINANCIAL_ASSISTANCE: Produtos de Assistência Financeira                   
+        - DAMAGES_AND_PEOPLE_PATRIMONIAL: Produtos de Patrimonial
+        - DAMAGES_AND_PEOPLE_RESPONSIBILITY: Produtos de Responsabilidade
+        - DAMAGES_AND_PEOPLE_TRANSPORT: Produtos de Transportes
+        - DAMAGES_AND_PEOPLE_FINANCIAL_RISKS: Produtos de Riscos Financeiros
+        - DAMAGES_AND_PEOPLE_RURAL: Produtos de Rural
+        - DAMAGES_AND_PEOPLE_AUTO: Produtos de Automóveis
+        - DAMAGES_AND_PEOPLE_HOUSING: Produtos de Habitacional
+        - DAMAGES_AND_PEOPLE_PERSON: Produtos de Pessoas (Repartição simples)
+        - DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD: Aceitação e Sucursal no exterior
+        - CLAIM_NOTIFICATION: Solicitação de Aviso de Sinistro
+        - ENDORSEMENT: Solicitação de Endosso
+        - QUOTE_PATRIMONIAL: Cotação do Seguro Patrimonial
+        - QUOTE_ACCEPTANCE_AND_BRANCHES_ABROAD: Cotação do Seguro Aceitação e Sucursal no exterior
+        - QUOTE_AUTO: Cotação do Seguro Automóvel
+        - QUOTE_FINANCIAL_RISK: Cotação do Seguro Riscos Financeiros
+        - QUOTE_HOUSING: Cotação do Seguro Habitacional
+        - QUOTE_RESPONSIBILITY: Cotação do Seguro Responsabilidade
+        - QUOTE_RURAL: Cotação do Seguro Rural
+        - QUOTE_TRANSPORT: Cotação do Seguro Transportes
+        - QUOTE_PERSON: Cotação do Seguro Pessoas
+        - QUOTE_CAPITALIZATION_TITLE: Cotação de Títulos de Capitalização
+        - CONTRACT_LIFE_PENSION: Contratação/Portabilidade de Previdência Sobrevivência
+        - CONTRACT_PENSION_PLAN: Contratação/Portabilidade de Previdência Risco
+        - PENSION_WITHDRAWAL: Resgate de Previdência
+        - CAPITALIZATION_TITLE_WITHDRAWAL: Resgate de Títulos de Capitalização
+      example: CAPITALIZATION_TITLES
+    ResourceStatus:
+      type: string
+      enum:
+        - AVAILABLE
+        - UNAVAILABLE
+        - TEMPORARILY_UNAVAILABLE
+        - PENDING_AUTHORISATION
+      description: |
+        - Tipo de status de recurso (vide Enum):
+        - Available: Disponível
+        - Unavailable: Indisponível
+        - Temporarily Unavailable: Temporariamente Indisponível
+        - Pending Authorisation: Pendente de Autorização
+      example: AVAILABLE
+    CapitalizationTitlePlansResponseV1:
+      type: object
+      required:
+        - data
+        - links
+        - meta
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/CapitalizationTitlePlanData"
+        links:
+            $ref: '#/components/schemas/Links'
+        meta:
+            $ref: '#/components/schemas/Meta'
+    CapitalizationTitlePlanData:
+      type: object
+      required:
+        - brand
+      properties:
+        brand:
+            $ref: '#/components/schemas/CapitalizationTitleBrand'
+    CapitalizationTitleBrand:
+      type: object
+      description: Marca reportada pelo participante do Open Insurance
+      required:
+        - name
+        - companies
+      properties:
+        name:
+          type: string
+          description: Nome da marca reportada pelo participante do Open Insurance
+          example: EMPRESA A Seguros
+        companies:
+          type: array
+          items:
+            $ref: '#/components/schemas/CapitalizationTitleCompany'
+    CapitalizationTitleCompany:
+      type: object
+      required:
+        - companyName
+        - cnpjNumber
+        - products
+      properties:
+        companyName:
+          description: Nome da sociedade pertencente à marca
+          type: string
+          maxLength: 200
+          example: Nome da sociedade
+        cnpjNumber:
+          description: CNPJ da sociedade pertencente à marca
+          type: string
+          pattern: '^\d{14}$'
+          example: "12345678901234"
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/CapitalizationTitleProduct'
+    CapitalizationTitleProduct:
+      type: object
+      required:
+        - productName
+        - planId
+      properties:
+        productName:
+          description: Nome comercial do produto associado ao plano
+          type: string
+          maxLength: 70
+          example: "Produto Exemplo"
+        planId:
+          description: planId - Identificador do contrato do plano
+          type: string
+    CapitalizationTitlePlanInfoResponseV1:
+      type: object
+      required:
+        - data
+        - links
+        - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/CapitalizationTitlePlanInfo'
+        links:
+          $ref: '#/components/schemas/Links'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    CapitalizationTitlePlanInfo:
+      type: object
+      required:
+        - series
+      properties:
+        series:
+          description: Dados Gerais da Série        
+          type: array
+          items:
+            $ref: "#/components/schemas/CapitalizationTitleSeries"
+    CapitalizationTitleSeries:
+      description: Dados Gerais da Série
+      type: object
+      required:
+        - seriesId
+        - modality
+        - susepProcessNumber
+        - serieSize
+        - uploadQuota
+        - capitalizationQuota
+        - raffleQuota
+        - gracePeriodForFullRedemption
+        - updateIndex
+        - readjustmentIndex
+        - bonusClause
+        - frequency
+        - interestRate
+        - titles
+      properties:
+        planId:
+          description: Identificação do plano
+          type: string
+        seriesId:
+          description: Identificação da série
+          type: string
+          maxLength: 60
+        modality:
+          $ref: "#/components/schemas/CapitalizationTitleSeriesModality"
+        susepProcessNumber:
+          type: string
+          description: Número do processo SUSEP.
+          maxLength: 20
+          example: "15414622222222222"
+        commercialName:
+          type: string
+          description: Denominação comercial do produto de propriedade exclusiva da sociedade de capitalização. Condicional, caso selecionada as opções "Filantropia Premiável" ou "Popular" no campo "Modalidade".
+          maxLength: 100
+          example: Denominação comercial do produto
+        serieSize:
+          type: integer
+          description: Quantidade máxima possível de títulos que pode ser emitida para uma mesma série
+          maxLength: 10
+          example: 5000000
+        uploadQuota:
+          description: Percentual da contribuição destinado aos custos de despesas com corretagem, colocação e administração do título de capitalização, emissão, divulgação, lucro da sociedade de capitalização e eventuais despesas relativas ao custeio da contemplação obrigatória e da distribuição de bônus
+          allOf:
+            - $ref: '#/components/schemas/PercentageDetails'
+        capitalizationQuota:
+          description: Percentual da contribuição destinado à constituição de capital referente ao direito de resgate
+          allOf:
+            - $ref: '#/components/schemas/PercentageDetails'
+        raffleQuota:
+          description: Percentual da contribuição destinado a custear os sorteios, se previstos no plano
+          allOf:
+            - $ref: '#/components/schemas/PercentageDetails'
+        gracePeriodRedemption:
+          type: integer
+          description: Intervalo de tempo mínimo entre contratação e resgate parcial do direito, em meses.
+          maxLength: 3
+          example: 48
+        gracePeriodForFullRedemption:
+          type: integer
+          description: Intervalo de tempo mínimo entre contratação e resgate total do direito, em meses
+          maxLength: 3
+          example: 48
+        updateIndex:
+          $ref: "#/components/schemas/UpdateIndex"
+        updateIndexOthers:
+          type: string
+          description: Descreve o índice de atualização utilizado quando outro que não previamente relacionado nos domínios do campo.
+          maxLength: 100
+          example: Índice de atualização Outros
+        readjustmentIndex:
+          $ref: "#/components/schemas/ReadjustmentIndex"
+        readjustmentIndexOthers:
+          type: string
+          description: Descreve o índice de reajuste utilizado quando outro que não previamente relacionado nos domínios do campo.
+          maxLength: 100
+          example: Índice de reajuste Outros
+        bonusClause: 
+          type: boolean
+          description: Cláusula de bônus
+          example: false
+        frequency:
+          $ref: "#/components/schemas/Frequency"
+        frequencyDescription:
+          type: string
+          description: Descrição do Tipo de Contribuição (Quando o Tipo de Contribuição for 3. Pagamento Periódico)
+          maxLength: 100
+        interestRate:
+          description: Taxa de juros efetiva real mensal utilizada para remuneração do título de capitalização.
+          allOf:
+            - $ref: '#/components/schemas/PercentageDetails'
+        broker:
+          description: Dados do corretor (quando houver)
+          type: array
+          items:
+            $ref: "#/components/schemas/CapitalizationTitleBroker"
+        titles:
+          description: Dados Gerais do Título
+          type: array
+          items:
+            $ref: "#/components/schemas/CapitalizationTitleTitle"
+    CapitalizationTitleBroker:
+      type: object
+      required:
+        - susepBrokerCode
+        - brokerDescription
+      properties:
+        susepBrokerCode:
+          type: string
+          description: Código SUSEP do corretor.
+          maxLength: 12
+          example: "123123123"
+        brokerDescription:
+          description: Nome ou Razão Social do Corretor
+          type: string
+          maxLength: 200
+    CapitalizationTitleTitle:
+      type: object
+      required:
+        - titleId
+        - registrationForm
+        - issueTitleDate
+        - termStartDate
+        - termEndDate
+        - rafflePremiumAmount
+        - contributionAmount
+        - subscriber
+        - technicalProvisions
+      properties:
+        titleId: 
+          description: Identificação do título de capitalização
+          type: string
+          maxLength: 60
+        registrationForm: 
+          description: Identificação da ﬁcha de cadastro ou contrato comercial
+          type: string
+          maxLength: 50
+        issueTitleDate: 
+          description: Data de Emissão do Título
+          type: string
+          format: date
+          example: "2023-01-30"         
+        termStartDate: 
+          description: Data de início de vigência do título de capitalização.
+          type: string
+          format: date
+          example: "2023-01-30"         
+        termEndDate:
+          description: Data de fim de vigência do título de capitalização.
+          type: string
+          format: date
+          example: "2023-01-30"
+        rafflePremiumAmount:
+          description: Valor do premio de sorteio
+          allOf:
+            - $ref: "#/components/schemas/AmountDetails"
+        contributionAmount:
+          description: Corresponde ao pagamento efetuado pelo subscritor à sociedade de capitalização para a aquisição do título de capitalização, podendo ser única, periódica ou mensal. Em todas as situações indicar para qual periodicidade de pagamento se aplicam os valores(pagamento mensal, pagamento único ou periódico). 
+          allOf:
+            - $ref: "#/components/schemas/AmountDetails"
+        subscriber:
+          description: Dados Gerais do Título
+          type: array
+          items:
+            $ref: "#/components/schemas/CapitalizationTitleSubscriber"
+        technicalProvisions:
+          description: Informações de Provisões técnicas
+          type: array
+          items:
+            $ref: "#/components/schemas/CapitalizationTitleTechnicalProvisions"
+    CapitalizationTitleSeriesModality:
+      type: string
+      description: Modalidade
+      example: TRADICIONAL
+      enum: [TRADICIONAL, INSTRUMENTO_GARANTIA, COMPRA_PROGRAMADA, POPULAR, FILANTROPIA_PREMIAVEL]
+    PercentageDetails:
+      type: number
+      pattern: '^\d{1,3}\.\d{1,9}$'
+      example: 10.00
+    UpdateIndex:
+      type: string
+      description: Descreve o índice de atualização das reservas.
+      example: IPCA
+      enum: [INDICE_REMUNERACAO_BASICA_DEPOSITOS_POUPANCA, IPCA, INCC, INPC, IGPM, OUTROS]
+    ReadjustmentIndex:
+      type: string
+      description: Índice de reajuste das contribuições e do capital para vigências acima de doze meses
+      example: IPCA
+      enum: [INDICE_REMUNERACAO_BASICA_DEPOSITOS_POUPANCA, IPCA, INCC, INPC, IGPM, OUTROS]
+    Frequency:
+      type: string         
+      description: Tipo de Contribuição - pagamento único, pagamento mensal ou periódico
+      example: MENSAL
+      enum: [UNICO, MENSAL, PERIODICO]
+    AmountDetails:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+          pattern: '^\d{1,16}\.\d{2}$'
+          example: 2000.00
+        currency:
+          description: Moeda da Parcela, de acordo com ISO-4217.
+          type: string
+          pattern: '^(\w{3}){1}$'
+          example: BRL
+    CapitalizationTitleSubscriber:
+      type: object
+      required:
+        - subscriberName
+        - subscriberDocumentType
+        - subscriberDocumentNumber
+        - subscriberAddress
+        - subscriberTownName
+        - subscriberCountrySubDivision
+        - subscriberCountryCode
+        - subscriberPostCode
+      properties:
+        subscriberName:
+          description: Nome ou Razão Social do Subscritor
+          type: string
+          maxLength: 144
+          example: Nome do Subscritor
+        subscriberDocumentType:
+          $ref: "#/components/schemas/DocumentType"
+        subscriberDocumentTypeOthers:
+          description: Tipo de Documento do Subscritor, caso seja selecionado OUTROS.
+          type: string
+        subscriberDocumentNumber:
+          description: Documento de Identificação do Subscritor
+          type: string
+          maxLength: 40
+        subscriberPhones:
+          description: Lista com telefones do subscritor (quando houver)
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestorPhone'
+        subscriberAddress:
+          description: |
+            Endereço do subscritor
+          type: string
+          maxLength: 200
+          pattern: '[\w\W\s]*'
+          example: "Av Naburo Ykesaki, 1270"
+        subscriberAddressAdditionalInfo:
+          type: string
+          maxLength: 30
+          pattern: '[\w\W\s]*'
+          example: Fundos
+          description: Alguns logradouros ainda necessitam ser especificados por meio de complemento.
+        subscriberTownName:
+          type: string
+          maxLength: 50
+          pattern: '[\w\W\s]*'
+          example: Rio de Janeiro
+          description: |
+            Localidade: O nome da localidade corresponde à designação da cidade ou município no qual o endereço está localizado.
+            Cidade do subscritor
+        subscriberCountrySubDivision:
+          description: Estado do subscritor
+          allOf:
+            - $ref: "#/components/schemas/CountrySubDivision"
+        subscriberCountryCode:
+          description: |
+            Código do pais de acordo com o código “alpha3” do ISO-3166.
+            País do subscritor
+          type: string
+          maxLength: 3
+          example: BRA
+        subscriberPostCode:
+          description: |
+            Código de Endereçamento Postal: Composto por um conjunto numérico de oito dígitos, o objetivo principal do CEP é orientar e acelerar o encaminhamento, o tratamento e a entrega de objetos postados nos Correios, por meio da sua atribuição a localidades, logradouros, unidades dos Correios, serviços, órgãos públicos, empresas e edifícios. p.ex. '01311000'.
+            Código Postal do subscritor, Obrigatório, se houver
+          type: string
+          pattern: '\d{8}|^NA$'
+          maxLength: 8
+          example: "17500001"
+        holder:
+          description: Dados Gerais do Titular
+          type: array
+          items:
+            $ref: "#/components/schemas/CapitalizationTitleHolder"
+    RequestorPhone:
+      type: object
+      properties:
+        countryCallingCode:
+          type: string
+          maxLength: 4
+          pattern: '^\d{2,4}$|^NA$'
+          example: '55'
+          description: Número de DDI (Discagem Direta Internacional) para telefone de acesso ao Cliente - se aplicável
+        areaCode:
+          $ref: '#/components/schemas/AreaCode'
+        number:
+          type: string
+          maxLength: 11
+          pattern: '^([0-9]{8,11})|^NA$'
+          example: '29875132'
+          description: Número de telefone do cliente
+      additionalProperties: false
+    CapitalizationTitleHolder:
+      type: object
+      required:
+        - holderName
+        - holderDocumentType
+        - holderDocumentNumber
+        - holderAddress
+        - holderTownName
+        - holderCountrySubDivision
+        - holderCountryCode
+        - holderPostCode
+        - holderRedemption
+        - holderRaffle
+      properties:
+        holderName:
+          description: Nome ou Razão Social do Titular
+          type: string
+          maxLength: 144
+          example: Nome do Titular
+        holderDocumentType:
+          $ref: "#/components/schemas/DocumentType"
+        holderDocumentTypeOthers:
+          description: Tipo de Documento do Titular, caso seja selecionado OUTROS.
+          type: string
+        holderDocumentNumber:
+          description: Documento de Identificação do Titular
+          type: string
+          maxLength: 40
+        holderPhones:
+          description: Lista com telefones do Titular (quando houver)
+          type: array
+          items:
+            $ref: '#/components/schemas/RequestorPhone'
+        holderAddress:
+          description: |
+            Endereço do titular
+          type: string
+          maxLength: 200
+          pattern: '[\w\W\s]*'
+          example: "Av Naburo Ykesaki, 1270"
+        holderAddressAdditionalInfo:
+          type: string
+          maxLength: 30
+          pattern: '[\w\W\s]*'
+          example: Fundos
+          description: Alguns logradouros ainda necessitam ser especificados por meio de complemento.
+        holderTownName:
+          type: string
+          maxLength: 50
+          pattern: '[\w\W\s]*'
+          example: Rio de Janeiro
+          description: |
+            Localidade: O nome da localidade corresponde à designação da cidade ou município no qual o endereço está localizado.
+            Cidade do titular
+        holderCountrySubDivision:
+          description: Estado do titular
+          allOf:
+            - $ref: "#/components/schemas/CountrySubDivision"
+        holderCountryCode:
+          description: |
+            Código do pais de acordo com o código “alpha3” do ISO-3166.
+            País do titular
+          type: string
+          maxLength: 3
+          example: BRA
+        holderPostCode:
+          description: |
+            Código de Endereçamento Postal: Composto por um conjunto numérico de oito dígitos, o objetivo principal do CEP é orientar e acelerar o encaminhamento, o tratamento e a entrega de objetos postados nos Correios, por meio da sua atribuição a localidades, logradouros, unidades dos Correios, serviços, órgãos públicos, empresas e edifícios. p.ex. '01311000'.
+            Código Postal do titular, Obrigatório, se houver
+          type: string
+          pattern: '\d{8}|^NA$'
+          maxLength: 8
+          example: "17500001"
+        holderRedemption:
+          type: boolean
+          description: Titular do direito de resgate?
+          example: false
+        holderRaffle:
+          type: boolean
+          description: Titular do direito de sorteio?
+          example: false
+    DocumentType:
+      description: Tipo de Documento do Titular
+      type: string
+      enum: [CPF, CNPJ, PASSAPORTE, OUTROS]
+      example: OUTROS
+    CapitalizationTitleTechnicalProvisions:
+      description: (Esses valores poderão sofrer alterações no momento do resgate/pagamento,conforme regras do produto nas condições gerais)
+      type: object
+      required:
+        - pmcAmount
+        - pdbAmount
+        - prAmount
+        - pspAmount
+      properties:
+        pmcAmount:
+          description: Valor da PMC (fim do mes) - Valor da Provisão Matemática para Capitalização (PMC), no fim de cada mês. Caso não haja saldo informar nulo
+          allOf:
+            - $ref: '#/components/schemas/AmountDetails'
+        pdbAmount:
+          description: Valor da PDB (fim do mes) - Valor da Provisão para Distribuição de Bônus (PDB), no fim de cada mês. Caso não haja saldo informar nulo
+          allOf:
+            - $ref: '#/components/schemas/AmountDetails'
+        prAmount:
+          description: Valor da PR (fim do mes) - Valor da Provisão para Resgate (PR), no fim de cada mês. Caso não haja saldo informar nulo
+          allOf:
+            - $ref: '#/components/schemas/AmountDetails'
+        pspAmount:
+          description: Valor da PSP (fim do mes) - Valor da Provisão de Sorteios a Pagar (PSP), no fim de cada mês. Caso não haja saldo informar nulo
+          allOf:
+            - $ref: '#/components/schemas/AmountDetails'
+    CapitalizationTitleEventsResponseV1:
+      type: object
+      required:
+        - data
+        - links
+        - meta
+      properties:
+        data:
+            $ref: '#/components/schemas/CapitalizationTitleEvents'                    
+        links:
+            $ref: '#/components/schemas/Links'
+        meta:
+            $ref: '#/components/schemas/Meta'
+    CapitalizationTitleEvents:
+      type: array
+      items:
+        $ref: '#/components/schemas/CapitalizationTitleEvent'
+    CapitalizationTitleEvent:
+      type: object
+      properties:
+        titleId:
+          description: Código identificador do título na sociedade.
+          type: string
+          maxLength: 80        
+        eventType:
+          $ref: '#/components/schemas/CapitalizationTitleEventType'
+        event:
+          $ref: '#/components/schemas/CapitalizationTitleEventInfo'
+    CapitalizationTitleEventType:
+      description: Tipo de Evento
+      type: string
+      enum: [SORTEIO, RESGATE]
+    CapitalizationTitleEventInfo:
+      type: object
+      properties:
+        raffle:
+          $ref: '#/components/schemas/CapitalizationTitleEventRaffle'
+        redemption:
+          $ref: '#/components/schemas/CapitalizationTitleEventRedemption'
+    CapitalizationTitleEventRaffle:
+      type: object
+      required:
+        - raffleAmount
+        - raffleDate
+        - raffleSettlementDate
+      properties:
+        raffleAmount:
+          description: Montante do capital sorteado (prêmio de sorteio bruto, livre de IOF, quando aplicável)
+          allOf:
+            - $ref: '#/components/schemas/AmountDetails'
+        raffleDate:
+          description: Data de realização do sorteio
+          type: string
+          format: date
+          example: "2023-01-30"
+        raffleSettlementDate:
+          description: Data da liquidação financeira do capital sorteado
+          type: string
+          format: date
+          example: "2023-01-30"
+    CapitalizationTitleEventRedemption:
+      type: object
+      required:
+        - redemptionType
+        - redemptionAmount
+        - redemptionBonusAmount
+        - redemptionRequestDate
+        - redemptionSettlementDate
+      properties:
+        redemptionType:
+          $ref: '#/components/schemas/AmountDetails'
+        redemptionAmount:
+          description: Valor de resgate. (Valor bruto de resgate, livre de IOF, quando aplicável)
+          allOf:
+            - $ref: '#/components/schemas/AmountDetails'
+        redemptionBonusAmount:
+          description: Valor do Bonus. (Valor bruto do bonus resgatado, livre de IOF, quando aplicável)
+          allOf:
+            - $ref: '#/components/schemas/AmountDetails'
+        unreturnedAmount:
+          description: Valor não restituido. (Valor bruto não restituido ao titular em caso de resgate antecipado)
+          allOf:
+            - $ref: '#/components/schemas/AmountDetails'
+        redemptionRequestDate:
+          description: Data de solicitação do resgate
+          type: string
+          format: date
+          example: "2023-01-30"
+        redemptionSettlementDate:
+          description: Data da liquidação financeira do resgate
+          type: string
+          format: date
+          example: "2023-01-30"
+    CapitalizationTypeEventRedemptionType:
+      description: Tipo de resgate
+      type: string
+      enum: [ANTECIPADO_PARCIAL, ANTECIPADO_TOTAL, FINAL_VIGENCIA]
+    CapitalizationTitleSettlementsResponseV1:
+      type: object
+      required:
+        - data
+        - links
+        - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/CapitalizationTitleSettlements'                    
+        links:
+          $ref: '#/components/schemas/Links'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    CapitalizationTitleSettlements:
+      type: array
+      items:
+        $ref: '#/components/schemas/CapitalizationTitleSettlement'
+    CapitalizationTitleSettlement:
+      type: object
+      required:
+        - settlementId
+        - settlementFinancialAmount
+        - settlementPaymentDate
+        - settlementDueDate
+      properties:
+        settlementId:
+          description: Identificador da Contribuicao
+          type: string
+        settlementFinancialAmount:
+          description: Valor da contribuicao
+          allOf:
+            - $ref: '#/components/schemas/AmountDetails'
+        settlementPaymentDate:
+          description: Data da Contribuicao
+          type: string
+          format: date
+          example: "2023-01-30"
+        settlementDueDate:
+          description: Data de Vencimento da Contribuicao
+          type: string
+          format: date
+          example: "2023-01-30"
+    
   parameters:
     consentId:
       name: consentId
@@ -1223,3 +2078,29 @@ components:
         type: string
         pattern: '^urn:[a-zA-Z0-9][a-zA-Z0-9-]{0,31}:[a-zA-Z0-9()+,\-.:=@;$_!*''%\/?#]+$'
         maxLength: 256
+    pageNumber:
+      name: page
+      in: query
+      description: Número da página que está sendo requisitada (o valor da primeira página é 1).
+      schema:
+        type: integer
+        default: 1
+        minimum: 1
+        format: int32
+    pageSize:
+      name: page-size
+      in: query
+      description: Quantidade total de registros por páginas.
+      schema:
+        type: integer
+        default: 25
+        minimum: 1
+        format: int32
+        maximum: 1000
+    planId:
+        name: planId
+        in: path
+        required: true
+        schema:
+          type: string
+          maxLength: 60

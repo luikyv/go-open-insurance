@@ -7,10 +7,14 @@ import (
 	"net/http"
 
 	"github.com/luikyv/go-open-insurance/internal/api"
+	"github.com/luikyv/go-open-insurance/internal/capitalizationtitle"
+	capitalizationtitlev1 "github.com/luikyv/go-open-insurance/internal/capitalizationtitle/v1"
 	"github.com/luikyv/go-open-insurance/internal/consent"
 	consentv2 "github.com/luikyv/go-open-insurance/internal/consent/v2"
 	"github.com/luikyv/go-open-insurance/internal/customer"
 	customersv1 "github.com/luikyv/go-open-insurance/internal/customer/v1"
+	"github.com/luikyv/go-open-insurance/internal/resource"
+	resourcev2 "github.com/luikyv/go-open-insurance/internal/resource/v2"
 	"github.com/luikyv/go-open-insurance/internal/user"
 	nethttpmiddleware "github.com/oapi-codegen/nethttp-middleware"
 	"github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
@@ -38,12 +42,22 @@ func main() {
 
 	// Storage.
 	userStorage := user.NewStorage()
+	idempotencyStorage := api.NewIdempotencyStorage(db)
 	consentStorage := consent.NewStorage(db)
+	resourceStorage := resource.NewStorage()
+	customerStorage := customer.NewStorage()
+	capitalizationtitleStorage := capitalizationtitle.NewStorage()
 
 	// Services.
 	userService := user.NewService(userStorage)
-	consentService := consent.NewService(userService, consentStorage)
-	customerService := customer.NewService()
+	consentService := consent.NewService(consentStorage, userService)
+	resourceService := resource.NewService(resourceStorage, consentService)
+	customerService := customer.NewService(customerStorage)
+	capitalizationtitleService := capitalizationtitle.NewService(
+		capitalizationtitleStorage,
+		resourceService,
+	)
+	idempotencyService := api.NewIdempotencyService(idempotencyStorage)
 
 	// Provider.
 	op, err := openidProvider(db, userService, consentService,
@@ -56,13 +70,20 @@ func main() {
 	server := opinServer{
 		consentV2Server:  consentv2.NewServer(baseURLOPIN, consentService),
 		customerV1Server: customersv1.NewServer(baseURLOPIN, customerService),
+		resouceV2Server:  resourcev2.NewServer(baseURLOPIN, resourceService),
+		capitalizationTitleV1Server: capitalizationtitlev1.NewServer(
+			baseURLOPIN,
+			capitalizationtitleService,
+		),
 	}
 	strictHandler := api.NewStrictHandlerWithOptions(
 		server,
 		[]nethttp.StrictHTTPMiddlewareFunc{
+			api.MetaMiddleware(),
 			api.CacheControlMiddleware(),
 			api.AuthPermissionMiddleware(consentService.VerifyPermissions),
 			api.AuthScopeMiddleware(op),
+			api.IdempotencyMiddleware(idempotencyService),
 			api.FAPIIDMiddleware(),
 		},
 		api.StrictHTTPServerOptions{
@@ -83,6 +104,7 @@ func main() {
 			ErrorHandler: api.ValidationErrorHandler(),
 		},
 	)(opinMux)
+	opinHandler = api.ResponseEncodingMiddleware(opinHandler)
 	opinHandler = http.StripPrefix(apiPrefixOPIN, opinHandler)
 
 	mux := http.NewServeMux()
@@ -90,7 +112,12 @@ func main() {
 	mux.Handle(apiPrefixOPIN+"/", opinHandler)
 
 	// Run.
-	if err := loadMocks(userService, customerService); err != nil {
+	if err := loadMocks(
+		userService,
+		customerService,
+		resourceService,
+		capitalizationtitleService,
+	); err != nil {
 		log.Fatal(err)
 	}
 	s := &http.Server{

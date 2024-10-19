@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -18,6 +19,7 @@ import (
 
 const (
 	headerXFAPIInteractionID = "X-FAPI-Interaction-ID"
+	headerIdempotencyID      = "X-Idempotency-Key"
 	headerCacheControl       = "Cache-Control"
 	headerPragma             = "Pragma"
 )
@@ -71,7 +73,7 @@ func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
 
 type VerifyPermissionsFunc func(
 	ctx context.Context,
-	id string,
+	consentID string,
 	permissions ...ConsentPermission,
 ) error
 
@@ -109,6 +111,85 @@ func AuthPermissionMiddleware(
 	}
 }
 
+// IdempotencyMiddleware ensures that requests with the same idempotency ID
+// are not processed multiple times, returning a cached response if available.
+func IdempotencyMiddleware(
+	service IdempotencyService,
+) nethttp.StrictHTTPMiddlewareFunc {
+	return func(
+		f nethttp.StrictHTTPHandlerFunc,
+		operationID string,
+	) nethttp.StrictHTTPHandlerFunc {
+		return func(
+			ctx context.Context,
+			w http.ResponseWriter,
+			r *http.Request,
+			request interface{},
+		) (
+			response interface{},
+			err error,
+		) {
+			if !isIdempotent(operationID) {
+				return f(ctx, w, r, request)
+			}
+
+			idempotencyID := r.Header.Get(headerIdempotencyID)
+			if idempotencyID == "" {
+				return nil, opinerr.New("ERRO_IDEMPOTENCIA", http.StatusUnprocessableEntity,
+					"missing idempotency id header")
+			}
+
+			// Try to fetch a cached response for the idempotency ID.
+			idempotentResp, err := service.FetchIdempotencyResponse(
+				ctx,
+				idempotencyID,
+				request,
+			)
+			// If a cached response exists, write it to the response writer and
+			// exit early.
+			if err == nil {
+				Logger(ctx).Info("return cached idempotency response")
+				writeIdempotencyResp(w, r, idempotentResp)
+				// returning the response as nil guarantees that the cached
+				// response won't be overwritten.
+				return nil, nil
+			}
+			// If the error was not due to "idempotency not found", return an
+			// internal error.
+			if !errors.Is(err, errIdempotencyNotFound) {
+				return nil, opinerr.ErrInternal
+			}
+
+			// The idempotency record was not found, then process the request
+			// and cache the response for next requests with the same idempotency ID.
+			response, err = f(ctx, w, r, request)
+			if err != nil {
+				return nil, err
+			}
+			service.CreateIdempotency(
+				r.Context(),
+				idempotencyID,
+				request,
+				response,
+			)
+			return response, nil
+		}
+	}
+}
+
+func writeIdempotencyResp(
+	w http.ResponseWriter,
+	r *http.Request,
+	resp string,
+) {
+	if r.Method == http.MethodPost {
+		w.WriteHeader(http.StatusCreated)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+	_, _ = w.Write([]byte(resp))
+}
+
 func FAPIIDMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 	return func(
 		f nethttp.StrictHTTPHandlerFunc,
@@ -124,12 +205,48 @@ func FAPIIDMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 			err error,
 		) {
 			interactionID := r.Header.Get(headerXFAPIInteractionID)
+			interactionIDIsValid := true
+			interactionIDIsRequired := isFAPIIDRequired(operationID)
+
+			// Verify if the interaction ID is valid, generate a new value if not.
 			if _, err := uuid.Parse(interactionID); err != nil {
+				interactionIDIsValid = false
 				interactionID = uuid.NewString()
 			}
 
+			// Return the same interaction ID in the response or a new valid value
+			// if the original is invalid.
 			w.Header().Add(headerXFAPIInteractionID, interactionID)
+
+			if interactionIDIsRequired && !interactionIDIsValid {
+				return nil, opinerr.New(
+					"INVALID_INTERACTION_ID",
+					http.StatusUnprocessableEntity,
+					"The FAPI interaction ID is missing or invalid",
+				)
+			}
+
 			ctx = context.WithValue(ctx, CtxKeyCorrelationID, interactionID)
+			return f(ctx, w, r, request)
+		}
+	}
+}
+
+func MetaMiddleware() nethttp.StrictHTTPMiddlewareFunc {
+	return func(
+		f nethttp.StrictHTTPHandlerFunc,
+		operationID string,
+	) nethttp.StrictHTTPHandlerFunc {
+		return func(
+			ctx context.Context,
+			w http.ResponseWriter,
+			r *http.Request,
+			request interface{},
+		) (
+			response interface{},
+			err error,
+		) {
+			ctx = context.WithValue(ctx, CtxKeyRequestURI, r.URL.RequestURI())
 			return f(ctx, w, r, request)
 		}
 	}
@@ -158,7 +275,7 @@ func CacheControlMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 
 func ValidationErrorHandler() nethttpmiddleware.ErrorHandler {
 	return func(w http.ResponseWriter, message string, statusCode int) {
-		opinErr := opinerr.New("INVALID_REQUEST", http.StatusBadRequest, message)
+		opinErr := opinerr.New("INVALID_REQUEST", http.StatusUnprocessableEntity, message)
 		w.WriteHeader(opinErr.StatusCode)
 		_ = json.NewEncoder(w).Encode(newResponseError(opinErr))
 	}
@@ -202,4 +319,25 @@ func newResponseError(err opinerr.Error) ResponseError {
 			TotalPages:   1,
 		},
 	}
+}
+
+// Middleware to disable HTML escaping in responses.
+func ResponseEncodingMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		rec := &responseRecorder{ResponseWriter: w, buf: &bytes.Buffer{}}
+		next.ServeHTTP(rec, r)
+
+		modifiedBody := strings.ReplaceAll(rec.buf.String(), `\u0026`, `&`)
+		w.Write([]byte(modifiedBody))
+	})
+}
+
+// Custom response recorder to capture the response.
+type responseRecorder struct {
+	http.ResponseWriter
+	buf *bytes.Buffer
+}
+
+func (rec *responseRecorder) Write(b []byte) (int, error) {
+	return rec.buf.Write(b) // Capture response in buffer.
 }

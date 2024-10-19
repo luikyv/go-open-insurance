@@ -25,6 +25,7 @@ var (
 	ScopeInsuranceFinancialRisk      = goidc.NewScope("insurance-financial-risk")
 	ScopeInsurancePatrimonial        = goidc.NewScope("insurance-patrimonial")
 	ScopeInsuranceResponsibility     = goidc.NewScope("insurance-responsibility")
+	ScopeCapitalizationTitle         = goidc.NewScope("capitalization-title")
 )
 
 var Scopes = []goidc.Scope{
@@ -33,6 +34,7 @@ var Scopes = []goidc.Scope{
 	ScopeConsents,
 	ScopeResources,
 	ScopeCustomers,
+	ScopeCapitalizationTitle,
 	ScopeAcceptanceAndBranchesAbroad,
 	ScopeInsuranceAuto,
 	ScopeInsuranceFinancialRisk,

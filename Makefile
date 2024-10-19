@@ -1,17 +1,35 @@
-setup:
+setup-dev:
 	@pre-commit install
 	@go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen@main
 	@make init-keys
+	@if [ ! -d "conformance-suite" ]; then \
+	  echo "Cloning open insurance conformance suite repository..."; \
+	  git clone --branch main --single-branch --depth=1 https://gitlab.com/raidiam-conformance/open-insurance/open-insurance-brasil.git conformance-suite; \
+	  
+	  # The Dockerfile to build the conformance suite jar is missing, then adding it manually.
+	  mkdir server-dev; \
+	  echo 'FROM openjdk:17-jdk-slim\n\nRUN apt-get update && apt-get install redir' > server-dev/Dockerfile; \
+	  
+	  docker compose run cs-builder; \
+	fi
 
-run-no-server:
-	@docker-compose --profile opin up
-
-run-cs:
+setup-cs:
 	@if [ ! -d "conformance-suite" ]; then \
 	  echo "Cloning open insurance conformance suite repository..."; \
 	  git clone --branch main --single-branch --depth=1 https://gitlab.com/raidiam-conformance/open-insurance/open-insurance-brasil.git conformance-suite; \
 	  docker compose run cs-builder; \
 	fi
+
+# Run the MockIn dependencies for local development.
+run-dev:
+	@docker-compose --profile dev up
+
+# Run the MockIn dependencies for local development alongside the Conformance Suite.
+run-dev-with-cs:
+	@docker-compose --profile dev --profile conformance up
+
+# Run the Conformance Suite.
+run-cs:
 	docker compose --profile conformance up
 	
 init-keys:

@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"net/http"
 	"net/url"
 	"os"
@@ -40,7 +41,6 @@ func openidProvider(
 	provider.Provider,
 	error,
 ) {
-	authenticator := authn.New(userService, consentService, host+prefix)
 	ps256ServerKeyID := "ps256_key"
 	return provider.New(
 		goidc.ProfileOpenID,
@@ -72,15 +72,11 @@ func openidProvider(
 		provider.WithStaticClient(client("client_one")),
 		provider.WithStaticClient(client("client_two")),
 		provider.WithHandleGrantFunc(handleGrantFunc(consentService)),
-		provider.WithPolicy(goidc.NewPolicy(
-			"policy",
-			func(r *http.Request, c *goidc.Client, as *goidc.AuthnSession) bool {
-				return true
-			},
-			authenticator.Authenticate,
-		)),
+		provider.WithPolicy(authn.Policy(userService, consentService, host+prefix)),
 		provider.WithHandleErrorFunc(func(r *http.Request, err error) {
-			log.Println(err)
+			api.Logger(r.Context()).Info("error during request", slog.String(
+				"error", err.Error(),
+			))
 		}),
 	)
 }

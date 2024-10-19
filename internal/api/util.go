@@ -5,6 +5,20 @@ import (
 	"github.com/luikyv/go-open-insurance/internal/oidc"
 )
 
+func isIdempotent(operationID string) bool {
+	switch operationID {
+	default:
+		return false
+	}
+}
+
+func isFAPIIDRequired(operationID string) bool {
+	switch operationID {
+	default:
+		return false
+	}
+}
+
 func requiredPermissions(operationID string) []ConsentPermission {
 	switch operationID {
 	case "PersonalIdentificationsV1":
@@ -22,6 +36,28 @@ func requiredPermissions(operationID string) []ConsentPermission {
 			ConsentPermissionRESOURCESREAD,
 			ConsentPermissionCUSTOMERSPERSONALADDITIONALINFOREAD,
 		}
+	case "ResourcesV2":
+		return []ConsentPermission{ConsentPermissionRESOURCESREAD}
+	case "CapitalizationTitlePlansV1":
+		return []ConsentPermission{
+			ConsentPermissionRESOURCESREAD,
+			ConsentPermissionCAPITALIZATIONTITLEREAD,
+		}
+	case "CapitalizationTitlePlanInfoV1":
+		return []ConsentPermission{
+			ConsentPermissionRESOURCESREAD,
+			ConsentPermissionCAPITALIZATIONTITLEPLANINFOREAD,
+		}
+	case "CapitalizationTitleEventsV1":
+		return []ConsentPermission{
+			ConsentPermissionRESOURCESREAD,
+			ConsentPermissionCAPITALIZATIONTITLEEVENTSREAD,
+		}
+	case "CapitalizationTitleSettlementsV1":
+		return []ConsentPermission{
+			ConsentPermissionRESOURCESREAD,
+			ConsentPermissionCAPITALIZATIONTITLESETTLEMENTSREAD,
+		}
 	default:
 		return nil
 	}
@@ -31,9 +67,14 @@ func requiredScopes(operationID string) []goidc.Scope {
 	switch operationID {
 	case "CreateConsentV2", "ConsentV2", "DeleteConsentV2":
 		return []goidc.Scope{oidc.ScopeConsents}
+	case "ResourcesV2":
+		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent, oidc.ScopeResources}
 	case "PersonalIdentificationsV1", "PersonalQualificationsV1",
 		"PersonalComplimentaryInfoV1":
-		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent}
+		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent, oidc.ScopeCustomers}
+	case "CapitalizationTitlePlansV1", "CapitalizationTitlePlanInfoV1",
+		"CapitalizationTitleEventsV1", "CapitalizationTitleSettlementsV1":
+		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent, oidc.ScopeCapitalizationTitle}
 	default:
 		return nil
 	}

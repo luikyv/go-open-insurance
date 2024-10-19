@@ -95,6 +95,28 @@ const (
 	AreaCodeNA  AreaCode = "NA"
 )
 
+// Defines values for CapitalizationTitleEventType.
+const (
+	CapitalizationTitleEventTypeRESGATE CapitalizationTitleEventType = "RESGATE"
+	CapitalizationTitleEventTypeSORTEIO CapitalizationTitleEventType = "SORTEIO"
+)
+
+// Defines values for CapitalizationTitleSeriesModality.
+const (
+	CapitalizationTitleSeriesModalityCOMPRAPROGRAMADA     CapitalizationTitleSeriesModality = "COMPRA_PROGRAMADA"
+	CapitalizationTitleSeriesModalityFILANTROPIAPREMIAVEL CapitalizationTitleSeriesModality = "FILANTROPIA_PREMIAVEL"
+	CapitalizationTitleSeriesModalityINSTRUMENTOGARANTIA  CapitalizationTitleSeriesModality = "INSTRUMENTO_GARANTIA"
+	CapitalizationTitleSeriesModalityPOPULAR              CapitalizationTitleSeriesModality = "POPULAR"
+	CapitalizationTitleSeriesModalityTRADICIONAL          CapitalizationTitleSeriesModality = "TRADICIONAL"
+)
+
+// Defines values for CapitalizationTypeEventRedemptionType.
+const (
+	CapitalizationTypeEventRedemptionTypeANTECIPADOPARCIAL CapitalizationTypeEventRedemptionType = "ANTECIPADO_PARCIAL"
+	CapitalizationTypeEventRedemptionTypeANTECIPADOTOTAL   CapitalizationTypeEventRedemptionType = "ANTECIPADO_TOTAL"
+	CapitalizationTypeEventRedemptionTypeFINALVIGENCIA     CapitalizationTypeEventRedemptionType = "FINAL_VIGENCIA"
+)
+
 // Defines values for CivilStatusCode.
 const (
 	CivilStatusCodeCASADO                CivilStatusCode = "CASADO"
@@ -306,6 +328,14 @@ const (
 	CreateConsentRequestV2DataClaimNotificationInformationDocumentTypeCERTIFICADOAUTOMOVEL       CreateConsentRequestV2DataClaimNotificationInformationDocumentType = "CERTIFICADO_AUTOMOVEL"
 )
 
+// Defines values for DocumentType.
+const (
+	DocumentTypeCNPJ       DocumentType = "CNPJ"
+	DocumentTypeCPF        DocumentType = "CPF"
+	DocumentTypeOUTROS     DocumentType = "OUTROS"
+	DocumentTypePASSAPORTE DocumentType = "PASSAPORTE"
+)
+
 // Defines values for EndorsementType.
 const (
 	EndorsementTypeALTERACAO    EndorsementType = "ALTERACAO"
@@ -319,6 +349,13 @@ const (
 	FiliationTypeMAE         FiliationType = "MAE"
 	FiliationTypePAI         FiliationType = "PAI"
 	FiliationTypeSEMFILIACAO FiliationType = "SEM_FILIACAO"
+)
+
+// Defines values for Frequency.
+const (
+	FrequencyMENSAL    Frequency = "MENSAL"
+	FrequencyPERIODICO Frequency = "PERIODICO"
+	FrequencyUNICO     Frequency = "UNICO"
 )
 
 // Defines values for IncomeFrequency.
@@ -388,6 +425,81 @@ const (
 	ProductServiceTypeTITULOSDECAPITALIZACAO          ProductServiceType = "TITULOS_DE_CAPITALIZACAO"
 )
 
+// Defines values for ReadjustmentIndex.
+const (
+	ReadjustmentIndexIGPM                                     ReadjustmentIndex = "IGPM"
+	ReadjustmentIndexINCC                                     ReadjustmentIndex = "INCC"
+	ReadjustmentIndexINDICEREMUNERACAOBASICADEPOSITOSPOUPANCA ReadjustmentIndex = "INDICE_REMUNERACAO_BASICA_DEPOSITOS_POUPANCA"
+	ReadjustmentIndexINPC                                     ReadjustmentIndex = "INPC"
+	ReadjustmentIndexIPCA                                     ReadjustmentIndex = "IPCA"
+	ReadjustmentIndexOUTROS                                   ReadjustmentIndex = "OUTROS"
+)
+
+// Defines values for ResourceStatus.
+const (
+	ResourceStatusAVAILABLE              ResourceStatus = "AVAILABLE"
+	ResourceStatusPENDINGAUTHORISATION   ResourceStatus = "PENDING_AUTHORISATION"
+	ResourceStatusTEMPORARILYUNAVAILABLE ResourceStatus = "TEMPORARILY_UNAVAILABLE"
+	ResourceStatusUNAVAILABLE            ResourceStatus = "UNAVAILABLE"
+)
+
+// Defines values for ResourceType.
+const (
+	ResourceTypeCAPITALIZATIONTITLES                        ResourceType = "CAPITALIZATION_TITLES"
+	ResourceTypeCAPITALIZATIONTITLEWITHDRAWAL               ResourceType = "CAPITALIZATION_TITLE_WITHDRAWAL"
+	ResourceTypeCLAIMNOTIFICATION                           ResourceType = "CLAIM_NOTIFICATION"
+	ResourceTypeCONTRACTLIFEPENSION                         ResourceType = "CONTRACT_LIFE_PENSION"
+	ResourceTypeCONTRACTPENSIONPLAN                         ResourceType = "CONTRACT_PENSION_PLAN"
+	ResourceTypeCUSTOMERSBUSINESSADDITIONALINFO             ResourceType = "CUSTOMERS_BUSINESS_ADDITIONALINFO"
+	ResourceTypeCUSTOMERSBUSINESSIDENTIFICATIONS            ResourceType = "CUSTOMERS_BUSINESS_IDENTIFICATIONS"
+	ResourceTypeCUSTOMERSBUSINESSQUALIFICATION              ResourceType = "CUSTOMERS_BUSINESS_QUALIFICATION"
+	ResourceTypeCUSTOMERSPERSONALADDITIONALINFO             ResourceType = "CUSTOMERS_PERSONAL_ADDITIONALINFO"
+	ResourceTypeCUSTOMERSPERSONALIDENTIFICATIONS            ResourceType = "CUSTOMERS_PERSONAL_IDENTIFICATIONS"
+	ResourceTypeCUSTOMERSPERSONALQUALIFICATION              ResourceType = "CUSTOMERS_PERSONAL_QUALIFICATION"
+	ResourceTypeDAMAGESANDPEOPLEACCEPTANCEANDBRANCHESABROAD ResourceType = "DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD"
+	ResourceTypeDAMAGESANDPEOPLEAUTO                        ResourceType = "DAMAGES_AND_PEOPLE_AUTO"
+	ResourceTypeDAMAGESANDPEOPLEFINANCIALRISKS              ResourceType = "DAMAGES_AND_PEOPLE_FINANCIAL_RISKS"
+	ResourceTypeDAMAGESANDPEOPLEHOUSING                     ResourceType = "DAMAGES_AND_PEOPLE_HOUSING"
+	ResourceTypeDAMAGESANDPEOPLEPATRIMONIAL                 ResourceType = "DAMAGES_AND_PEOPLE_PATRIMONIAL"
+	ResourceTypeDAMAGESANDPEOPLEPERSON                      ResourceType = "DAMAGES_AND_PEOPLE_PERSON"
+	ResourceTypeDAMAGESANDPEOPLERESPONSIBILITY              ResourceType = "DAMAGES_AND_PEOPLE_RESPONSIBILITY"
+	ResourceTypeDAMAGESANDPEOPLERURAL                       ResourceType = "DAMAGES_AND_PEOPLE_RURAL"
+	ResourceTypeDAMAGESANDPEOPLETRANSPORT                   ResourceType = "DAMAGES_AND_PEOPLE_TRANSPORT"
+	ResourceTypeENDORSEMENT                                 ResourceType = "ENDORSEMENT"
+	ResourceTypeFINANCIALASSISTANCE                         ResourceType = "FINANCIAL_ASSISTANCE"
+	ResourceTypeLIFEPENSION                                 ResourceType = "LIFE_PENSION"
+	ResourceTypePENSIONPLAN                                 ResourceType = "PENSION_PLAN"
+	ResourceTypePENSIONWITHDRAWAL                           ResourceType = "PENSION_WITHDRAWAL"
+	ResourceTypeQUOTEACCEPTANCEANDBRANCHESABROAD            ResourceType = "QUOTE_ACCEPTANCE_AND_BRANCHES_ABROAD"
+	ResourceTypeQUOTEAUTO                                   ResourceType = "QUOTE_AUTO"
+	ResourceTypeQUOTECAPITALIZATIONTITLE                    ResourceType = "QUOTE_CAPITALIZATION_TITLE"
+	ResourceTypeQUOTEFINANCIALRISK                          ResourceType = "QUOTE_FINANCIAL_RISK"
+	ResourceTypeQUOTEHOUSING                                ResourceType = "QUOTE_HOUSING"
+	ResourceTypeQUOTEPATRIMONIAL                            ResourceType = "QUOTE_PATRIMONIAL"
+	ResourceTypeQUOTEPERSON                                 ResourceType = "QUOTE_PERSON"
+	ResourceTypeQUOTERESPONSIBILITY                         ResourceType = "QUOTE_RESPONSIBILITY"
+	ResourceTypeQUOTERURAL                                  ResourceType = "QUOTE_RURAL"
+	ResourceTypeQUOTETRANSPORT                              ResourceType = "QUOTE_TRANSPORT"
+)
+
+// Defines values for UpdateIndex.
+const (
+	UpdateIndexIGPM                                     UpdateIndex = "IGPM"
+	UpdateIndexINCC                                     UpdateIndex = "INCC"
+	UpdateIndexINDICEREMUNERACAOBASICADEPOSITOSPOUPANCA UpdateIndex = "INDICE_REMUNERACAO_BASICA_DEPOSITOS_POUPANCA"
+	UpdateIndexINPC                                     UpdateIndex = "INPC"
+	UpdateIndexIPCA                                     UpdateIndex = "IPCA"
+	UpdateIndexOUTROS                                   UpdateIndex = "OUTROS"
+)
+
+// AmountDetails defines model for AmountDetails.
+type AmountDetails struct {
+	Amount float32 `json:"amount"`
+
+	// Currency Moeda da Parcela, de acordo com ISO-4217.
+	Currency string `json:"currency"`
+}
+
 // AreaCode defines model for AreaCode.
 type AreaCode string
 
@@ -398,6 +510,358 @@ type BusinessEntity struct {
 		Rel            string `json:"rel"`
 	} `json:"document"`
 }
+
+// CapitalizationTitleBrand Marca reportada pelo participante do Open Insurance
+type CapitalizationTitleBrand struct {
+	Companies []CapitalizationTitleCompany `json:"companies"`
+
+	// Name Nome da marca reportada pelo participante do Open Insurance
+	Name string `json:"name"`
+}
+
+// CapitalizationTitleBroker defines model for CapitalizationTitleBroker.
+type CapitalizationTitleBroker struct {
+	// BrokerDescription Nome ou Razão Social do Corretor
+	BrokerDescription string `json:"brokerDescription"`
+
+	// SusepBrokerCode Código SUSEP do corretor.
+	SusepBrokerCode string `json:"susepBrokerCode"`
+}
+
+// CapitalizationTitleCompany defines model for CapitalizationTitleCompany.
+type CapitalizationTitleCompany struct {
+	// CnpjNumber CNPJ da sociedade pertencente à marca
+	CnpjNumber string `json:"cnpjNumber"`
+
+	// CompanyName Nome da sociedade pertencente à marca
+	CompanyName string                       `json:"companyName"`
+	Products    []CapitalizationTitleProduct `json:"products"`
+}
+
+// CapitalizationTitleEvent defines model for CapitalizationTitleEvent.
+type CapitalizationTitleEvent struct {
+	Event *CapitalizationTitleEventInfo `json:"event,omitempty"`
+
+	// EventType Tipo de Evento
+	EventType *CapitalizationTitleEventType `json:"eventType,omitempty"`
+
+	// TitleId Código identificador do título na sociedade.
+	TitleId *string `json:"titleId,omitempty"`
+}
+
+// CapitalizationTitleEventInfo defines model for CapitalizationTitleEventInfo.
+type CapitalizationTitleEventInfo struct {
+	Raffle     *CapitalizationTitleEventRaffle     `json:"raffle,omitempty"`
+	Redemption *CapitalizationTitleEventRedemption `json:"redemption,omitempty"`
+}
+
+// CapitalizationTitleEventRaffle defines model for CapitalizationTitleEventRaffle.
+type CapitalizationTitleEventRaffle struct {
+	// RaffleAmount Montante do capital sorteado (prêmio de sorteio bruto, livre de IOF, quando aplicável)
+	RaffleAmount AmountDetails `json:"raffleAmount"`
+
+	// RaffleDate Data de realização do sorteio
+	RaffleDate openapi_types.Date `json:"raffleDate"`
+
+	// RaffleSettlementDate Data da liquidação financeira do capital sorteado
+	RaffleSettlementDate openapi_types.Date `json:"raffleSettlementDate"`
+}
+
+// CapitalizationTitleEventRedemption defines model for CapitalizationTitleEventRedemption.
+type CapitalizationTitleEventRedemption struct {
+	// RedemptionAmount Valor de resgate. (Valor bruto de resgate, livre de IOF, quando aplicável)
+	RedemptionAmount AmountDetails `json:"redemptionAmount"`
+
+	// RedemptionBonusAmount Valor do Bonus. (Valor bruto do bonus resgatado, livre de IOF, quando aplicável)
+	RedemptionBonusAmount AmountDetails `json:"redemptionBonusAmount"`
+
+	// RedemptionRequestDate Data de solicitação do resgate
+	RedemptionRequestDate openapi_types.Date `json:"redemptionRequestDate"`
+
+	// RedemptionSettlementDate Data da liquidação financeira do resgate
+	RedemptionSettlementDate openapi_types.Date `json:"redemptionSettlementDate"`
+	RedemptionType           AmountDetails      `json:"redemptionType"`
+
+	// UnreturnedAmount Valor não restituido. (Valor bruto não restituido ao titular em caso de resgate antecipado)
+	UnreturnedAmount *AmountDetails `json:"unreturnedAmount,omitempty"`
+}
+
+// CapitalizationTitleEventType Tipo de Evento
+type CapitalizationTitleEventType string
+
+// CapitalizationTitleEvents defines model for CapitalizationTitleEvents.
+type CapitalizationTitleEvents = []CapitalizationTitleEvent
+
+// CapitalizationTitleEventsResponseV1 defines model for CapitalizationTitleEventsResponseV1.
+type CapitalizationTitleEventsResponseV1 struct {
+	Data  CapitalizationTitleEvents `json:"data"`
+	Links Links                     `json:"links"`
+	Meta  Meta                      `json:"meta"`
+}
+
+// CapitalizationTitleHolder defines model for CapitalizationTitleHolder.
+type CapitalizationTitleHolder struct {
+	// HolderAddress Endereço do titular
+	HolderAddress string `json:"holderAddress"`
+
+	// HolderAddressAdditionalInfo Alguns logradouros ainda necessitam ser especificados por meio de complemento.
+	HolderAddressAdditionalInfo *string `json:"holderAddressAdditionalInfo,omitempty"`
+
+	// HolderCountryCode Código do pais de acordo com o código “alpha3” do ISO-3166.
+	// País do titular
+	HolderCountryCode string `json:"holderCountryCode"`
+
+	// HolderCountrySubDivision Estado do titular
+	HolderCountrySubDivision CountrySubDivision `json:"holderCountrySubDivision"`
+
+	// HolderDocumentNumber Documento de Identificação do Titular
+	HolderDocumentNumber string `json:"holderDocumentNumber"`
+
+	// HolderDocumentType Tipo de Documento do Titular
+	HolderDocumentType DocumentType `json:"holderDocumentType"`
+
+	// HolderDocumentTypeOthers Tipo de Documento do Titular, caso seja selecionado OUTROS.
+	HolderDocumentTypeOthers *string `json:"holderDocumentTypeOthers,omitempty"`
+
+	// HolderName Nome ou Razão Social do Titular
+	HolderName string `json:"holderName"`
+
+	// HolderPhones Lista com telefones do Titular (quando houver)
+	HolderPhones *[]RequestorPhone `json:"holderPhones,omitempty"`
+
+	// HolderPostCode Código de Endereçamento Postal: Composto por um conjunto numérico de oito dígitos, o objetivo principal do CEP é orientar e acelerar o encaminhamento, o tratamento e a entrega de objetos postados nos Correios, por meio da sua atribuição a localidades, logradouros, unidades dos Correios, serviços, órgãos públicos, empresas e edifícios. p.ex. '01311000'.
+	// Código Postal do titular, Obrigatório, se houver
+	HolderPostCode string `json:"holderPostCode"`
+
+	// HolderRaffle Titular do direito de sorteio?
+	HolderRaffle bool `json:"holderRaffle"`
+
+	// HolderRedemption Titular do direito de resgate?
+	HolderRedemption bool `json:"holderRedemption"`
+
+	// HolderTownName Localidade: O nome da localidade corresponde à designação da cidade ou município no qual o endereço está localizado.
+	// Cidade do titular
+	HolderTownName string `json:"holderTownName"`
+}
+
+// CapitalizationTitlePlanData defines model for CapitalizationTitlePlanData.
+type CapitalizationTitlePlanData struct {
+	// Brand Marca reportada pelo participante do Open Insurance
+	Brand CapitalizationTitleBrand `json:"brand"`
+}
+
+// CapitalizationTitlePlanInfo defines model for CapitalizationTitlePlanInfo.
+type CapitalizationTitlePlanInfo struct {
+	// Series Dados Gerais da Série
+	Series []CapitalizationTitleSeries `json:"series"`
+}
+
+// CapitalizationTitlePlanInfoResponseV1 defines model for CapitalizationTitlePlanInfoResponseV1.
+type CapitalizationTitlePlanInfoResponseV1 struct {
+	Data  CapitalizationTitlePlanInfo `json:"data"`
+	Links Links                       `json:"links"`
+	Meta  Meta                        `json:"meta"`
+}
+
+// CapitalizationTitlePlansResponseV1 defines model for CapitalizationTitlePlansResponseV1.
+type CapitalizationTitlePlansResponseV1 struct {
+	Data  []CapitalizationTitlePlanData `json:"data"`
+	Links Links                         `json:"links"`
+	Meta  Meta                          `json:"meta"`
+}
+
+// CapitalizationTitleProduct defines model for CapitalizationTitleProduct.
+type CapitalizationTitleProduct struct {
+	// PlanId planId - Identificador do contrato do plano
+	PlanId string `json:"planId"`
+
+	// ProductName Nome comercial do produto associado ao plano
+	ProductName string `json:"productName"`
+}
+
+// CapitalizationTitleSeries Dados Gerais da Série
+type CapitalizationTitleSeries struct {
+	// BonusClause Cláusula de bônus
+	BonusClause bool `json:"bonusClause"`
+
+	// Broker Dados do corretor (quando houver)
+	Broker *[]CapitalizationTitleBroker `json:"broker,omitempty"`
+
+	// CapitalizationQuota Percentual da contribuição destinado à constituição de capital referente ao direito de resgate
+	CapitalizationQuota PercentageDetails `json:"capitalizationQuota"`
+
+	// CommercialName Denominação comercial do produto de propriedade exclusiva da sociedade de capitalização. Condicional, caso selecionada as opções "Filantropia Premiável" ou "Popular" no campo "Modalidade".
+	CommercialName *string `json:"commercialName,omitempty"`
+
+	// Frequency Tipo de Contribuição - pagamento único, pagamento mensal ou periódico
+	Frequency Frequency `json:"frequency"`
+
+	// FrequencyDescription Descrição do Tipo de Contribuição (Quando o Tipo de Contribuição for 3. Pagamento Periódico)
+	FrequencyDescription *string `json:"frequencyDescription,omitempty"`
+
+	// GracePeriodForFullRedemption Intervalo de tempo mínimo entre contratação e resgate total do direito, em meses
+	GracePeriodForFullRedemption int `json:"gracePeriodForFullRedemption"`
+
+	// GracePeriodRedemption Intervalo de tempo mínimo entre contratação e resgate parcial do direito, em meses.
+	GracePeriodRedemption *int `json:"gracePeriodRedemption,omitempty"`
+
+	// InterestRate Taxa de juros efetiva real mensal utilizada para remuneração do título de capitalização.
+	InterestRate PercentageDetails `json:"interestRate"`
+
+	// Modality Modalidade
+	Modality CapitalizationTitleSeriesModality `json:"modality"`
+
+	// PlanId Identificação do plano
+	PlanId *string `json:"planId,omitempty"`
+
+	// RaffleQuota Percentual da contribuição destinado a custear os sorteios, se previstos no plano
+	RaffleQuota PercentageDetails `json:"raffleQuota"`
+
+	// ReadjustmentIndex Índice de reajuste das contribuições e do capital para vigências acima de doze meses
+	ReadjustmentIndex ReadjustmentIndex `json:"readjustmentIndex"`
+
+	// ReadjustmentIndexOthers Descreve o índice de reajuste utilizado quando outro que não previamente relacionado nos domínios do campo.
+	ReadjustmentIndexOthers *string `json:"readjustmentIndexOthers,omitempty"`
+
+	// SerieSize Quantidade máxima possível de títulos que pode ser emitida para uma mesma série
+	SerieSize int `json:"serieSize"`
+
+	// SeriesId Identificação da série
+	SeriesId string `json:"seriesId"`
+
+	// SusepProcessNumber Número do processo SUSEP.
+	SusepProcessNumber string `json:"susepProcessNumber"`
+
+	// Titles Dados Gerais do Título
+	Titles []CapitalizationTitleTitle `json:"titles"`
+
+	// UpdateIndex Descreve o índice de atualização das reservas.
+	UpdateIndex UpdateIndex `json:"updateIndex"`
+
+	// UpdateIndexOthers Descreve o índice de atualização utilizado quando outro que não previamente relacionado nos domínios do campo.
+	UpdateIndexOthers *string `json:"updateIndexOthers,omitempty"`
+
+	// UploadQuota Percentual da contribuição destinado aos custos de despesas com corretagem, colocação e administração do título de capitalização, emissão, divulgação, lucro da sociedade de capitalização e eventuais despesas relativas ao custeio da contemplação obrigatória e da distribuição de bônus
+	UploadQuota PercentageDetails `json:"uploadQuota"`
+}
+
+// CapitalizationTitleSeriesModality Modalidade
+type CapitalizationTitleSeriesModality string
+
+// CapitalizationTitleSettlement defines model for CapitalizationTitleSettlement.
+type CapitalizationTitleSettlement struct {
+	// SettlementDueDate Data de Vencimento da Contribuicao
+	SettlementDueDate openapi_types.Date `json:"settlementDueDate"`
+
+	// SettlementFinancialAmount Valor da contribuicao
+	SettlementFinancialAmount AmountDetails `json:"settlementFinancialAmount"`
+
+	// SettlementId Identificador da Contribuicao
+	SettlementId string `json:"settlementId"`
+
+	// SettlementPaymentDate Data da Contribuicao
+	SettlementPaymentDate openapi_types.Date `json:"settlementPaymentDate"`
+}
+
+// CapitalizationTitleSettlements defines model for CapitalizationTitleSettlements.
+type CapitalizationTitleSettlements = []CapitalizationTitleSettlement
+
+// CapitalizationTitleSettlementsResponseV1 defines model for CapitalizationTitleSettlementsResponseV1.
+type CapitalizationTitleSettlementsResponseV1 struct {
+	Data  CapitalizationTitleSettlements `json:"data"`
+	Links Links                          `json:"links"`
+	Meta  Meta                           `json:"meta"`
+}
+
+// CapitalizationTitleSubscriber defines model for CapitalizationTitleSubscriber.
+type CapitalizationTitleSubscriber struct {
+	// Holder Dados Gerais do Titular
+	Holder *[]CapitalizationTitleHolder `json:"holder,omitempty"`
+
+	// SubscriberAddress Endereço do subscritor
+	SubscriberAddress string `json:"subscriberAddress"`
+
+	// SubscriberAddressAdditionalInfo Alguns logradouros ainda necessitam ser especificados por meio de complemento.
+	SubscriberAddressAdditionalInfo *string `json:"subscriberAddressAdditionalInfo,omitempty"`
+
+	// SubscriberCountryCode Código do pais de acordo com o código “alpha3” do ISO-3166.
+	// País do subscritor
+	SubscriberCountryCode string `json:"subscriberCountryCode"`
+
+	// SubscriberCountrySubDivision Estado do subscritor
+	SubscriberCountrySubDivision CountrySubDivision `json:"subscriberCountrySubDivision"`
+
+	// SubscriberDocumentNumber Documento de Identificação do Subscritor
+	SubscriberDocumentNumber string `json:"subscriberDocumentNumber"`
+
+	// SubscriberDocumentType Tipo de Documento do Titular
+	SubscriberDocumentType DocumentType `json:"subscriberDocumentType"`
+
+	// SubscriberDocumentTypeOthers Tipo de Documento do Subscritor, caso seja selecionado OUTROS.
+	SubscriberDocumentTypeOthers *string `json:"subscriberDocumentTypeOthers,omitempty"`
+
+	// SubscriberName Nome ou Razão Social do Subscritor
+	SubscriberName string `json:"subscriberName"`
+
+	// SubscriberPhones Lista com telefones do subscritor (quando houver)
+	SubscriberPhones *[]RequestorPhone `json:"subscriberPhones,omitempty"`
+
+	// SubscriberPostCode Código de Endereçamento Postal: Composto por um conjunto numérico de oito dígitos, o objetivo principal do CEP é orientar e acelerar o encaminhamento, o tratamento e a entrega de objetos postados nos Correios, por meio da sua atribuição a localidades, logradouros, unidades dos Correios, serviços, órgãos públicos, empresas e edifícios. p.ex. '01311000'.
+	// Código Postal do subscritor, Obrigatório, se houver
+	SubscriberPostCode string `json:"subscriberPostCode"`
+
+	// SubscriberTownName Localidade: O nome da localidade corresponde à designação da cidade ou município no qual o endereço está localizado.
+	// Cidade do subscritor
+	SubscriberTownName string `json:"subscriberTownName"`
+}
+
+// CapitalizationTitleTechnicalProvisions (Esses valores poderão sofrer alterações no momento do resgate/pagamento,conforme regras do produto nas condições gerais)
+type CapitalizationTitleTechnicalProvisions struct {
+	// PdbAmount Valor da PDB (fim do mes) - Valor da Provisão para Distribuição de Bônus (PDB), no fim de cada mês. Caso não haja saldo informar nulo
+	PdbAmount AmountDetails `json:"pdbAmount"`
+
+	// PmcAmount Valor da PMC (fim do mes) - Valor da Provisão Matemática para Capitalização (PMC), no fim de cada mês. Caso não haja saldo informar nulo
+	PmcAmount AmountDetails `json:"pmcAmount"`
+
+	// PrAmount Valor da PR (fim do mes) - Valor da Provisão para Resgate (PR), no fim de cada mês. Caso não haja saldo informar nulo
+	PrAmount AmountDetails `json:"prAmount"`
+
+	// PspAmount Valor da PSP (fim do mes) - Valor da Provisão de Sorteios a Pagar (PSP), no fim de cada mês. Caso não haja saldo informar nulo
+	PspAmount AmountDetails `json:"pspAmount"`
+}
+
+// CapitalizationTitleTitle defines model for CapitalizationTitleTitle.
+type CapitalizationTitleTitle struct {
+	// ContributionAmount Corresponde ao pagamento efetuado pelo subscritor à sociedade de capitalização para a aquisição do título de capitalização, podendo ser única, periódica ou mensal. Em todas as situações indicar para qual periodicidade de pagamento se aplicam os valores(pagamento mensal, pagamento único ou periódico).
+	ContributionAmount AmountDetails `json:"contributionAmount"`
+
+	// IssueTitleDate Data de Emissão do Título
+	IssueTitleDate openapi_types.Date `json:"issueTitleDate"`
+
+	// RafflePremiumAmount Valor do premio de sorteio
+	RafflePremiumAmount AmountDetails `json:"rafflePremiumAmount"`
+
+	// RegistrationForm Identificação da ﬁcha de cadastro ou contrato comercial
+	RegistrationForm string `json:"registrationForm"`
+
+	// Subscriber Dados Gerais do Título
+	Subscriber []CapitalizationTitleSubscriber `json:"subscriber"`
+
+	// TechnicalProvisions Informações de Provisões técnicas
+	TechnicalProvisions []CapitalizationTitleTechnicalProvisions `json:"technicalProvisions"`
+
+	// TermEndDate Data de fim de vigência do título de capitalização.
+	TermEndDate openapi_types.Date `json:"termEndDate"`
+
+	// TermStartDate Data de início de vigência do título de capitalização.
+	TermStartDate openapi_types.Date `json:"termStartDate"`
+
+	// TitleId Identificação do título de capitalização
+	TitleId string `json:"titleId"`
+}
+
+// CapitalizationTypeEventRedemptionType Tipo de resgate
+type CapitalizationTypeEventRedemptionType string
 
 // CivilStatusCode defines model for CivilStatusCode.
 type CivilStatusCode string
@@ -509,6 +973,9 @@ type CustomerPhone struct {
 	PhoneExtension     *string   `json:"phoneExtension,omitempty"`
 }
 
+// DocumentType Tipo de Documento do Titular
+type DocumentType string
+
 // EndorsementType defines model for EndorsementType.
 type EndorsementType string
 
@@ -533,6 +1000,9 @@ type Filiation struct {
 
 // FiliationType Tipo de filiação.
 type FiliationType string
+
+// Frequency Tipo de Contribuição - pagamento único, pagamento mensal ou periódico
+type Frequency string
 
 // IdentificationDetails Informações referente ao cônjuge.
 type IdentificationDetails struct {
@@ -632,6 +1102,9 @@ type OtherPersonalDocuments struct {
 	// Type Tipo do(s) documento(s) estrangeiro(s) de identificação
 	Type *string `json:"type,omitempty"`
 }
+
+// PercentageDetails defines model for PercentageDetails.
+type PercentageDetails = float32
 
 // PersonalComplimentaryInfoData Objeto que reúne as informações relativas ao relacionamento do cliente junto à Instituição. Considera-se relacionamento as informações que permitam conhecer desde quando a pessoa consultada é cliente da instituição, bem como um indicador dos produtos e serviços que ela consome atualmente e seus representantes
 type PersonalComplimentaryInfoData struct {
@@ -800,14 +1273,183 @@ type ProductService struct {
 // ProductServiceType Tipos de produtos.
 type ProductServiceType string
 
+// ReadjustmentIndex Índice de reajuste das contribuições e do capital para vigências acima de doze meses
+type ReadjustmentIndex string
+
+// RequestorPhone defines model for RequestorPhone.
+type RequestorPhone struct {
+	AreaCode *AreaCode `json:"areaCode,omitempty"`
+
+	// CountryCallingCode Número de DDI (Discagem Direta Internacional) para telefone de acesso ao Cliente - se aplicável
+	CountryCallingCode *string `json:"countryCallingCode,omitempty"`
+
+	// Number Número de telefone do cliente
+	Number *string `json:"number,omitempty"`
+}
+
+// ResourceData defines model for ResourceData.
+type ResourceData struct {
+	// ResourceId Identifica o recurso reportado pelo participante do Open Insurance, no caso de:
+	// Produtos de Titulos de Capitalização: policyNumber ou certificateNumber
+	// Produtos de Previdência: certificateNumber
+	// Produtos de Danos e Pessoas (independente do ramo e torná-lo como obrigatório): policyNumber ou certificateNumber
+	ResourceId string `json:"resourceId"`
+
+	// Status - Tipo de status de recurso (vide Enum):
+	// - Available: Disponível
+	// - Unavailable: Indisponível
+	// - Temporarily Unavailable: Temporariamente Indisponível
+	// - Pending Authorisation: Pendente de Autorização
+	Status ResourceStatus `json:"status"`
+
+	// Type Tipo de recurso (vide Enum):
+	// - CUSTOMERS_PERSONAL_IDENTIFICATIONS: Informações de identificação PF
+	// - CUSTOMERS_PERSONAL_QUALIFICATION: Informações de qualificação PF
+	// - CUSTOMERS_PERSONAL_ADDITIONALINFO: Informações complementares PF
+	// - CUSTOMERS_BUSINESS_IDENTIFICATIONS: Informações de identificação PJ
+	// - CUSTOMERS_BUSINESS_QUALIFICATION: Informações de qualificação PJ
+	// - CUSTOMERS_BUSINESS_ADDITIONALINFO: Informações complementares PJ
+	// - CAPITALIZATION_TITLES: Produtos de Titulos de Capitalização
+	// - PENSION_PLAN: Produtos de Previdência Risco
+	// - LIFE_PENSION: Produtos de Previdência Sobrevivência
+	// - FINANCIAL_ASSISTANCE: Produtos de Assistência Financeira
+	// - DAMAGES_AND_PEOPLE_PATRIMONIAL: Produtos de Patrimonial
+	// - DAMAGES_AND_PEOPLE_RESPONSIBILITY: Produtos de Responsabilidade
+	// - DAMAGES_AND_PEOPLE_TRANSPORT: Produtos de Transportes
+	// - DAMAGES_AND_PEOPLE_FINANCIAL_RISKS: Produtos de Riscos Financeiros
+	// - DAMAGES_AND_PEOPLE_RURAL: Produtos de Rural
+	// - DAMAGES_AND_PEOPLE_AUTO: Produtos de Automóveis
+	// - DAMAGES_AND_PEOPLE_HOUSING: Produtos de Habitacional
+	// - DAMAGES_AND_PEOPLE_PERSON: Produtos de Pessoas (Repartição simples)
+	// - DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD: Aceitação e Sucursal no exterior
+	// - CLAIM_NOTIFICATION: Solicitação de Aviso de Sinistro
+	// - ENDORSEMENT: Solicitação de Endosso
+	// - QUOTE_PATRIMONIAL: Cotação do Seguro Patrimonial
+	// - QUOTE_ACCEPTANCE_AND_BRANCHES_ABROAD: Cotação do Seguro Aceitação e Sucursal no exterior
+	// - QUOTE_AUTO: Cotação do Seguro Automóvel
+	// - QUOTE_FINANCIAL_RISK: Cotação do Seguro Riscos Financeiros
+	// - QUOTE_HOUSING: Cotação do Seguro Habitacional
+	// - QUOTE_RESPONSIBILITY: Cotação do Seguro Responsabilidade
+	// - QUOTE_RURAL: Cotação do Seguro Rural
+	// - QUOTE_TRANSPORT: Cotação do Seguro Transportes
+	// - QUOTE_PERSON: Cotação do Seguro Pessoas
+	// - QUOTE_CAPITALIZATION_TITLE: Cotação de Títulos de Capitalização
+	// - CONTRACT_LIFE_PENSION: Contratação/Portabilidade de Previdência Sobrevivência
+	// - CONTRACT_PENSION_PLAN: Contratação/Portabilidade de Previdência Risco
+	// - PENSION_WITHDRAWAL: Resgate de Previdência
+	// - CAPITALIZATION_TITLE_WITHDRAWAL: Resgate de Títulos de Capitalização
+	Type ResourceType `json:"type"`
+}
+
+// ResourceStatus - Tipo de status de recurso (vide Enum):
+// - Available: Disponível
+// - Unavailable: Indisponível
+// - Temporarily Unavailable: Temporariamente Indisponível
+// - Pending Authorisation: Pendente de Autorização
+type ResourceStatus string
+
+// ResourceType Tipo de recurso (vide Enum):
+// - CUSTOMERS_PERSONAL_IDENTIFICATIONS: Informações de identificação PF
+// - CUSTOMERS_PERSONAL_QUALIFICATION: Informações de qualificação PF
+// - CUSTOMERS_PERSONAL_ADDITIONALINFO: Informações complementares PF
+// - CUSTOMERS_BUSINESS_IDENTIFICATIONS: Informações de identificação PJ
+// - CUSTOMERS_BUSINESS_QUALIFICATION: Informações de qualificação PJ
+// - CUSTOMERS_BUSINESS_ADDITIONALINFO: Informações complementares PJ
+// - CAPITALIZATION_TITLES: Produtos de Titulos de Capitalização
+// - PENSION_PLAN: Produtos de Previdência Risco
+// - LIFE_PENSION: Produtos de Previdência Sobrevivência
+// - FINANCIAL_ASSISTANCE: Produtos de Assistência Financeira
+// - DAMAGES_AND_PEOPLE_PATRIMONIAL: Produtos de Patrimonial
+// - DAMAGES_AND_PEOPLE_RESPONSIBILITY: Produtos de Responsabilidade
+// - DAMAGES_AND_PEOPLE_TRANSPORT: Produtos de Transportes
+// - DAMAGES_AND_PEOPLE_FINANCIAL_RISKS: Produtos de Riscos Financeiros
+// - DAMAGES_AND_PEOPLE_RURAL: Produtos de Rural
+// - DAMAGES_AND_PEOPLE_AUTO: Produtos de Automóveis
+// - DAMAGES_AND_PEOPLE_HOUSING: Produtos de Habitacional
+// - DAMAGES_AND_PEOPLE_PERSON: Produtos de Pessoas (Repartição simples)
+// - DAMAGES_AND_PEOPLE_ACCEPTANCE_AND_BRANCHES_ABROAD: Aceitação e Sucursal no exterior
+// - CLAIM_NOTIFICATION: Solicitação de Aviso de Sinistro
+// - ENDORSEMENT: Solicitação de Endosso
+// - QUOTE_PATRIMONIAL: Cotação do Seguro Patrimonial
+// - QUOTE_ACCEPTANCE_AND_BRANCHES_ABROAD: Cotação do Seguro Aceitação e Sucursal no exterior
+// - QUOTE_AUTO: Cotação do Seguro Automóvel
+// - QUOTE_FINANCIAL_RISK: Cotação do Seguro Riscos Financeiros
+// - QUOTE_HOUSING: Cotação do Seguro Habitacional
+// - QUOTE_RESPONSIBILITY: Cotação do Seguro Responsabilidade
+// - QUOTE_RURAL: Cotação do Seguro Rural
+// - QUOTE_TRANSPORT: Cotação do Seguro Transportes
+// - QUOTE_PERSON: Cotação do Seguro Pessoas
+// - QUOTE_CAPITALIZATION_TITLE: Cotação de Títulos de Capitalização
+// - CONTRACT_LIFE_PENSION: Contratação/Portabilidade de Previdência Sobrevivência
+// - CONTRACT_PENSION_PLAN: Contratação/Portabilidade de Previdência Risco
+// - PENSION_WITHDRAWAL: Resgate de Previdência
+// - CAPITALIZATION_TITLE_WITHDRAWAL: Resgate de Títulos de Capitalização
+type ResourceType string
+
+// ResourcesResponseV2 defines model for ResourcesResponseV2.
+type ResourcesResponseV2 struct {
+	// Data Lista de recursos e seus respectivos status.
+	Data  []ResourceData `json:"data"`
+	Links Links          `json:"links"`
+	Meta  Meta           `json:"meta"`
+}
+
 // ResponseError defines model for ResponseError.
 type ResponseError struct {
 	Errors []Error `json:"errors"`
 	Meta   *Meta   `json:"meta,omitempty"`
 }
 
+// UpdateIndex Descreve o índice de atualização das reservas.
+type UpdateIndex string
+
 // ConsentId defines model for consentId.
 type ConsentId = string
+
+// PageNumber defines model for pageNumber.
+type PageNumber = int32
+
+// PageSize defines model for pageSize.
+type PageSize = int32
+
+// PlanId defines model for planId.
+type PlanId = string
+
+// CapitalizationTitlePlansV1Params defines parameters for CapitalizationTitlePlansV1.
+type CapitalizationTitlePlansV1Params struct {
+	// Page Número da página que está sendo requisitada (o valor da primeira página é 1).
+	Page *PageNumber `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize Quantidade total de registros por páginas.
+	PageSize *PageSize `form:"page-size,omitempty" json:"page-size,omitempty"`
+}
+
+// CapitalizationTitleEventsV1Params defines parameters for CapitalizationTitleEventsV1.
+type CapitalizationTitleEventsV1Params struct {
+	// Page Número da página que está sendo requisitada (o valor da primeira página é 1).
+	Page *PageNumber `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize Quantidade total de registros por páginas.
+	PageSize *PageSize `form:"page-size,omitempty" json:"page-size,omitempty"`
+}
+
+// CapitalizationTitleSettlementsV1Params defines parameters for CapitalizationTitleSettlementsV1.
+type CapitalizationTitleSettlementsV1Params struct {
+	// Page Número da página que está sendo requisitada (o valor da primeira página é 1).
+	Page *PageNumber `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize Quantidade total de registros por páginas.
+	PageSize *PageSize `form:"page-size,omitempty" json:"page-size,omitempty"`
+}
+
+// ResourcesV2Params defines parameters for ResourcesV2.
+type ResourcesV2Params struct {
+	// Page Número da página que está sendo requisitada (o valor da primeira página é 1).
+	Page *PageNumber `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize Quantidade total de registros por páginas.
+	PageSize *PageSize `form:"page-size,omitempty" json:"page-size,omitempty"`
+}
 
 // CreateConsentV2JSONRequestBody defines body for CreateConsentV2 for application/json ContentType.
 type CreateConsentV2JSONRequestBody = CreateConsentRequestV2
@@ -832,6 +1474,21 @@ type ServerInterface interface {
 
 	// (GET /customers/v1/personal/qualifications)
 	PersonalQualificationsV1(w http.ResponseWriter, r *http.Request)
+	// Obtem a lista de identificação de InsuranceCapitalizationTitle
+	// (GET /insurance-capitalization-title/v1/insurance-capitalization-title/plans)
+	CapitalizationTitlePlansV1(w http.ResponseWriter, r *http.Request, params CapitalizationTitlePlansV1Params)
+	// Obtém os dados de eventos do plano identificado por {planId}
+	// (GET /insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/events)
+	CapitalizationTitleEventsV1(w http.ResponseWriter, r *http.Request, planId PlanId, params CapitalizationTitleEventsV1Params)
+	// Obtém as informações gerais do plano identificado por {planId}
+	// (GET /insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/plan-info)
+	CapitalizationTitlePlanInfoV1(w http.ResponseWriter, r *http.Request, planId PlanId)
+	// Obtém os dados de liquidações do plano identificado por {planId}
+	// (GET /insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/settlements)
+	CapitalizationTitleSettlementsV1(w http.ResponseWriter, r *http.Request, planId PlanId, params CapitalizationTitleSettlementsV1Params)
+	// Obtém a lista de recursos consentidos pelo cliente.
+	// (GET /resources/v2/resources)
+	ResourcesV2(w http.ResponseWriter, r *http.Request, params ResourcesV2Params)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -940,6 +1597,189 @@ func (siw *ServerInterfaceWrapper) PersonalQualificationsV1(w http.ResponseWrite
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PersonalQualificationsV1(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CapitalizationTitlePlansV1 operation middleware
+func (siw *ServerInterfaceWrapper) CapitalizationTitlePlansV1(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CapitalizationTitlePlansV1Params
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "page-size" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page-size", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page-size", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CapitalizationTitlePlansV1(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CapitalizationTitleEventsV1 operation middleware
+func (siw *ServerInterfaceWrapper) CapitalizationTitleEventsV1(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "planId" -------------
+	var planId PlanId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "planId", r.PathValue("planId"), &planId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "planId", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CapitalizationTitleEventsV1Params
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "page-size" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page-size", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page-size", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CapitalizationTitleEventsV1(w, r, planId, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CapitalizationTitlePlanInfoV1 operation middleware
+func (siw *ServerInterfaceWrapper) CapitalizationTitlePlanInfoV1(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "planId" -------------
+	var planId PlanId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "planId", r.PathValue("planId"), &planId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "planId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CapitalizationTitlePlanInfoV1(w, r, planId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CapitalizationTitleSettlementsV1 operation middleware
+func (siw *ServerInterfaceWrapper) CapitalizationTitleSettlementsV1(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "planId" -------------
+	var planId PlanId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "planId", r.PathValue("planId"), &planId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "planId", Err: err})
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CapitalizationTitleSettlementsV1Params
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "page-size" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page-size", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page-size", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CapitalizationTitleSettlementsV1(w, r, planId, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ResourcesV2 operation middleware
+func (siw *ServerInterfaceWrapper) ResourcesV2(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ResourcesV2Params
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "page-size" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page-size", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page-size", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ResourcesV2(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1069,6 +1909,11 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("GET "+options.BaseURL+"/customers/v1/personal/complimentary-information", wrapper.PersonalComplimentaryInfoV1)
 	m.HandleFunc("GET "+options.BaseURL+"/customers/v1/personal/identifications", wrapper.PersonalIdentificationsV1)
 	m.HandleFunc("GET "+options.BaseURL+"/customers/v1/personal/qualifications", wrapper.PersonalQualificationsV1)
+	m.HandleFunc("GET "+options.BaseURL+"/insurance-capitalization-title/v1/insurance-capitalization-title/plans", wrapper.CapitalizationTitlePlansV1)
+	m.HandleFunc("GET "+options.BaseURL+"/insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/events", wrapper.CapitalizationTitleEventsV1)
+	m.HandleFunc("GET "+options.BaseURL+"/insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/plan-info", wrapper.CapitalizationTitlePlanInfoV1)
+	m.HandleFunc("GET "+options.BaseURL+"/insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/settlements", wrapper.CapitalizationTitleSettlementsV1)
+	m.HandleFunc("GET "+options.BaseURL+"/resources/v2/resources", wrapper.ResourcesV2)
 
 	return m
 }
@@ -1171,6 +2016,93 @@ func (response PersonalQualificationsV1200JSONResponse) VisitPersonalQualificati
 	return json.NewEncoder(w).Encode(response)
 }
 
+type CapitalizationTitlePlansV1RequestObject struct {
+	Params CapitalizationTitlePlansV1Params
+}
+
+type CapitalizationTitlePlansV1ResponseObject interface {
+	VisitCapitalizationTitlePlansV1Response(w http.ResponseWriter) error
+}
+
+type CapitalizationTitlePlansV1200JSONResponse CapitalizationTitlePlansResponseV1
+
+func (response CapitalizationTitlePlansV1200JSONResponse) VisitCapitalizationTitlePlansV1Response(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CapitalizationTitleEventsV1RequestObject struct {
+	PlanId PlanId `json:"planId"`
+	Params CapitalizationTitleEventsV1Params
+}
+
+type CapitalizationTitleEventsV1ResponseObject interface {
+	VisitCapitalizationTitleEventsV1Response(w http.ResponseWriter) error
+}
+
+type CapitalizationTitleEventsV1200JSONResponse CapitalizationTitleEventsResponseV1
+
+func (response CapitalizationTitleEventsV1200JSONResponse) VisitCapitalizationTitleEventsV1Response(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CapitalizationTitlePlanInfoV1RequestObject struct {
+	PlanId PlanId `json:"planId"`
+}
+
+type CapitalizationTitlePlanInfoV1ResponseObject interface {
+	VisitCapitalizationTitlePlanInfoV1Response(w http.ResponseWriter) error
+}
+
+type CapitalizationTitlePlanInfoV1200JSONResponse CapitalizationTitlePlanInfoResponseV1
+
+func (response CapitalizationTitlePlanInfoV1200JSONResponse) VisitCapitalizationTitlePlanInfoV1Response(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CapitalizationTitleSettlementsV1RequestObject struct {
+	PlanId PlanId `json:"planId"`
+	Params CapitalizationTitleSettlementsV1Params
+}
+
+type CapitalizationTitleSettlementsV1ResponseObject interface {
+	VisitCapitalizationTitleSettlementsV1Response(w http.ResponseWriter) error
+}
+
+type CapitalizationTitleSettlementsV1200JSONResponse CapitalizationTitleSettlementsResponseV1
+
+func (response CapitalizationTitleSettlementsV1200JSONResponse) VisitCapitalizationTitleSettlementsV1Response(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ResourcesV2RequestObject struct {
+	Params ResourcesV2Params
+}
+
+type ResourcesV2ResponseObject interface {
+	VisitResourcesV2Response(w http.ResponseWriter) error
+}
+
+type ResourcesV2200JSONResponse ResourcesResponseV2
+
+func (response ResourcesV2200JSONResponse) VisitResourcesV2Response(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 
@@ -1191,6 +2123,21 @@ type StrictServerInterface interface {
 
 	// (GET /customers/v1/personal/qualifications)
 	PersonalQualificationsV1(ctx context.Context, request PersonalQualificationsV1RequestObject) (PersonalQualificationsV1ResponseObject, error)
+	// Obtem a lista de identificação de InsuranceCapitalizationTitle
+	// (GET /insurance-capitalization-title/v1/insurance-capitalization-title/plans)
+	CapitalizationTitlePlansV1(ctx context.Context, request CapitalizationTitlePlansV1RequestObject) (CapitalizationTitlePlansV1ResponseObject, error)
+	// Obtém os dados de eventos do plano identificado por {planId}
+	// (GET /insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/events)
+	CapitalizationTitleEventsV1(ctx context.Context, request CapitalizationTitleEventsV1RequestObject) (CapitalizationTitleEventsV1ResponseObject, error)
+	// Obtém as informações gerais do plano identificado por {planId}
+	// (GET /insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/plan-info)
+	CapitalizationTitlePlanInfoV1(ctx context.Context, request CapitalizationTitlePlanInfoV1RequestObject) (CapitalizationTitlePlanInfoV1ResponseObject, error)
+	// Obtém os dados de liquidações do plano identificado por {planId}
+	// (GET /insurance-capitalization-title/v1/insurance-capitalization-title/{planId}/settlements)
+	CapitalizationTitleSettlementsV1(ctx context.Context, request CapitalizationTitleSettlementsV1RequestObject) (CapitalizationTitleSettlementsV1ResponseObject, error)
+	// Obtém a lista de recursos consentidos pelo cliente.
+	// (GET /resources/v2/resources)
+	ResourcesV2(ctx context.Context, request ResourcesV2RequestObject) (ResourcesV2ResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -1377,117 +2324,329 @@ func (sh *strictHandler) PersonalQualificationsV1(w http.ResponseWriter, r *http
 	}
 }
 
+// CapitalizationTitlePlansV1 operation middleware
+func (sh *strictHandler) CapitalizationTitlePlansV1(w http.ResponseWriter, r *http.Request, params CapitalizationTitlePlansV1Params) {
+	var request CapitalizationTitlePlansV1RequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CapitalizationTitlePlansV1(ctx, request.(CapitalizationTitlePlansV1RequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CapitalizationTitlePlansV1")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CapitalizationTitlePlansV1ResponseObject); ok {
+		if err := validResponse.VisitCapitalizationTitlePlansV1Response(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CapitalizationTitleEventsV1 operation middleware
+func (sh *strictHandler) CapitalizationTitleEventsV1(w http.ResponseWriter, r *http.Request, planId PlanId, params CapitalizationTitleEventsV1Params) {
+	var request CapitalizationTitleEventsV1RequestObject
+
+	request.PlanId = planId
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CapitalizationTitleEventsV1(ctx, request.(CapitalizationTitleEventsV1RequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CapitalizationTitleEventsV1")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CapitalizationTitleEventsV1ResponseObject); ok {
+		if err := validResponse.VisitCapitalizationTitleEventsV1Response(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CapitalizationTitlePlanInfoV1 operation middleware
+func (sh *strictHandler) CapitalizationTitlePlanInfoV1(w http.ResponseWriter, r *http.Request, planId PlanId) {
+	var request CapitalizationTitlePlanInfoV1RequestObject
+
+	request.PlanId = planId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CapitalizationTitlePlanInfoV1(ctx, request.(CapitalizationTitlePlanInfoV1RequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CapitalizationTitlePlanInfoV1")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CapitalizationTitlePlanInfoV1ResponseObject); ok {
+		if err := validResponse.VisitCapitalizationTitlePlanInfoV1Response(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CapitalizationTitleSettlementsV1 operation middleware
+func (sh *strictHandler) CapitalizationTitleSettlementsV1(w http.ResponseWriter, r *http.Request, planId PlanId, params CapitalizationTitleSettlementsV1Params) {
+	var request CapitalizationTitleSettlementsV1RequestObject
+
+	request.PlanId = planId
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CapitalizationTitleSettlementsV1(ctx, request.(CapitalizationTitleSettlementsV1RequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CapitalizationTitleSettlementsV1")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CapitalizationTitleSettlementsV1ResponseObject); ok {
+		if err := validResponse.VisitCapitalizationTitleSettlementsV1Response(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ResourcesV2 operation middleware
+func (sh *strictHandler) ResourcesV2(w http.ResponseWriter, r *http.Request, params ResourcesV2Params) {
+	var request ResourcesV2RequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ResourcesV2(ctx, request.(ResourcesV2RequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ResourcesV2")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ResourcesV2ResponseObject); ok {
+		if err := validResponse.VisitResourcesV2Response(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

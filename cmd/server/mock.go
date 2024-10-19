@@ -3,14 +3,19 @@ package main
 import (
 	"context"
 
+	"github.com/google/uuid"
 	"github.com/luikyv/go-open-insurance/internal/api"
+	"github.com/luikyv/go-open-insurance/internal/capitalizationtitle"
 	"github.com/luikyv/go-open-insurance/internal/customer"
+	"github.com/luikyv/go-open-insurance/internal/resource"
 	"github.com/luikyv/go-open-insurance/internal/user"
 )
 
 func loadMocks(
 	userService user.Service,
 	customerService customer.Service,
+	resourceService resource.Service,
+	capitalizationTitleService capitalizationtitle.Service,
 ) error {
 	ctx := context.Background()
 
@@ -32,7 +37,7 @@ func loadMocks(
 		return err
 	}
 
-	customerService.SetPersonalIdentifications(
+	customerService.AddPersonalIdentification(
 		userBob.UserName,
 		api.PersonalIdentificationData{
 			CpfNumber:       userBob.CPF,
@@ -62,7 +67,7 @@ func loadMocks(
 			UpdateDateTime:          dateTimeNow,
 		},
 	)
-	customerService.SetPersonalQualifications(
+	customerService.AddPersonalQualification(
 		userBob.UserName,
 		api.PersonalQualificationData{
 			LifePensionPlans:  api.LifePensionPlanApplicabilityNAOSEAPLICA,
@@ -70,7 +75,7 @@ func loadMocks(
 			UpdateDateTime:    dateTimeNow,
 		},
 	)
-	customerService.SetPersonalComplimentaryInfos(
+	customerService.AddPersonalComplimentaryInfo(
 		userBob.UserName,
 		api.PersonalComplimentaryInfoData{
 			ProductsServices: []api.ProductService{
@@ -81,6 +86,135 @@ func loadMocks(
 			},
 			StartDate:      api.NewDate(dateNow.AddDate(0, 0, -1)),
 			UpdateDateTime: dateTimeNow,
+		},
+	)
+
+	capitalizationTitlePlanID1 := "cbad06ae-5f44-483a-bded-e61593ea195c"
+	capitalizationTitleService.AddPlan(
+		userBob.UserName,
+		api.CapitalizationTitlePlanData{
+			Brand: api.CapitalizationTitleBrand{
+				Name: "Mock Insurance",
+				Companies: []api.CapitalizationTitleCompany{
+					{
+						CnpjNumber:  "90990354000113",
+						CompanyName: "Mock Insurance",
+						Products: []api.CapitalizationTitleProduct{
+							{
+								PlanId:      capitalizationTitlePlanID1,
+								ProductName: "Random Capitalization Title",
+							},
+						},
+					},
+				},
+			},
+		},
+	)
+	capitalizationTitleSeriesID1 := "eb71e4d5-ff97-41ca-923f-efa08536793e"
+	capitalizationTitleService.AddPlanInfo(
+		userBob.UserName,
+		capitalizationTitlePlanID1,
+		api.CapitalizationTitlePlanInfo{
+			Series: []api.CapitalizationTitleSeries{
+				{
+					PlanId:   &capitalizationTitlePlanID1,
+					SeriesId: capitalizationTitleSeriesID1,
+					Modality: api.CapitalizationTitleSeriesModalityPOPULAR,
+				},
+			},
+		},
+	)
+	capitalizationTitleService.AddPlanEvent(
+		userBob.UserName,
+		capitalizationTitlePlanID1,
+		api.CapitalizationTitleEvent{
+			TitleId: pointerOf("random_title"),
+		},
+	)
+	capitalizationTitleService.AddPlanSettlement(
+		userBob.UserName,
+		capitalizationTitlePlanID1,
+		api.CapitalizationTitleSettlement{
+			SettlementId:          "random_settlement",
+			SettlementDueDate:     api.DateNow(),
+			SettlementPaymentDate: api.DateNow(),
+			SettlementFinancialAmount: api.AmountDetails{
+				Amount:   100.0,
+				Currency: "BRL",
+			},
+		},
+	)
+
+	resourceService.Add(
+		userBob.UserName,
+		api.ResourceData{
+			ResourceId: uuid.NewString(),
+			Status:     api.ResourceStatusUNAVAILABLE,
+			Type:       api.ResourceTypeCAPITALIZATIONTITLES,
+		},
+	)
+	resourceService.Add(
+		userBob.UserName,
+		api.ResourceData{
+			ResourceId: uuid.NewString(),
+			Status:     api.ResourceStatusUNAVAILABLE,
+			Type:       api.ResourceTypeCAPITALIZATIONTITLES,
+		},
+	)
+	resourceService.Add(
+		userBob.UserName,
+		api.ResourceData{
+			ResourceId: uuid.NewString(),
+			Status:     api.ResourceStatusUNAVAILABLE,
+			Type:       api.ResourceTypeCAPITALIZATIONTITLES,
+		},
+	)
+	resourceService.Add(
+		userBob.UserName,
+		api.ResourceData{
+			ResourceId: uuid.NewString(),
+			Status:     api.ResourceStatusUNAVAILABLE,
+			Type:       api.ResourceTypeCAPITALIZATIONTITLES,
+		},
+	)
+	resourceService.Add(
+		userBob.UserName,
+		api.ResourceData{
+			ResourceId: uuid.NewString(),
+			Status:     api.ResourceStatusUNAVAILABLE,
+			Type:       api.ResourceTypeCAPITALIZATIONTITLES,
+		},
+	)
+	resourceService.Add(
+		userBob.UserName,
+		api.ResourceData{
+			ResourceId: uuid.NewString(),
+			Status:     api.ResourceStatusUNAVAILABLE,
+			Type:       api.ResourceTypeCAPITALIZATIONTITLES,
+		},
+	)
+	resourceService.Add(
+		userBob.UserName,
+		api.ResourceData{
+			ResourceId: uuid.NewString(),
+			Status:     api.ResourceStatusUNAVAILABLE,
+			Type:       api.ResourceTypeCAPITALIZATIONTITLES,
+		},
+	)
+	resourceService.Add(
+		userBob.UserName,
+		api.ResourceData{
+			ResourceId: uuid.NewString(),
+			Status:     api.ResourceStatusUNAVAILABLE,
+			Type:       api.ResourceTypeCAPITALIZATIONTITLES,
+		},
+	)
+	resourceService.Add(
+		userBob.UserName,
+		api.ResourceData{
+			ResourceId: uuid.NewString(),
+			Status:     api.ResourceStatusUNAVAILABLE,
+			Type:       api.ResourceTypeCAPITALIZATIONTITLES,
 		},
 	)
 

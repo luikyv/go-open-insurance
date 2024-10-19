@@ -18,7 +18,7 @@ func NewStorage(db *mongo.Database) Storage {
 	}
 }
 
-func (st Storage) Save(ctx context.Context, consent Consent) error {
+func (st Storage) save(ctx context.Context, consent Consent) error {
 	shouldUpsert := true
 	filter := bson.D{{Key: "_id", Value: consent.ID}}
 	if _, err := st.collection.ReplaceOne(
@@ -33,7 +33,7 @@ func (st Storage) Save(ctx context.Context, consent Consent) error {
 	return nil
 }
 
-func (st Storage) Get(ctx context.Context, id string) (Consent, error) {
+func (st Storage) get(ctx context.Context, id string) (Consent, error) {
 	filter := bson.D{{Key: "_id", Value: id}}
 
 	result := st.collection.FindOne(ctx, filter)
@@ -49,7 +49,7 @@ func (st Storage) Get(ctx context.Context, id string) (Consent, error) {
 	return consent, nil
 }
 
-func (st Storage) Delete(ctx context.Context, id string) error {
+func (st Storage) delete(ctx context.Context, id string) error {
 	filter := bson.D{{Key: "_id", Value: id}}
 	if _, err := st.collection.DeleteOne(ctx, filter); err != nil {
 		return err

@@ -2,7 +2,6 @@ package authn
 
 import (
 	"context"
-	"fmt"
 	"html/template"
 	"net/http"
 	"slices"
@@ -15,6 +14,26 @@ import (
 	"github.com/luikyv/go-open-insurance/internal/oidc"
 	"github.com/luikyv/go-open-insurance/internal/user"
 )
+
+func Policy(
+	userService user.Service,
+	consentService consent.Service,
+	baseURL string,
+) goidc.AuthnPolicy {
+	authenticator := authenticator{
+		userService:    userService,
+		consentService: consentService,
+		baseURL:        baseURL,
+	}
+	return goidc.NewPolicy(
+		"main",
+		func(r *http.Request, c *goidc.Client, as *goidc.AuthnSession) bool {
+			as.StoreParameter(paramStepID, stepIDSetUp)
+			return true
+		},
+		authenticator.authenticate,
+	)
+}
 
 const (
 	paramConsentID   = "consent_id"
@@ -36,36 +55,26 @@ const (
 	correctPassword = "pass"
 )
 
-type Authenticator struct {
+type authnPage struct {
+	BaseURL     string
+	CallbackID  string
+	Permissions []api.ConsentPermission
+	Error       string
+}
+
+type authenticator struct {
 	userService    user.Service
 	consentService consent.Service
 	baseURL        string
 }
 
-func New(
-	userService user.Service,
-	consentService consent.Service,
-	baseURL string,
-) Authenticator {
-	return Authenticator{
-		userService:    userService,
-		consentService: consentService,
-		baseURL:        baseURL,
-	}
-}
-
-func (a Authenticator) Authenticate(
+func (a authenticator) authenticate(
 	w http.ResponseWriter,
 	r *http.Request,
 	session *goidc.AuthnSession,
 ) goidc.AuthnStatus {
 	ctx := context.WithValue(r.Context(), api.CtxKeyClientID, session.ClientID)
 	r = r.WithContext(ctx)
-
-	// Set the step ID if it was not set before.
-	if _, ok := session.Store[paramStepID]; !ok {
-		session.StoreParameter(paramStepID, stepIDSetUp)
-	}
 
 	if session.Parameter(paramStepID) == stepIDSetUp {
 		if status := a.setUp(r, session); status != goidc.StatusSuccess {
@@ -95,7 +104,7 @@ func (a Authenticator) Authenticate(
 	return goidc.StatusFailure
 }
 
-func (a Authenticator) setUp(
+func (a authenticator) setUp(
 	r *http.Request,
 	session *goidc.AuthnSession,
 ) goidc.AuthnStatus {
@@ -119,18 +128,19 @@ func (a Authenticator) setUp(
 		return goidc.StatusFailure
 	}
 
-	session.StoreParameter(paramConsentID, consent.ID)
-	permissions := ""
-	for _, p := range consent.Permissions {
-		permissions += fmt.Sprintf("%s ", p)
+	// Convert permissions to []string for joining.
+	strPermissions := make([]string, len(consent.Permissions))
+	for i, permission := range consent.Permissions {
+		strPermissions[i] = string(permission)
 	}
-	permissions = permissions[:len(permissions)-1]
-	session.StoreParameter(paramPermissions, permissions)
+
+	session.StoreParameter(paramConsentID, consent.ID)
+	session.StoreParameter(paramPermissions, strings.Join(strPermissions, " "))
 	session.StoreParameter(paramConsentCPF, consent.UserCPF)
 	return goidc.StatusSuccess
 }
 
-func (a Authenticator) login(
+func (a authenticator) login(
 	w http.ResponseWriter,
 	r *http.Request,
 	session *goidc.AuthnSession,
@@ -141,6 +151,7 @@ func (a Authenticator) login(
 	isLogin := r.PostFormValue(loginFormParam)
 	if isLogin == "" {
 		w.WriteHeader(http.StatusOK)
+		// TODO: Improve this.
 		tmpl, _ := template.ParseFiles("../../templates/login.html")
 		tmpl.Execute(w, authnPage{
 			BaseURL:    a.baseURL,
@@ -192,7 +203,7 @@ func (a Authenticator) login(
 	return goidc.StatusSuccess
 }
 
-func (a Authenticator) grantConsent(
+func (a authenticator) grantConsent(
 	w http.ResponseWriter,
 	r *http.Request,
 	session *goidc.AuthnSession,
@@ -238,10 +249,11 @@ func (a Authenticator) grantConsent(
 	return goidc.StatusSuccess
 }
 
-func (a Authenticator) finishFlow(
+func (a authenticator) finishFlow(
 	session *goidc.AuthnSession,
 ) goidc.AuthnStatus {
 	session.SetUserID(session.Parameter(paramUserID).(string))
+	// TODO: Grant scopes based on permissions.
 	session.GrantScopes(session.Scopes)
 	session.SetIDTokenClaimACR(oidc.ACROpenInsuranceLOA2)
 	session.SetIDTokenClaimAuthTime(int(time.Now().Unix()))
@@ -257,11 +269,4 @@ func (a Authenticator) finishFlow(
 	}
 
 	return goidc.StatusSuccess
-}
-
-type authnPage struct {
-	BaseURL     string
-	CallbackID  string
-	Permissions []api.ConsentPermission
-	Error       string
 }

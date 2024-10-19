@@ -11,14 +11,14 @@ import (
 )
 
 type Service struct {
-	userService user.Service
 	storage     Storage
+	userService user.Service
 }
 
-func NewService(userService user.Service, storage Storage) Service {
+func NewService(storage Storage, userService user.Service) Service {
 	return Service{
-		userService: userService,
 		storage:     storage,
+		userService: userService,
 	}
 }
 
@@ -137,7 +137,7 @@ func (s Service) save(
 	ctx context.Context,
 	consent Consent,
 ) error {
-	if err := s.storage.Save(ctx, consent); err != nil {
+	if err := s.storage.save(ctx, consent); err != nil {
 		api.Logger(ctx).Error("could not save the consent", slog.Any("error", err))
 		return opinerr.ErrInternal
 	}
@@ -145,7 +145,7 @@ func (s Service) save(
 }
 
 func (s Service) get(ctx context.Context, id string) (Consent, error) {
-	consent, err := s.storage.Get(ctx, id)
+	consent, err := s.storage.get(ctx, id)
 	if err != nil {
 		api.Logger(ctx).Debug("could not find the consent", slog.Any("error", err))
 		return Consent{}, opinerr.New("NOT_FOUND", http.StatusNotFound,
