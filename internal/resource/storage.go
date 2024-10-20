@@ -1,6 +1,7 @@
 package resource
 
 import (
+	"fmt"
 	"slices"
 
 	"github.com/luikyv/go-open-insurance/internal/api"
@@ -32,4 +33,14 @@ func (s *Storage) resources(
 		}
 	}
 	return api.Paginate(rs, page)
+}
+
+func (s *Storage) get(sub string, id string) (api.ResourceData, error) {
+	for _, r := range s.resourcesMap[sub] {
+		if r.ResourceId == id {
+			return r, nil
+		}
+	}
+
+	return api.ResourceData{}, fmt.Errorf("resource %s not found", id)
 }

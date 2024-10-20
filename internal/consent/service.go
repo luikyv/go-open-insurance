@@ -83,6 +83,24 @@ func (s Service) Get(
 	return consent, nil
 }
 
+func (s Service) GetAndConsume(
+	ctx context.Context,
+	id string,
+) (
+	Consent,
+	error,
+) {
+	consent, err := s.Get(ctx, id)
+	if err != nil {
+		return Consent{}, err
+	}
+	if err := s.Consume(ctx, consent); err != nil {
+		return Consent{}, err
+	}
+
+	return consent, nil
+}
+
 func (s Service) RejectByID(
 	ctx context.Context,
 	id string,
@@ -111,6 +129,21 @@ func (s Service) Reject(
 	return s.save(ctx, consent)
 }
 
+func (s Service) Consume(
+	ctx context.Context,
+	consent Consent,
+) error {
+	if !consent.IsAuthorized() {
+		return opinerr.New("INVALID_OPERATION", http.StatusBadRequest,
+			"cannot consume a consent that is not authorized")
+	}
+
+	consent.Status = api.ConsentStatusCONSUMED
+	return s.save(ctx, consent)
+}
+
+// VerifyPermissions checks if the consent with the given ID is authorized
+// and has the required permissions.
 func (s Service) VerifyPermissions(
 	ctx context.Context,
 	id string,
@@ -123,12 +156,12 @@ func (s Service) VerifyPermissions(
 
 	if !consent.IsAuthorized() {
 		return opinerr.New("INVALID_STATUS", http.StatusBadRequest,
-			"invalid consent status")
+			"consent is not authorized")
 	}
 
 	if !consent.HasPermissions(permissions) {
 		return opinerr.New("INVALID_PERMISSIONS", http.StatusBadRequest,
-			"invalid consent permissions")
+			"consent missing permissions")
 	}
 	return nil
 }

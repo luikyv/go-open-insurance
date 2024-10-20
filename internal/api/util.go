@@ -7,6 +7,8 @@ import (
 
 func isIdempotent(operationID string) bool {
 	switch operationID {
+	case "CreateEndorsementV1":
+		return true
 	default:
 		return false
 	}
@@ -14,6 +16,8 @@ func isIdempotent(operationID string) bool {
 
 func isFAPIIDRequired(operationID string) bool {
 	switch operationID {
+	case "CreateEndorsementV1":
+		return true
 	default:
 		return false
 	}
@@ -58,6 +62,10 @@ func requiredPermissions(operationID string) []ConsentPermission {
 			ConsentPermissionRESOURCESREAD,
 			ConsentPermissionCAPITALIZATIONTITLESETTLEMENTSREAD,
 		}
+	case "CreateEndorsementV1":
+		return []ConsentPermission{
+			ConsentPermissionENDORSEMENTREQUESTCREATE,
+		}
 	default:
 		return nil
 	}
@@ -75,6 +83,8 @@ func requiredScopes(operationID string) []goidc.Scope {
 	case "CapitalizationTitlePlansV1", "CapitalizationTitlePlanInfoV1",
 		"CapitalizationTitleEventsV1", "CapitalizationTitleSettlementsV1":
 		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent, oidc.ScopeCapitalizationTitle}
+	case "CreateEndorsementV1":
+		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent, oidc.ScopeEndorsement}
 	default:
 		return nil
 	}

@@ -48,12 +48,3 @@ func (st Storage) get(ctx context.Context, id string) (Consent, error) {
 
 	return consent, nil
 }
-
-func (st Storage) delete(ctx context.Context, id string) error {
-	filter := bson.D{{Key: "_id", Value: id}}
-	if _, err := st.collection.DeleteOne(ctx, filter); err != nil {
-		return err
-	}
-
-	return nil
-}

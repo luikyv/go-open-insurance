@@ -26,6 +26,7 @@ var (
 	ScopeInsurancePatrimonial        = goidc.NewScope("insurance-patrimonial")
 	ScopeInsuranceResponsibility     = goidc.NewScope("insurance-responsibility")
 	ScopeCapitalizationTitle         = goidc.NewScope("capitalization-title")
+	ScopeEndorsement                 = goidc.NewScope("endorsement")
 )
 
 var Scopes = []goidc.Scope{
@@ -40,6 +41,7 @@ var Scopes = []goidc.Scope{
 	ScopeInsuranceFinancialRisk,
 	ScopeInsurancePatrimonial,
 	ScopeInsuranceResponsibility,
+	ScopeEndorsement,
 }
 
 func ConsentID(scopes string) (string, bool) {

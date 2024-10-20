@@ -2,10 +2,12 @@ package resource
 
 import (
 	"context"
+	"net/http"
 	"strings"
 
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/consent"
+	"github.com/luikyv/go-open-insurance/internal/opinerr"
 )
 
 type Service struct {
@@ -58,4 +60,19 @@ func consentedResourceTypes(permissions []api.ConsentPermission) []api.ResourceT
 		}
 	}
 	return consentedTypes
+}
+
+func (s Service) Get(
+	ctx context.Context,
+	sub, id string,
+) (
+	api.ResourceData,
+	error,
+) {
+	r, err := s.storage.get(sub, id)
+	if err != nil {
+		return api.ResourceData{},
+			opinerr.New("NAO_FOUND", http.StatusNotFound, err.Error())
+	}
+	return r, nil
 }

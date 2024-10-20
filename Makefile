@@ -1,6 +1,5 @@
 setup-dev:
 	@pre-commit install
-	@go install github.com/deepmap/oapi-codegen/v2/cmd/oapi-codegen@main
 	@make init-keys
 	@if [ ! -d "conformance-suite" ]; then \
 	  echo "Cloning open insurance conformance suite repository..."; \
@@ -54,4 +53,4 @@ init-keys:
 	@rm keys/req.csr
 
 generate-models:
-	@oapi-codegen --config=oapi-config.yml oapi-spec.yml
+	@go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=oapi-config.yml oapi-spec.yml

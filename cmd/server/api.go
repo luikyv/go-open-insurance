@@ -7,6 +7,7 @@ import (
 	capitalizationtitlev1 "github.com/luikyv/go-open-insurance/internal/capitalizationtitle/v1"
 	consentv2 "github.com/luikyv/go-open-insurance/internal/consent/v2"
 	customersv1 "github.com/luikyv/go-open-insurance/internal/customer/v1"
+	endorsementv1 "github.com/luikyv/go-open-insurance/internal/endorsement/v1"
 	resourcev2 "github.com/luikyv/go-open-insurance/internal/resource/v2"
 )
 
@@ -15,6 +16,7 @@ type opinServer struct {
 	customerV1Server            customersv1.Server
 	resouceV2Server             resourcev2.Server
 	capitalizationTitleV1Server capitalizationtitlev1.Server
+	endorsementV1Server         endorsementv1.Server
 }
 
 func (s opinServer) CreateConsentV2(
@@ -125,4 +127,14 @@ func (s opinServer) CapitalizationTitleSettlementsV1(
 	error,
 ) {
 	return s.capitalizationTitleV1Server.CapitalizationTitleSettlements(ctx, request)
+}
+
+func (s opinServer) CreateEndorsementV1(
+	ctx context.Context,
+	request api.CreateEndorsementV1RequestObject,
+) (
+	api.CreateEndorsementV1ResponseObject,
+	error,
+) {
+	return s.endorsementV1Server.CreateEndorsementV1(ctx, request)
 }

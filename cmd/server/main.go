@@ -13,6 +13,8 @@ import (
 	consentv2 "github.com/luikyv/go-open-insurance/internal/consent/v2"
 	"github.com/luikyv/go-open-insurance/internal/customer"
 	customersv1 "github.com/luikyv/go-open-insurance/internal/customer/v1"
+	"github.com/luikyv/go-open-insurance/internal/endorsement"
+	endorsementv1 "github.com/luikyv/go-open-insurance/internal/endorsement/v1"
 	"github.com/luikyv/go-open-insurance/internal/resource"
 	resourcev2 "github.com/luikyv/go-open-insurance/internal/resource/v2"
 	"github.com/luikyv/go-open-insurance/internal/user"
@@ -50,6 +52,7 @@ func main() {
 
 	// Services.
 	userService := user.NewService(userStorage)
+	idempotencyService := api.NewIdempotencyService(idempotencyStorage)
 	consentService := consent.NewService(consentStorage, userService)
 	resourceService := resource.NewService(resourceStorage, consentService)
 	customerService := customer.NewService(customerStorage)
@@ -57,7 +60,7 @@ func main() {
 		capitalizationtitleStorage,
 		resourceService,
 	)
-	idempotencyService := api.NewIdempotencyService(idempotencyStorage)
+	endorsementService := endorsement.NewService(consentService, resourceService)
 
 	// Provider.
 	op, err := openidProvider(db, userService, consentService,
@@ -75,6 +78,7 @@ func main() {
 			baseURLOPIN,
 			capitalizationtitleService,
 		),
+		endorsementV1Server: endorsementv1.NewServer(endorsementService),
 	}
 	strictHandler := api.NewStrictHandlerWithOptions(
 		server,

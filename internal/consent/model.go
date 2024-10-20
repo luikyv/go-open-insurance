@@ -7,16 +7,17 @@ import (
 )
 
 type Consent struct {
-	ID            string                  `bson:"_id"`
-	Status        api.ConsentStatus       `bson:"status"`
-	UserCPF       string                  `bson:"user_cpf"`
-	BusinessCNPJ  string                  `bson:"business_cnpj,omitempty"`
-	ClientId      string                  `bson:"client_id"`
-	Permissions   []api.ConsentPermission `bson:"permissions"`
-	CreatedAt     time.Time               `bson:"created_at"`
-	UpdatedAt     time.Time               `bson:"updated_at"`
-	ExpiresAt     time.Time               `bson:"expires_at"`
-	RejectionInfo *RejectionInfo          `json:"rejection,omitempty"`
+	ID              string                  `bson:"_id"`
+	Status          api.ConsentStatus       `bson:"status"`
+	UserCPF         string                  `bson:"user_cpf"`
+	BusinessCNPJ    string                  `bson:"business_cnpj,omitempty"`
+	ClientId        string                  `bson:"client_id"`
+	Permissions     []api.ConsentPermission `bson:"permissions"`
+	CreatedAt       time.Time               `bson:"created_at"`
+	UpdatedAt       time.Time               `bson:"updated_at"`
+	ExpiresAt       time.Time               `bson:"expires_at"`
+	RejectionInfo   *RejectionInfo          `bson:"rejection,omitempty"`
+	EndorsementInfo *EndorsementInfo        `bson:"endorsement,omitempty"`
 }
 
 // HasAuthExpired returns true if the status is [StatusAwaitingAuthorisation] and
@@ -43,6 +44,12 @@ func (c Consent) HasPermissions(permissions []api.ConsentPermission) bool {
 }
 
 type RejectionInfo struct {
-	RejectedBy api.ConsentRejectedBy         `json:"rejected_by"`
-	Reason     api.ConsentRejectedReasonCode `json:"reason"`
+	RejectedBy api.ConsentRejectedBy         `bson:"rejected_by"`
+	Reason     api.ConsentRejectedReasonCode `bson:"reason"`
+}
+
+type EndorsementInfo struct {
+	PolicyNumber string              `bson:"policy_number"`
+	Type         api.EndorsementType `bson:"type"`
+	Description  string              `bson:"description"`
 }

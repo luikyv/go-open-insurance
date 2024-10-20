@@ -157,7 +157,8 @@ func IdempotencyMiddleware(
 			// If the error was not due to "idempotency not found", return an
 			// internal error.
 			if !errors.Is(err, errIdempotencyNotFound) {
-				return nil, opinerr.ErrInternal
+				return nil, opinerr.New("ERRO_IDEMPOTENCIA", http.StatusUnprocessableEntity,
+					err.Error())
 			}
 
 			// The idempotency record was not found, then process the request
@@ -166,7 +167,7 @@ func IdempotencyMiddleware(
 			if err != nil {
 				return nil, err
 			}
-			service.CreateIdempotency(
+			_ = service.CreateIdempotency(
 				r.Context(),
 				idempotencyID,
 				request,
@@ -275,7 +276,7 @@ func CacheControlMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 
 func ValidationErrorHandler() nethttpmiddleware.ErrorHandler {
 	return func(w http.ResponseWriter, message string, statusCode int) {
-		opinErr := opinerr.New("INVALID_REQUEST", http.StatusUnprocessableEntity, message)
+		opinErr := opinerr.New("NAO_INFORMADO", http.StatusUnprocessableEntity, message)
 		w.WriteHeader(opinErr.StatusCode)
 		_ = json.NewEncoder(w).Encode(newResponseError(opinErr))
 	}
@@ -297,28 +298,31 @@ func ResponseErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) 
 }
 
 func newResponseError(err opinerr.Error) ResponseError {
-	title := err.Description
-	if len(title) > 255 {
-		title = title[:255]
+	msg := err.Description
+	if len(msg) > 255 {
+		msg = msg[:255]
+	}
+	errData := Error{
+		Code:   err.Code,
+		Title:  msg,
+		Detail: msg,
 	}
 
-	detail := err.Description
-	if len(detail) > 2048 {
-		detail = detail[:2048]
-	}
-	return ResponseError{
-		Errors: []Error{
-			{
-				Code:   err.Code,
-				Title:  title,
-				Detail: detail,
-			},
-		},
+	respErr := ResponseError{
+		Errors: ResponseError_Errors{},
 		Meta: &Meta{
 			TotalRecords: 1,
 			TotalPages:   1,
 		},
 	}
+
+	if err.RenderAsSingle {
+		_ = respErr.Errors.FromError(errData)
+	} else {
+		_ = respErr.Errors.FromErrors([]Error{errData})
+	}
+
+	return respErr
 }
 
 // Middleware to disable HTML escaping in responses.
@@ -328,7 +332,7 @@ func ResponseEncodingMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(rec, r)
 
 		modifiedBody := strings.ReplaceAll(rec.buf.String(), `\u0026`, `&`)
-		w.Write([]byte(modifiedBody))
+		_, _ = w.Write([]byte(modifiedBody))
 	})
 }
 

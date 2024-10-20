@@ -64,7 +64,7 @@ func (s IdempotencyService) CreateIdempotency(
 	id string,
 	req any,
 	resp any,
-) {
+) error {
 	reqPayload, err := json.Marshal(req)
 	if err != nil {
 		Logger(ctx).Error(
@@ -72,7 +72,7 @@ func (s IdempotencyService) CreateIdempotency(
 			slog.String("error", err.Error()),
 			slog.Any("request", resp),
 		)
-		return
+		return err
 	}
 	respPayload, err := json.Marshal(resp)
 	if err != nil {
@@ -81,7 +81,7 @@ func (s IdempotencyService) CreateIdempotency(
 			slog.String("error", err.Error()),
 			slog.Any("request", resp),
 		)
-		return
+		return err
 	}
 
 	Logger(ctx).Info("requested payload doesn't match the previous one sent for idempotency")
@@ -94,7 +94,10 @@ func (s IdempotencyService) CreateIdempotency(
 			"could not save the idempotency record",
 			slog.String("error", err.Error()),
 		)
+		return err
 	}
+
+	return nil
 }
 
 type idempotencyRecord struct {

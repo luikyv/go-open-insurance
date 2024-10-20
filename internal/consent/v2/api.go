@@ -81,10 +81,13 @@ func (s Server) ConsentV2(
 	return api.ConsentV2200JSONResponse(resp), nil
 }
 
-func newConsent(ctx context.Context, req api.CreateConsentRequestV2) consent.Consent {
+func newConsent(
+	ctx context.Context,
+	req api.CreateConsentRequestV2,
+) consent.Consent {
 	clientID := ctx.Value(api.CtxKeyClientID).(string)
 	now := time.Now().UTC()
-	consent := consent.Consent{
+	c := consent.Consent{
 		ID:          consent.ID(),
 		Status:      api.ConsentStatusAWAITINGAUTHORISATION,
 		UserCPF:     req.Data.LoggedUser.Document.Identification,
@@ -96,10 +99,18 @@ func newConsent(ctx context.Context, req api.CreateConsentRequestV2) consent.Con
 	}
 
 	if req.Data.BusinessEntity != nil {
-		consent.BusinessCNPJ = req.Data.BusinessEntity.Document.Identification
+		c.BusinessCNPJ = req.Data.BusinessEntity.Document.Identification
 	}
 
-	return consent
+	if req.Data.EndorsementInformation != nil {
+		c.EndorsementInfo = &consent.EndorsementInfo{
+			PolicyNumber: req.Data.EndorsementInformation.PolicyNumber,
+			Type:         req.Data.EndorsementInformation.EndorsementType,
+			Description:  req.Data.EndorsementInformation.RequestDescription,
+		}
+	}
+
+	return c
 }
 
 func newResponse(consent consent.Consent, baseURL string) api.ConsentResponseV2 {
