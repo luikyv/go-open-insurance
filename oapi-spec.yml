@@ -427,20 +427,7 @@ components:
           format: date-time
           maxLength: 20
         endorsementInformation:
-          type: object
-          required:
-            - policyNumber
-            - endorsementType
-            - requestDescription
-          properties:
-            policyNumber:
-              type: string
-              maxLength: 60
-            endorsementType:
-              $ref: '#/components/schemas/EndorsementType'
-            requestDescription:
-              type: string
-              maxLength: 1024
+          $ref: '#/components/schemas/EndorsementInfo'
         claimNotificationInformation:
           type: object
           required:
@@ -606,6 +593,21 @@ components:
         - PENSION_WITHDRAWAL_CREATE
         - CAPITALIZATION_TITLE_WITHDRAWAL_CREATE
         - RESOURCES_READ
+    EndorsementInfo:
+      type: object
+      required:
+        - policyNumber
+        - endorsementType
+        - requestDescription
+      properties:
+        policyNumber:
+          type: string
+          maxLength: 60
+        endorsementType:
+          $ref: '#/components/schemas/EndorsementType'
+        requestDescription:
+          type: string
+          maxLength: 1024
     EndorsementType:
       type: string
       enum:

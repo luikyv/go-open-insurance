@@ -44,9 +44,26 @@ func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
 				return f(ctx, w, r, request)
 			}
 
-			tokenInfo, err := op.TokenInfo(w, r)
+			token, ok := bearerToken(r)
+			if !ok {
+				Logger(ctx).Debug("bearer token is required")
+				return nil, opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
+					"missing token")
+			}
+
+			tokenInfo, err := op.TokenInfo(ctx, token)
 			if err != nil {
 				Logger(ctx).Debug("the token is not active")
+				return nil, opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
+					"invalid token")
+			}
+
+			if err := op.ValidateTokenPoP(
+				r,
+				token,
+				*tokenInfo.Confirmation,
+			); err != nil {
+				Logger(ctx).Debug("invalid proof of possesion")
 				return nil, opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
 					"invalid token")
 			}
@@ -69,6 +86,20 @@ func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
 			return f(ctx, w, r, request)
 		}
 	}
+}
+
+func bearerToken(r *http.Request) (string, bool) {
+	tokenHeader := r.Header.Get("Authorization")
+	if tokenHeader == "" {
+		return "", false
+	}
+
+	tokenParts := strings.Split(tokenHeader, " ")
+	if len(tokenParts) != 2 {
+		return "", false
+	}
+
+	return tokenParts[1], true
 }
 
 type VerifyPermissionsFunc func(

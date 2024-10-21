@@ -53,7 +53,8 @@ func openidProvider(
 		provider.WithTokenAuthnMethods(goidc.ClientAuthnPrivateKeyJWT),
 		provider.WithScopes(oidc.Scopes...),
 		provider.WithMTLS(mtlsHost, clientCertFunc),
-		provider.WithTLSCertTokenBinding(),
+		provider.WithTLSCertTokenBindingRequired(),
+		provider.WithPAR(60),
 		provider.WithJAR(jose.PS256),
 		provider.WithJAREncryption(jose.RSA_OAEP),
 		provider.WithJARContentEncryptionAlgs(jose.A256GCM),
@@ -73,10 +74,12 @@ func openidProvider(
 		provider.WithStaticClient(client("client_two")),
 		provider.WithHandleGrantFunc(handleGrantFunc(consentService)),
 		provider.WithPolicy(authn.Policy(userService, consentService, host+prefix)),
-		provider.WithHandleErrorFunc(func(r *http.Request, err error) {
-			api.Logger(r.Context()).Info("error during request", slog.String(
-				"error", err.Error(),
-			))
+		provider.WithNotifyErrorFunc(func(r *http.Request, err error) {
+			api.Logger(r.Context()).Info(
+				"error during request",
+				slog.String("uri", r.URL.RequestURI()),
+				slog.String("error", err.Error()),
+			)
 		}),
 	)
 }

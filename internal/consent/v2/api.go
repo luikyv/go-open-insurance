@@ -133,6 +133,14 @@ func newResponse(consent consent.Consent, baseURL string) api.ConsentResponseV2 
 		}
 	}
 
+	if consent.EndorsementInfo != nil {
+		data.EndorsementInformation = &api.EndorsementInfo{
+			PolicyNumber:       consent.EndorsementInfo.PolicyNumber,
+			EndorsementType:    consent.EndorsementInfo.Type,
+			RequestDescription: consent.EndorsementInfo.Description,
+		}
+	}
+
 	return api.ConsentResponseV2{
 		Data: data,
 		Meta: &api.Meta{
