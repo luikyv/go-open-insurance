@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 
+	"github.com/getkin/kin-openapi/routers/gorillamux"
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/capitalizationtitle"
 	capitalizationtitlev1 "github.com/luikyv/go-open-insurance/internal/capitalizationtitle/v1"
@@ -18,7 +19,6 @@ import (
 	"github.com/luikyv/go-open-insurance/internal/resource"
 	resourcev2 "github.com/luikyv/go-open-insurance/internal/resource/v2"
 	"github.com/luikyv/go-open-insurance/internal/user"
-	nethttpmiddleware "github.com/oapi-codegen/nethttp-middleware"
 	"github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -71,43 +71,39 @@ func main() {
 
 	// Server.
 	server := opinServer{
-		consentV2Server:  consentv2.NewServer(baseURLOPIN, consentService),
-		customerV1Server: customersv1.NewServer(baseURLOPIN, customerService),
-		resouceV2Server:  resourcev2.NewServer(baseURLOPIN, resourceService),
-		capitalizationTitleV1Server: capitalizationtitlev1.NewServer(
-			baseURLOPIN,
-			capitalizationtitleService,
-		),
-		endorsementV1Server: endorsementv1.NewServer(endorsementService),
+		consentV2Server:             consentv2.NewServer(baseURLOPIN, consentService),
+		customerV1Server:            customersv1.NewServer(baseURLOPIN, customerService),
+		resouceV2Server:             resourcev2.NewServer(baseURLOPIN, resourceService),
+		capitalizationTitleV1Server: capitalizationtitlev1.NewServer(baseURLOPIN, capitalizationtitleService),
+		endorsementV1Server:         endorsementv1.NewServer(endorsementService),
+	}
+
+	swagger, err := api.GetSwagger()
+	if err != nil {
+		log.Fatal(err)
+	}
+	router, err := gorillamux.NewRouter(swagger)
+	if err != nil {
+		log.Fatal(err)
 	}
 	strictHandler := api.NewStrictHandlerWithOptions(
 		server,
 		[]nethttp.StrictHTTPMiddlewareFunc{
 			api.MetaMiddleware(),
 			api.CacheControlMiddleware(),
-			api.AuthPermissionMiddleware(consentService.VerifyPermissions),
+			api.AuthPermissionMiddleware(consentService),
 			api.AuthScopeMiddleware(op),
 			api.IdempotencyMiddleware(idempotencyService),
 			api.FAPIIDMiddleware(),
 		},
 		api.StrictHTTPServerOptions{
+			RequestErrorHandlerFunc:  api.RequestErrorMiddleware,
 			ResponseErrorHandlerFunc: api.ResponseErrorMiddleware,
 		},
 	)
 
-	opinMux := http.NewServeMux()
-	api.HandlerFromMux(strictHandler, opinMux)
-	// Add a validation middleware for open insurance requests.
-	swagger, err := api.GetSwagger()
-	if err != nil {
-		log.Fatal(err)
-	}
-	opinHandler := nethttpmiddleware.OapiRequestValidatorWithOptions(
-		swagger,
-		&nethttpmiddleware.Options{
-			ErrorHandler: api.ValidationErrorHandler(),
-		},
-	)(opinMux)
+	opinHandler := api.HandlerFromMux(strictHandler, http.NewServeMux())
+	opinHandler = api.SchemaValidationMiddleware(opinHandler, router)
 	opinHandler = api.ResponseEncodingMiddleware(opinHandler)
 	opinHandler = http.StripPrefix(apiPrefixOPIN, opinHandler)
 

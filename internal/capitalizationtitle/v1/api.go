@@ -29,12 +29,11 @@ func (s Server) CapitalizationTitlePlans(
 	api.CapitalizationTitlePlansV1ResponseObject,
 	error,
 ) {
-	sub := ctx.Value(api.CtxKeySubject).(string)
+	meta := api.NewRequestMeta(ctx)
 	pagination := api.NewPagination(request.Params.Page, request.Params.PageSize)
-	requestURI := ctx.Value(api.CtxKeyRequestURI).(string)
 
-	plans := s.service.Plans(sub, pagination)
-	resp := newPlansResponse(s.baseURL+requestURI, plans)
+	plans := s.service.Plans(meta, pagination)
+	resp := newPlansResponse(s.baseURL+meta.RequestURI, plans)
 	return api.CapitalizationTitlePlansV1200JSONResponse(resp), nil
 }
 
@@ -45,16 +44,15 @@ func (s Server) CapitalizationTitleEvents(
 	api.CapitalizationTitleEventsV1ResponseObject,
 	error,
 ) {
-	sub := ctx.Value(api.CtxKeySubject).(string)
+	meta := api.NewRequestMeta(ctx)
 	pagination := api.NewPagination(request.Params.Page, request.Params.PageSize)
-	requestURI := ctx.Value(api.CtxKeyRequestURI).(string)
 
-	events, err := s.service.PlanEvents(sub, request.PlanId, pagination)
+	events, err := s.service.PlanEvents(meta, request.PlanId, pagination)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := newPlanEventsResponse(s.baseURL+requestURI, events)
+	resp := newPlanEventsResponse(s.baseURL+meta.RequestURI, events)
 	return api.CapitalizationTitleEventsV1200JSONResponse(resp), nil
 }
 
@@ -65,15 +63,13 @@ func (s Server) CapitalizationTitlePlanInfo(
 	api.CapitalizationTitlePlanInfoV1ResponseObject,
 	error,
 ) {
-	sub := ctx.Value(api.CtxKeySubject).(string)
-	requestURI := ctx.Value(api.CtxKeyRequestURI).(string)
-
-	info, err := s.service.PlanInfo(sub, request.PlanId)
+	meta := api.NewRequestMeta(ctx)
+	info, err := s.service.PlanInfo(meta, request.PlanId)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := newPlanIfnoResponse(s.baseURL+requestURI, info)
+	resp := newPlanIfnoResponse(s.baseURL+meta.RequestURI, info)
 	return api.CapitalizationTitlePlanInfoV1200JSONResponse(resp), nil
 }
 
@@ -84,16 +80,15 @@ func (s Server) CapitalizationTitleSettlements(
 	api.CapitalizationTitleSettlementsV1ResponseObject,
 	error,
 ) {
-	sub := ctx.Value(api.CtxKeySubject).(string)
+	meta := api.NewRequestMeta(ctx)
 	pagination := api.NewPagination(request.Params.Page, request.Params.PageSize)
-	requestURI := ctx.Value(api.CtxKeyRequestURI).(string)
 
-	settlements, err := s.service.PlanSettlements(sub, request.PlanId, pagination)
+	settlements, err := s.service.PlanSettlements(meta, request.PlanId, pagination)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := newPlanSettlementsResponse(s.baseURL+requestURI, settlements)
+	resp := newPlanSettlementsResponse(s.baseURL+meta.RequestURI, settlements)
 	return api.CapitalizationTitleSettlementsV1200JSONResponse(resp), nil
 }
 

@@ -2,19 +2,19 @@ package v1
 
 import (
 	"context"
-	"net/http"
 	"time"
 
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/endorsement"
-	"github.com/luikyv/go-open-insurance/internal/opinerr"
 )
 
 type Server struct {
 	service endorsement.Service
 }
 
-func NewServer(service endorsement.Service) Server {
+func NewServer(
+	service endorsement.Service,
+) Server {
 	return Server{
 		service: service,
 	}
@@ -27,18 +27,9 @@ func (s Server) CreateEndorsementV1(
 	api.CreateEndorsementV1ResponseObject,
 	error,
 ) {
-	consentID := ctx.Value(api.CtxKeyConsentID).(string)
-	if request.ConsentId != consentID {
-		return nil, opinerr.New(
-			"NAO_INFORMADO",
-			http.StatusBadRequest,
-			"invalid consent id",
-		)
-	}
-
-	sub := ctx.Value(api.CtxKeySubject).(string)
-	endorsement := newEndorsement(*request.Body, consentID)
-	if err := s.service.Create(ctx, sub, endorsement); err != nil {
+	meta := api.NewRequestMeta(ctx)
+	endorsement := newEndorsement(*request.Body, request.ConsentId)
+	if err := s.service.Create(ctx, meta, endorsement); err != nil {
 		return nil, err
 	}
 

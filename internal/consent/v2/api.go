@@ -14,7 +14,10 @@ type Server struct {
 	service consent.Service
 }
 
-func NewServer(baseURL string, service consent.Service) Server {
+func NewServer(
+	baseURL string,
+	service consent.Service,
+) Server {
 	return Server{
 		baseURL: baseURL,
 		service: service,
@@ -29,8 +32,9 @@ func (s Server) CreateConsentV2(
 	error,
 ) {
 
-	consent := newConsent(ctx, *request.Body)
-	if err := s.service.Create(ctx, consent); err != nil {
+	meta := api.NewRequestMeta(ctx)
+	consent := newConsent(meta, *request.Body)
+	if err := s.service.Create(ctx, meta, consent); err != nil {
 		return nil, err
 	}
 
@@ -45,7 +49,8 @@ func (s Server) DeleteConsentV2(
 	api.DeleteConsentV2ResponseObject,
 	error,
 ) {
-	c, err := s.service.Get(ctx, request.ConsentId)
+	meta := api.NewRequestMeta(ctx)
+	c, err := s.service.Get(ctx, meta, request.ConsentId)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +77,8 @@ func (s Server) ConsentV2(
 	api.ConsentV2ResponseObject,
 	error,
 ) {
-	consent, err := s.service.Get(ctx, request.ConsentId)
+	meta := api.NewRequestMeta(ctx)
+	consent, err := s.service.Get(ctx, meta, request.ConsentId)
 	if err != nil {
 		return nil, err
 	}
@@ -82,16 +88,15 @@ func (s Server) ConsentV2(
 }
 
 func newConsent(
-	ctx context.Context,
+	meta api.RequestMeta,
 	req api.CreateConsentRequestV2,
 ) consent.Consent {
-	clientID := ctx.Value(api.CtxKeyClientID).(string)
 	now := time.Now().UTC()
 	c := consent.Consent{
 		ID:          consent.ID(),
 		Status:      api.ConsentStatusAWAITINGAUTHORISATION,
 		UserCPF:     req.Data.LoggedUser.Document.Identification,
-		ClientId:    clientID,
+		ClientId:    meta.ClientID,
 		Permissions: req.Data.Permissions,
 		CreatedAt:   now,
 		UpdatedAt:   now,

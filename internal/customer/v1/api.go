@@ -26,8 +26,8 @@ func (s Server) PersonalIdentificationsV1(
 	api.PersonalIdentificationsV1ResponseObject,
 	error,
 ) {
-	sub := ctx.Value(api.CtxKeySubject).(string)
-	identifications := s.service.PersonalIdentifications(sub)
+	meta := api.NewRequestMeta(ctx)
+	identifications := s.service.PersonalIdentifications(meta)
 	resp := newPersonalIdentificationsResponse(s.baseURL, identifications)
 	return api.PersonalIdentificationsV1200JSONResponse(resp), nil
 }
@@ -39,8 +39,8 @@ func (s Server) PersonalQualificationsV1(
 	api.PersonalQualificationsV1ResponseObject,
 	error,
 ) {
-	sub := ctx.Value(api.CtxKeySubject).(string)
-	qualifications := s.service.PersonalQualifications(sub)
+	meta := api.NewRequestMeta(ctx)
+	qualifications := s.service.PersonalQualifications(meta)
 	resp := newPersonalQualificationsResponse(s.baseURL, qualifications)
 	return api.PersonalQualificationsV1200JSONResponse(resp), nil
 }
@@ -52,8 +52,8 @@ func (s Server) PersonalComplimentaryInfoV1(
 	api.PersonalComplimentaryInfoV1ResponseObject,
 	error,
 ) {
-	sub := ctx.Value(api.CtxKeySubject).(string)
-	infos := s.service.PersonalComplimentaryInfos(sub)
+	meta := api.NewRequestMeta(ctx)
+	infos := s.service.PersonalComplimentaryInfos(meta)
 	resp := newPersonalComplimentaryInfoResponse(s.baseURL, infos)
 	return api.PersonalComplimentaryInfoV1200JSONResponse(resp), nil
 }

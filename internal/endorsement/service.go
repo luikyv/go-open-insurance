@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/consent"
 	"github.com/luikyv/go-open-insurance/internal/opinerr"
 	"github.com/luikyv/go-open-insurance/internal/resource"
@@ -27,15 +28,15 @@ func NewService(
 
 func (s Service) Create(
 	ctx context.Context,
-	sub string,
+	meta api.RequestMeta,
 	endorsement Endorsement,
 ) error {
-	consent, err := s.consentService.GetAndConsume(ctx, endorsement.ConsentID)
+	consent, err := s.consentService.GetAndConsume(ctx, meta, endorsement.ConsentID)
 	if err != nil {
 		return err
 	}
 
-	if err := s.validate(ctx, sub, endorsement, consent); err != nil {
+	if err := s.validate(ctx, meta, endorsement, consent); err != nil {
 		return err
 	}
 
@@ -44,23 +45,31 @@ func (s Service) Create(
 
 func (s Service) validate(
 	ctx context.Context,
-	sub string,
+	meta api.RequestMeta,
 	endorsement Endorsement,
 	consent consent.Consent,
 ) error {
-	info := *consent.EndorsementInfo
 
+	if endorsement.ConsentID != meta.ConsentID {
+		return opinerr.New("NAO_INFORMADO", http.StatusBadRequest,
+			"invalid consent id")
+	}
+
+	if meta.Error != nil {
+		return opinerr.New("NAO_INFORMADO", http.StatusUnprocessableEntity,
+			meta.Error.Error())
+	}
+
+	info := *consent.EndorsementInfo
 	if endorsement.PolicyNumber != info.PolicyNumber {
 		return opinerr.New("NAO_INFORMADO", http.StatusUnprocessableEntity,
 			"policy number not consented")
 	}
-
 	if endorsement.Type != info.Type {
 		return opinerr.New("NAO_INFORMADO", http.StatusUnprocessableEntity,
 			"endorsement type not consented")
 	}
-
-	if _, err := s.resourceService.Get(ctx, sub, endorsement.PolicyNumber); err != nil {
+	if _, err := s.resourceService.Get(ctx, meta, endorsement.PolicyNumber); err != nil {
 		return opinerr.New("NAO_INFORMADO", http.StatusUnprocessableEntity,
 			"policy number not found")
 	}

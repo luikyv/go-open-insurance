@@ -6,14 +6,13 @@ import (
 )
 
 var (
-	ErrInternal = Error{"INTERNAL_ERROR", http.StatusInternalServerError, "internal error", false}
+	ErrInternal = Error{"INTERNAL_ERROR", http.StatusInternalServerError, "internal error"}
 )
 
 type Error struct {
-	Code           string
-	StatusCode     int
-	Description    string
-	RenderAsSingle bool
+	Code        string
+	StatusCode  int
+	Description string
 }
 
 func (err Error) Error() string {
@@ -25,10 +24,6 @@ func New(code string, status int, description string) Error {
 		Code:        code,
 		StatusCode:  status,
 		Description: description,
-	}
-
-	if status == http.StatusUnprocessableEntity {
-		err.RenderAsSingle = true
 	}
 
 	return err

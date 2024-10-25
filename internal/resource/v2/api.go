@@ -26,16 +26,13 @@ func (s Server) ResourcesV2(
 	api.ResourcesV2ResponseObject,
 	error,
 ) {
-	sub := ctx.Value(api.CtxKeySubject).(string)
-	consentID := ctx.Value(api.CtxKeyConsentID).(string)
-	requestURI := ctx.Value(api.CtxKeyRequestURI).(string)
-
+	meta := api.NewRequestMeta(ctx)
 	pagination := api.NewPagination(request.Params.Page, request.Params.PageSize)
-	resources, err := s.service.Resources(ctx, sub, consentID, pagination)
+	resources, err := s.service.Resources(ctx, meta, pagination)
 	if err != nil {
 		return nil, err
 	}
-	resp := newResourcesResponse(s.baseURL+requestURI, resources)
+	resp := newResourcesResponse(s.baseURL+meta.RequestURI, resources)
 	return api.ResourcesV2200JSONResponse(resp), nil
 }
 

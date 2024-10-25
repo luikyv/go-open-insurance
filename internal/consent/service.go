@@ -51,9 +51,10 @@ func (s Service) Authorize(
 
 func (s Service) Create(
 	ctx context.Context,
+	meta api.RequestMeta,
 	consent Consent,
 ) error {
-	if err := s.validate(ctx, consent); err != nil {
+	if err := s.validate(ctx, meta, consent); err != nil {
 		return err
 	}
 
@@ -63,6 +64,7 @@ func (s Service) Create(
 
 func (s Service) Get(
 	ctx context.Context,
+	meta api.RequestMeta,
 	id string,
 ) (
 	Consent,
@@ -73,8 +75,7 @@ func (s Service) Get(
 		return Consent{}, err
 	}
 
-	clientID := ctx.Value(api.CtxKeyClientID)
-	if clientID != consent.ClientId {
+	if meta.ClientID != consent.ClientId {
 		api.Logger(ctx).Debug("client not allowed to fetch the consent")
 		return Consent{}, opinerr.New("UNAUTHORIZED", http.StatusForbidden,
 			"client not authorized to perform this operation")
@@ -85,12 +86,13 @@ func (s Service) Get(
 
 func (s Service) GetAndConsume(
 	ctx context.Context,
+	meta api.RequestMeta,
 	id string,
 ) (
 	Consent,
 	error,
 ) {
-	consent, err := s.Get(ctx, id)
+	consent, err := s.Get(ctx, meta, id)
 	if err != nil {
 		return Consent{}, err
 	}
@@ -103,10 +105,11 @@ func (s Service) GetAndConsume(
 
 func (s Service) RejectByID(
 	ctx context.Context,
+	meta api.RequestMeta,
 	id string,
 	info RejectionInfo,
 ) error {
-	consent, err := s.Get(ctx, id)
+	consent, err := s.Get(ctx, meta, id)
 	if err != nil {
 		return err
 	}
@@ -142,14 +145,15 @@ func (s Service) Consume(
 	return s.save(ctx, consent)
 }
 
-// VerifyPermissions checks if the consent with the given ID is authorized
+// Verify checks if the consent with the given ID is authorized
 // and has the required permissions.
-func (s Service) VerifyPermissions(
+func (s Service) Verify(
 	ctx context.Context,
+	meta api.RequestMeta,
 	id string,
 	permissions ...api.ConsentPermission,
 ) error {
-	consent, err := s.Get(ctx, id)
+	consent, err := s.Get(ctx, meta, id)
 	if err != nil {
 		return err
 	}
@@ -163,6 +167,7 @@ func (s Service) VerifyPermissions(
 		return opinerr.New("INVALID_PERMISSIONS", http.StatusBadRequest,
 			"consent missing permissions")
 	}
+
 	return nil
 }
 
@@ -231,7 +236,12 @@ func (s Service) modify(ctx context.Context, consent *Consent) error {
 // validate validates the consent information.
 // This is intended to be used before the consent is created to make sure the
 // information is compliant.
-func (s Service) validate(ctx context.Context, consent Consent) error {
+func (s Service) validate(ctx context.Context, meta api.RequestMeta, consent Consent) error {
+	if meta.Error != nil {
+		return opinerr.New("NAO_INFORMADO", http.StatusBadRequest,
+			meta.Error.Error())
+	}
+
 	if err := validate(ctx, consent); err != nil {
 		api.Logger(ctx).Debug("the consent is not valid", slog.Any("error", err))
 		return err

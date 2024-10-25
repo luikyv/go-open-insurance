@@ -5,88 +5,127 @@ import (
 	"github.com/luikyv/go-open-insurance/internal/oidc"
 )
 
-func isIdempotent(operationID string) bool {
-	switch operationID {
-	case "CreateEndorsementV1":
-		return true
-	default:
-		return false
-	}
+type operationOptions struct {
+	scopes           []goidc.Scope
+	permissions      []ConsentPermission
+	fapiIDIsRequired bool
+	isIdempotent     bool
 }
 
-func isFAPIIDRequired(operationID string) bool {
-	switch operationID {
-	case "CreateEndorsementV1":
-		return true
-	default:
-		return false
-	}
-}
-
-func requiredPermissions(operationID string) []ConsentPermission {
-	switch operationID {
-	case "PersonalIdentificationsV1":
-		return []ConsentPermission{
-			ConsentPermissionRESOURCESREAD,
-			ConsentPermissionCUSTOMERSPERSONALIDENTIFICATIONSREAD,
-		}
-	case "PersonalQualificationsV1":
-		return []ConsentPermission{
-			ConsentPermissionRESOURCESREAD,
-			ConsentPermissionCUSTOMERSPERSONALQUALIFICATIONREAD,
-		}
-	case "PersonalComplimentaryInfoV1":
-		return []ConsentPermission{
-			ConsentPermissionRESOURCESREAD,
-			ConsentPermissionCUSTOMERSPERSONALADDITIONALINFOREAD,
-		}
-	case "ResourcesV2":
-		return []ConsentPermission{ConsentPermissionRESOURCESREAD}
-	case "CapitalizationTitlePlansV1":
-		return []ConsentPermission{
-			ConsentPermissionRESOURCESREAD,
-			ConsentPermissionCAPITALIZATIONTITLEREAD,
-		}
-	case "CapitalizationTitlePlanInfoV1":
-		return []ConsentPermission{
-			ConsentPermissionRESOURCESREAD,
-			ConsentPermissionCAPITALIZATIONTITLEPLANINFOREAD,
-		}
-	case "CapitalizationTitleEventsV1":
-		return []ConsentPermission{
-			ConsentPermissionRESOURCESREAD,
-			ConsentPermissionCAPITALIZATIONTITLEEVENTSREAD,
-		}
-	case "CapitalizationTitleSettlementsV1":
-		return []ConsentPermission{
-			ConsentPermissionRESOURCESREAD,
-			ConsentPermissionCAPITALIZATIONTITLESETTLEMENTSREAD,
-		}
-	case "CreateEndorsementV1":
-		return []ConsentPermission{
-			ConsentPermissionENDORSEMENTREQUESTCREATE,
-		}
-	default:
-		return nil
-	}
-}
-
-func requiredScopes(operationID string) []goidc.Scope {
+func newOperationOptions(operationID string) operationOptions {
 	switch operationID {
 	case "CreateConsentV2", "ConsentV2", "DeleteConsentV2":
-		return []goidc.Scope{oidc.ScopeConsents}
+		return operationOptions{
+			scopes: []goidc.Scope{oidc.ScopeConsents},
+		}
 	case "ResourcesV2":
-		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent, oidc.ScopeResources}
-	case "PersonalIdentificationsV1", "PersonalQualificationsV1",
-		"PersonalComplimentaryInfoV1":
-		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent, oidc.ScopeCustomers}
-	case "CapitalizationTitlePlansV1", "CapitalizationTitlePlanInfoV1",
-		"CapitalizationTitleEventsV1", "CapitalizationTitleSettlementsV1":
-		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent, oidc.ScopeCapitalizationTitle}
+		return operationOptions{
+			scopes: []goidc.Scope{
+				oidc.ScopeOpenID,
+				oidc.ScopeConsent,
+				oidc.ScopeResources,
+			},
+			permissions: []ConsentPermission{ConsentPermissionRESOURCESREAD},
+		}
+	case "PersonalIdentificationsV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				oidc.ScopeOpenID,
+				oidc.ScopeConsent,
+				// oidc.ScopeCustomers,
+			},
+			permissions: []ConsentPermission{
+				ConsentPermissionRESOURCESREAD,
+				ConsentPermissionCUSTOMERSPERSONALIDENTIFICATIONSREAD,
+			},
+		}
+	case "PersonalQualificationsV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				oidc.ScopeOpenID,
+				oidc.ScopeConsent,
+				oidc.ScopeCustomers,
+			},
+			permissions: []ConsentPermission{
+				ConsentPermissionRESOURCESREAD,
+				ConsentPermissionCUSTOMERSPERSONALQUALIFICATIONREAD,
+			},
+		}
+	case "PersonalComplimentaryInfoV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				oidc.ScopeOpenID,
+				oidc.ScopeConsent,
+				oidc.ScopeCustomers,
+			},
+			permissions: []ConsentPermission{
+				ConsentPermissionRESOURCESREAD,
+				ConsentPermissionCUSTOMERSPERSONALADDITIONALINFOREAD,
+			},
+		}
+	case "CapitalizationTitlePlansV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				oidc.ScopeOpenID,
+				oidc.ScopeConsent,
+				oidc.ScopeCapitalizationTitle,
+			},
+			permissions: []ConsentPermission{
+				ConsentPermissionRESOURCESREAD,
+				ConsentPermissionCAPITALIZATIONTITLEREAD,
+			},
+		}
+	case "CapitalizationTitlePlanInfoV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				oidc.ScopeOpenID,
+				oidc.ScopeConsent,
+				oidc.ScopeCapitalizationTitle,
+			},
+			permissions: []ConsentPermission{
+				ConsentPermissionRESOURCESREAD,
+				ConsentPermissionCAPITALIZATIONTITLEPLANINFOREAD,
+			},
+		}
+	case "CapitalizationTitleEventsV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				oidc.ScopeOpenID,
+				oidc.ScopeConsent,
+				oidc.ScopeCapitalizationTitle,
+			},
+			permissions: []ConsentPermission{
+				ConsentPermissionRESOURCESREAD,
+				ConsentPermissionCAPITALIZATIONTITLEEVENTSREAD,
+			},
+		}
+	case "CapitalizationTitleSettlementsV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				oidc.ScopeOpenID,
+				oidc.ScopeConsent,
+				oidc.ScopeCapitalizationTitle,
+			},
+			permissions: []ConsentPermission{
+				ConsentPermissionRESOURCESREAD,
+				ConsentPermissionCAPITALIZATIONTITLESETTLEMENTSREAD,
+			},
+		}
 	case "CreateEndorsementV1":
-		return []goidc.Scope{oidc.ScopeOpenID, oidc.ScopeConsent, oidc.ScopeEndorsement}
+		return operationOptions{
+			scopes: []goidc.Scope{
+				oidc.ScopeOpenID,
+				oidc.ScopeConsent,
+				oidc.ScopeEndorsement,
+			},
+			permissions: []ConsentPermission{
+				ConsentPermissionENDORSEMENTREQUESTCREATE,
+			},
+			fapiIDIsRequired: true,
+			isIdempotent:     true,
+		}
 	default:
-		return nil
+		return operationOptions{}
 	}
 }
 

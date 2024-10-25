@@ -9,11 +9,12 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/getkin/kin-openapi/openapi3filter"
+	"github.com/getkin/kin-openapi/routers"
 	"github.com/google/uuid"
 	"github.com/luikyv/go-oidc/pkg/provider"
 	"github.com/luikyv/go-open-insurance/internal/oidc"
 	"github.com/luikyv/go-open-insurance/internal/opinerr"
-	nethttpmiddleware "github.com/oapi-codegen/nethttp-middleware"
 	"github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
 
@@ -38,8 +39,8 @@ func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
 			response interface{},
 			err error,
 		) {
-			scopes := requiredScopes(operationID)
-			if len(scopes) == 0 {
+			opts := newOperationOptions(operationID)
+			if len(opts.scopes) == 0 {
 				Logger(ctx).Debug("no scopes are required for the request")
 				return f(ctx, w, r, request)
 			}
@@ -69,18 +70,18 @@ func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
 			}
 
 			tokenScopes := strings.Split(tokenInfo.Scopes, " ")
-			if !areScopesValid(scopes, tokenScopes) {
+			if !areScopesValid(opts.scopes, tokenScopes) {
 				Logger(ctx).Debug("invalid scopes",
 					slog.String("token_scopes", tokenInfo.Scopes))
 				return nil, opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
 					"token missing scopes")
 			}
 
-			ctx = context.WithValue(ctx, CtxKeyClientID, tokenInfo.ClientID)
-			ctx = context.WithValue(ctx, CtxKeySubject, tokenInfo.Subject)
+			ctx = context.WithValue(ctx, ctxKeyClientID, tokenInfo.ClientID)
+			ctx = context.WithValue(ctx, ctxKeySubject, tokenInfo.Subject)
 			consentID, ok := oidc.ConsentID(tokenInfo.Scopes)
 			if ok {
-				ctx = context.WithValue(ctx, CtxKeyConsentID, consentID)
+				ctx = context.WithValue(ctx, ctxKeyConsentID, consentID)
 			}
 
 			return f(ctx, w, r, request)
@@ -102,14 +103,15 @@ func bearerToken(r *http.Request) (string, bool) {
 	return tokenParts[1], true
 }
 
-type VerifyPermissionsFunc func(
-	ctx context.Context,
-	consentID string,
-	permissions ...ConsentPermission,
-) error
-
 func AuthPermissionMiddleware(
-	verifyPermissions VerifyPermissionsFunc,
+	consentService interface {
+		Verify(
+			ctx context.Context,
+			meta RequestMeta,
+			consentID string,
+			permissions ...ConsentPermission,
+		) error
+	},
 ) StrictMiddlewareFunc {
 	return func(
 		f nethttp.StrictHTTPHandlerFunc,
@@ -124,16 +126,16 @@ func AuthPermissionMiddleware(
 			response interface{},
 			err error,
 		) {
-			permissions := requiredPermissions(operationID)
-			if len(permissions) == 0 {
+			opts := newOperationOptions(operationID)
+			if len(opts.permissions) == 0 {
 				return f(ctx, w, r, request)
 			}
 
-			consentID := ctx.Value(CtxKeyConsentID).(string)
-			if err := verifyPermissions(ctx, consentID, permissions...); err != nil {
+			meta := NewRequestMeta(ctx)
+			if err = consentService.Verify(ctx, meta, meta.ConsentID, opts.permissions...); err != nil {
 				Logger(ctx).Debug("the consent is not valid for the request",
 					slog.Any("error", err))
-				return nil, opinerr.New("FORBIDDEN", http.StatusForbidden,
+				return nil, opinerr.New("UNAUTHORIZED", http.StatusUnauthorized,
 					"invalid consent")
 			}
 
@@ -160,7 +162,8 @@ func IdempotencyMiddleware(
 			response interface{},
 			err error,
 		) {
-			if !isIdempotent(operationID) {
+			opts := newOperationOptions(operationID)
+			if !opts.isIdempotent {
 				return f(ctx, w, r, request)
 			}
 
@@ -238,7 +241,7 @@ func FAPIIDMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 		) {
 			interactionID := r.Header.Get(headerXFAPIInteractionID)
 			interactionIDIsValid := true
-			interactionIDIsRequired := isFAPIIDRequired(operationID)
+			interactionIDIsRequired := newOperationOptions(operationID).fapiIDIsRequired
 
 			// Verify if the interaction ID is valid, generate a new value if not.
 			if _, err := uuid.Parse(interactionID); err != nil {
@@ -258,7 +261,7 @@ func FAPIIDMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 				)
 			}
 
-			ctx = context.WithValue(ctx, CtxKeyCorrelationID, interactionID)
+			ctx = context.WithValue(ctx, ctxKeyCorrelationID, interactionID)
 			return f(ctx, w, r, request)
 		}
 	}
@@ -278,10 +281,30 @@ func MetaMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 			response interface{},
 			err error,
 		) {
-			ctx = context.WithValue(ctx, CtxKeyRequestURI, r.URL.RequestURI())
+			// TODO: Fill the params here.
+			ctx = context.WithValue(ctx, ctxKeyRequestURI, r.URL.RequestURI())
 			return f(ctx, w, r, request)
 		}
 	}
+}
+
+func SchemaValidationMiddleware(next http.Handler, router routers.Router) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		route, pathParams, _ := router.FindRoute(r)
+		requestValidationInput := &openapi3filter.RequestValidationInput{
+			Request:    r,
+			PathParams: pathParams,
+			Route:      route,
+		}
+
+		ctx := r.Context()
+		if err := openapi3filter.ValidateRequest(ctx, requestValidationInput); err != nil {
+			ctx = context.WithValue(ctx, ctxKeyRequestError, err.Error())
+		}
+		r = r.WithContext(ctx)
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 func CacheControlMiddleware() nethttp.StrictHTTPMiddlewareFunc {
@@ -305,12 +328,13 @@ func CacheControlMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 	}
 }
 
-func ValidationErrorHandler() nethttpmiddleware.ErrorHandler {
-	return func(w http.ResponseWriter, message string, statusCode int) {
-		opinErr := opinerr.New("NAO_INFORMADO", http.StatusUnprocessableEntity, message)
-		w.WriteHeader(opinErr.StatusCode)
-		_ = json.NewEncoder(w).Encode(newResponseError(opinErr))
-	}
+func RequestErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) {
+	Logger(r.Context()).Info("unexpected error", slog.Any("error", err))
+	opinErr := opinerr.New("NAO_INFORMADO", http.StatusBadRequest, err.Error())
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(opinErr.StatusCode)
+	_ = json.NewEncoder(w).Encode(newResponseError(opinErr))
 }
 
 func ResponseErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) {
@@ -347,7 +371,7 @@ func newResponseError(err opinerr.Error) ResponseError {
 		},
 	}
 
-	if err.RenderAsSingle {
+	if err.StatusCode == http.StatusUnprocessableEntity {
 		_ = respErr.Errors.FromError(errData)
 	} else {
 		_ = respErr.Errors.FromErrors([]Error{errData})

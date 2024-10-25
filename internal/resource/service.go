@@ -28,19 +28,19 @@ func (s Service) Add(sub string, resource api.ResourceData) {
 
 func (s Service) Resources(
 	ctx context.Context,
-	sub, consentID string,
+	meta api.RequestMeta,
 	page api.Pagination,
 ) (
 	api.Page[api.ResourceData],
 	error,
 ) {
-	consent, err := s.consentService.Get(ctx, consentID)
+	consent, err := s.consentService.Get(ctx, meta, meta.ConsentID)
 	if err != nil {
 		return api.Page[api.ResourceData]{}, err
 	}
 
 	consentedTypes := consentedResourceTypes(consent.Permissions)
-	return s.storage.resources(sub, consentedTypes, page), nil
+	return s.storage.resources(meta.Subject, consentedTypes, page), nil
 }
 
 func consentedResourceTypes(permissions []api.ConsentPermission) []api.ResourceType {
@@ -64,12 +64,13 @@ func consentedResourceTypes(permissions []api.ConsentPermission) []api.ResourceT
 
 func (s Service) Get(
 	ctx context.Context,
-	sub, id string,
+	meta api.RequestMeta,
+	id string,
 ) (
 	api.ResourceData,
 	error,
 ) {
-	r, err := s.storage.get(sub, id)
+	r, err := s.storage.get(meta.Subject, id)
 	if err != nil {
 		return api.ResourceData{},
 			opinerr.New("NAO_FOUND", http.StatusNotFound, err.Error())

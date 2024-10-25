@@ -16,17 +16,17 @@ var baseLogger = slog.New(
 func Logger(ctx context.Context) *slog.Logger {
 	logger := baseLogger.With()
 
-	correlationID := ctx.Value(CtxKeyCorrelationID)
-	if correlationID != nil {
+	meta := NewRequestMeta(ctx)
+
+	if meta.CorrelationID != "" {
 		logger = logger.With(
-			slog.String(string(CtxKeyCorrelationID), correlationID.(string)),
+			slog.String(string(ctxKeyCorrelationID), meta.CorrelationID),
 		)
 	}
 
-	clientID := ctx.Value(CtxKeyClientID)
-	if clientID != nil {
+	if meta.ClientID != "" {
 		logger = logger.With(
-			slog.String(string(CtxKeyClientID), clientID.(string)),
+			slog.String(string(ctxKeyClientID), meta.ClientID),
 		)
 	}
 

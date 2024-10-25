@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
@@ -52,7 +51,7 @@ func openidProvider(
 		provider.WithGrantSessionStorage(oidc.NewGrantSessionManager(db)),
 		provider.WithTokenAuthnMethods(goidc.ClientAuthnPrivateKeyJWT),
 		provider.WithScopes(oidc.Scopes...),
-		provider.WithMTLS(mtlsHost, clientCertFunc),
+		provider.WithMTLS(mtlsHost, clientCertFunc()),
 		provider.WithTLSCertTokenBindingRequired(),
 		provider.WithPAR(60),
 		provider.WithJAR(jose.PS256),
@@ -74,13 +73,7 @@ func openidProvider(
 		provider.WithStaticClient(client("client_two")),
 		provider.WithHandleGrantFunc(handleGrantFunc(consentService)),
 		provider.WithPolicy(authn.Policy(userService, consentService, host+prefix)),
-		provider.WithNotifyErrorFunc(func(r *http.Request, err error) {
-			api.Logger(r.Context()).Info(
-				"error during request",
-				slog.String("uri", r.URL.RequestURI()),
-				slog.String("error", err.Error()),
-			)
-		}),
+		provider.WithNotifyErrorFunc(logErrorFun()),
 	)
 }
 
@@ -91,9 +84,10 @@ func handleGrantFunc(consentService consent.Service) goidc.HandleGrantFunc {
 			return nil
 		}
 
-		ctx := r.Context()
-		ctx = context.WithValue(ctx, api.CtxKeyClientID, gi.ClientID)
-		consent, err := consentService.Get(ctx, consentID)
+		meta := api.RequestMeta{
+			ClientID: gi.ClientID,
+		}
+		consent, err := consentService.Get(r.Context(), meta, consentID)
 		if err != nil {
 			return err
 		}
@@ -178,27 +172,39 @@ func privateJWKS(filePath string) jose.JSONWebKeySet {
 	return jwks
 }
 
-func clientCertFunc(r *http.Request) (*x509.Certificate, error) {
-	rawClientCert := r.Header.Get(headerClientCert)
-	if rawClientCert == "" {
-		return nil, errors.New("the client certificate was not informed")
-	}
+func clientCertFunc() goidc.ClientCertFunc {
+	return func(r *http.Request) (*x509.Certificate, error) {
+		rawClientCert := r.Header.Get(headerClientCert)
+		if rawClientCert == "" {
+			return nil, errors.New("the client certificate was not informed")
+		}
 
-	// Apply URL decoding.
-	rawClientCert, err := url.QueryUnescape(rawClientCert)
-	if err != nil {
-		return nil, fmt.Errorf("could not url decode the client certificate: %w", err)
-	}
+		// Apply URL decoding.
+		rawClientCert, err := url.QueryUnescape(rawClientCert)
+		if err != nil {
+			return nil, fmt.Errorf("could not url decode the client certificate: %w", err)
+		}
 
-	clientCertPEM, _ := pem.Decode([]byte(rawClientCert))
-	if clientCertPEM == nil {
-		return nil, errors.New("could not decode the client certificate")
-	}
+		clientCertPEM, _ := pem.Decode([]byte(rawClientCert))
+		if clientCertPEM == nil {
+			return nil, errors.New("could not decode the client certificate")
+		}
 
-	clientCert, err := x509.ParseCertificate(clientCertPEM.Bytes)
-	if err != nil {
-		return nil, fmt.Errorf("could not parse the client certificate: %w", err)
-	}
+		clientCert, err := x509.ParseCertificate(clientCertPEM.Bytes)
+		if err != nil {
+			return nil, fmt.Errorf("could not parse the client certificate: %w", err)
+		}
 
-	return clientCert, nil
+		return clientCert, nil
+	}
+}
+
+func logErrorFun() goidc.NotifyErrorFunc {
+	return func(r *http.Request, err error) {
+		api.Logger(r.Context()).Info(
+			"error during request",
+			slog.String("uri", r.URL.RequestURI()),
+			slog.String("error", err.Error()),
+		)
+	}
 }

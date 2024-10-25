@@ -14,9 +14,13 @@ The following Open Insurance Open API Specifications are implemented.
 * [API Endorsements v1.2.0](https://raw.githubusercontent.com/br-openinsurance/areadesenvolvedor/2f76347b669236ab39c184b68d6e154148f69685/documentation/source/files/swagger/endorsement.yaml)
 
 ## TODOs
+* Implement session.
+* go generate.
 * Improve template rendering.
 * Validation Middleware.
 * Custom swagger validator.
 * Create docker file.
 * Data generators.
 * Business.
+* Generate JWKS and certificates, go-jose?
+* Mock calls to the directory.
