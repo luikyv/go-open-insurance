@@ -11,6 +11,10 @@ services:
       - 80:80
 
   mongodb:
+    profiles:
+      - main
+      - dev
+      - conformance
     image: mongo:latest
     ports:
       - 27017:27017

@@ -27,6 +27,7 @@ If you are developing or modifying this project, start by running `make setup-de
 * Docker and Docker Compose installed.
 * Go 1.22.x installed and properly configured in the development environment.
 * Pre-commit installed for managing Git hooks.
+
 Once the setup is complete, you’ll be able to use all other make commands.
 
 If you only need to run the project without modifying it, you can use the simpler setup with `make setup`. For this you only need Docker and Docker Compose installed.
@@ -56,7 +57,7 @@ Runs only the MockIn dependencies necessary for local development. With this com
 Runs the local development environment with both MockIn and the Conformance Suite. With this command the MockIn server can run and be debugged in the local host with the Conformance Suite.
 
 `make run-cs` \
-Starts only the Conformance Suite using Docker Compose.
+Starts only the Conformance Suite.
 
 ### Utility Commands
 `make keys` \
