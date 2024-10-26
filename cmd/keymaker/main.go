@@ -105,6 +105,8 @@ func generateSelfSignedCert(
 	if err != nil {
 		log.Fatalf("Failed to create CA certificate: %v", err)
 	}
+	// This is important for when generation the claim "x5c" of the JWK
+	// corresponding to this cert.
 	template.Raw = certBytes
 
 	savePEMFile(filepath.Join(dir, name+".key"), "RSA PRIVATE KEY", x509.MarshalPKCS1PrivateKey(key))
@@ -161,6 +163,8 @@ func generateClientCert(
 	if err != nil {
 		log.Fatalf("Failed to create client certificate: %v", err)
 	}
+	// This is important for when generation the claim "x5c" of the JWK
+	// corresponding to this cert.
 	clientCert.Raw = clientCertBytes
 
 	// Save client private key and certificate.

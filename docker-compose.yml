@@ -7,8 +7,6 @@ services:
     build: .
     environment:
       - MOCKIN_DB_CONNECTION=mongodb://mongodb:27017/mockin
-    ports:
-      - 80:80
 
   mongodb:
     profiles:
