@@ -35,7 +35,7 @@ func (s Service) Authorize(
 		return err
 	}
 
-	if consent.Status != api.ConsentStatusAWAITINGAUTHORISATION {
+	if !consent.IsAwaitingAuthorization() {
 		api.Logger(ctx).Debug("cannot authorize a consent that is not awaiting authorization",
 			slog.String("consent_id", id), slog.Any("status", consent.Status))
 		return opinerr.New("INVALID_STATUS", http.StatusBadRequest,

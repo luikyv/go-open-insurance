@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/luikyv/go-oidc/pkg/goidc"
-	"github.com/luikyv/go-open-insurance/internal/oidc"
 )
 
 type operationOptions struct {
@@ -16,23 +15,23 @@ func newOperationOptions(operationID string) operationOptions {
 	switch operationID {
 	case "CreateConsentV2", "ConsentV2", "DeleteConsentV2":
 		return operationOptions{
-			scopes: []goidc.Scope{oidc.ScopeConsents},
+			scopes: []goidc.Scope{ScopeConsents},
 		}
 	case "ResourcesV2":
 		return operationOptions{
 			scopes: []goidc.Scope{
-				oidc.ScopeOpenID,
-				oidc.ScopeConsent,
-				oidc.ScopeResources,
+				ScopeOpenID,
+				ScopeConsent,
+				ScopeResources,
 			},
 			permissions: []ConsentPermission{ConsentPermissionRESOURCESREAD},
 		}
 	case "PersonalIdentificationsV1":
 		return operationOptions{
 			scopes: []goidc.Scope{
-				oidc.ScopeOpenID,
-				oidc.ScopeConsent,
-				// oidc.ScopeCustomers,
+				ScopeOpenID,
+				ScopeConsent,
+				ScopeCustomers,
 			},
 			permissions: []ConsentPermission{
 				ConsentPermissionRESOURCESREAD,
@@ -42,9 +41,9 @@ func newOperationOptions(operationID string) operationOptions {
 	case "PersonalQualificationsV1":
 		return operationOptions{
 			scopes: []goidc.Scope{
-				oidc.ScopeOpenID,
-				oidc.ScopeConsent,
-				oidc.ScopeCustomers,
+				ScopeOpenID,
+				ScopeConsent,
+				ScopeCustomers,
 			},
 			permissions: []ConsentPermission{
 				ConsentPermissionRESOURCESREAD,
@@ -54,9 +53,9 @@ func newOperationOptions(operationID string) operationOptions {
 	case "PersonalComplimentaryInfoV1":
 		return operationOptions{
 			scopes: []goidc.Scope{
-				oidc.ScopeOpenID,
-				oidc.ScopeConsent,
-				oidc.ScopeCustomers,
+				ScopeOpenID,
+				ScopeConsent,
+				ScopeCustomers,
 			},
 			permissions: []ConsentPermission{
 				ConsentPermissionRESOURCESREAD,
@@ -66,9 +65,9 @@ func newOperationOptions(operationID string) operationOptions {
 	case "CapitalizationTitlePlansV1":
 		return operationOptions{
 			scopes: []goidc.Scope{
-				oidc.ScopeOpenID,
-				oidc.ScopeConsent,
-				oidc.ScopeCapitalizationTitle,
+				ScopeOpenID,
+				ScopeConsent,
+				ScopeCapitalizationTitle,
 			},
 			permissions: []ConsentPermission{
 				ConsentPermissionRESOURCESREAD,
@@ -78,9 +77,9 @@ func newOperationOptions(operationID string) operationOptions {
 	case "CapitalizationTitlePlanInfoV1":
 		return operationOptions{
 			scopes: []goidc.Scope{
-				oidc.ScopeOpenID,
-				oidc.ScopeConsent,
-				oidc.ScopeCapitalizationTitle,
+				ScopeOpenID,
+				ScopeConsent,
+				ScopeCapitalizationTitle,
 			},
 			permissions: []ConsentPermission{
 				ConsentPermissionRESOURCESREAD,
@@ -90,9 +89,9 @@ func newOperationOptions(operationID string) operationOptions {
 	case "CapitalizationTitleEventsV1":
 		return operationOptions{
 			scopes: []goidc.Scope{
-				oidc.ScopeOpenID,
-				oidc.ScopeConsent,
-				oidc.ScopeCapitalizationTitle,
+				ScopeOpenID,
+				ScopeConsent,
+				ScopeCapitalizationTitle,
 			},
 			permissions: []ConsentPermission{
 				ConsentPermissionRESOURCESREAD,
@@ -102,9 +101,9 @@ func newOperationOptions(operationID string) operationOptions {
 	case "CapitalizationTitleSettlementsV1":
 		return operationOptions{
 			scopes: []goidc.Scope{
-				oidc.ScopeOpenID,
-				oidc.ScopeConsent,
-				oidc.ScopeCapitalizationTitle,
+				ScopeOpenID,
+				ScopeConsent,
+				ScopeCapitalizationTitle,
 			},
 			permissions: []ConsentPermission{
 				ConsentPermissionRESOURCESREAD,
@@ -114,9 +113,9 @@ func newOperationOptions(operationID string) operationOptions {
 	case "CreateEndorsementV1":
 		return operationOptions{
 			scopes: []goidc.Scope{
-				oidc.ScopeOpenID,
-				oidc.ScopeConsent,
-				oidc.ScopeEndorsement,
+				ScopeOpenID,
+				ScopeConsent,
+				ScopeEndorsement,
 			},
 			permissions: []ConsentPermission{
 				ConsentPermissionENDORSEMENTREQUESTCREATE,

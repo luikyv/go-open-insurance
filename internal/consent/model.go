@@ -24,7 +24,7 @@ type Consent struct {
 // the max time awaiting authorization has elapsed.
 func (c Consent) HasAuthExpired() bool {
 	now := time.Now().UTC()
-	return c.Status == api.ConsentStatusAWAITINGAUTHORISATION &&
+	return c.IsAwaitingAuthorization() &&
 		now.After(c.CreatedAt.Add(time.Second*maxTimeAwaitingAuthorizationSecs))
 }
 
@@ -37,6 +37,10 @@ func (c Consent) IsExpired() bool {
 
 func (c Consent) IsAuthorized() bool {
 	return c.Status == api.ConsentStatusAUTHORISED
+}
+
+func (c Consent) IsAwaitingAuthorization() bool {
+	return c.Status == api.ConsentStatusAWAITINGAUTHORISATION
 }
 
 func (c Consent) HasPermissions(permissions []api.ConsentPermission) bool {

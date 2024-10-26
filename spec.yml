@@ -1384,7 +1384,7 @@ components:
         - CUSTOMERS_PERSONAL_ADDITIONALINFO
         - CUSTOMERS_BUSINESS_IDENTIFICATIONS
         - CUSTOMERS_BUSINESS_QUALIFICATION
-        - CUSTOMERS_BUSINESS_ADDITIONALINFO                 
+        - CUSTOMERS_BUSINESS_ADDITIONALINFO
         - CAPITALIZATION_TITLES
         - PENSION_PLAN
         - LIFE_PENSION
@@ -1417,7 +1417,7 @@ components:
       description: |
         Tipo de recurso (vide Enum):
         - CUSTOMERS_PERSONAL_IDENTIFICATIONS: Informações de identificação PF
-        - CUSTOMERS_PERSONAL_QUALIFICATION: Informações de qualificação PF                    
+        - CUSTOMERS_PERSONAL_QUALIFICATION: Informações de qualificação PF
         - CUSTOMERS_PERSONAL_ADDITIONALINFO: Informações complementares PF
         - CUSTOMERS_BUSINESS_IDENTIFICATIONS: Informações de identificação PJ
         - CUSTOMERS_BUSINESS_QUALIFICATION: Informações de qualificação PJ
@@ -1425,7 +1425,7 @@ components:
         - CAPITALIZATION_TITLES: Produtos de Titulos de Capitalização
         - PENSION_PLAN: Produtos de Previdência Risco
         - LIFE_PENSION: Produtos de Previdência Sobrevivência
-        - FINANCIAL_ASSISTANCE: Produtos de Assistência Financeira                   
+        - FINANCIAL_ASSISTANCE: Produtos de Assistência Financeira
         - DAMAGES_AND_PEOPLE_PATRIMONIAL: Produtos de Patrimonial
         - DAMAGES_AND_PEOPLE_RESPONSIBILITY: Produtos de Responsabilidade
         - DAMAGES_AND_PEOPLE_TRANSPORT: Produtos de Transportes
@@ -1557,7 +1557,7 @@ components:
         - series
       properties:
         series:
-          description: Dados Gerais da Série        
+          description: Dados Gerais da Série
           type: array
           items:
             $ref: "#/components/schemas/CapitalizationTitleSeries"
@@ -1640,7 +1640,7 @@ components:
           description: Descreve o índice de reajuste utilizado quando outro que não previamente relacionado nos domínios do campo.
           maxLength: 100
           example: Índice de reajuste Outros
-        bonusClause: 
+        bonusClause:
           type: boolean
           description: Cláusula de bônus
           example: false
@@ -1692,24 +1692,24 @@ components:
         - subscriber
         - technicalProvisions
       properties:
-        titleId: 
+        titleId:
           description: Identificação do título de capitalização
           type: string
           maxLength: 60
-        registrationForm: 
+        registrationForm:
           description: Identificação da ﬁcha de cadastro ou contrato comercial
           type: string
           maxLength: 50
-        issueTitleDate: 
+        issueTitleDate:
           description: Data de Emissão do Título
           type: string
           format: date
-          example: "2023-01-30"         
-        termStartDate: 
+          example: "2023-01-30"
+        termStartDate:
           description: Data de início de vigência do título de capitalização.
           type: string
           format: date
-          example: "2023-01-30"         
+          example: "2023-01-30"
         termEndDate:
           description: Data de fim de vigência do título de capitalização.
           type: string
@@ -1720,7 +1720,7 @@ components:
           allOf:
             - $ref: "#/components/schemas/AmountDetails"
         contributionAmount:
-          description: Corresponde ao pagamento efetuado pelo subscritor à sociedade de capitalização para a aquisição do título de capitalização, podendo ser única, periódica ou mensal. Em todas as situações indicar para qual periodicidade de pagamento se aplicam os valores(pagamento mensal, pagamento único ou periódico). 
+          description: Corresponde ao pagamento efetuado pelo subscritor à sociedade de capitalização para a aquisição do título de capitalização, podendo ser única, periódica ou mensal. Em todas as situações indicar para qual periodicidade de pagamento se aplicam os valores(pagamento mensal, pagamento único ou periódico).
           allOf:
             - $ref: "#/components/schemas/AmountDetails"
         subscriber:
@@ -1753,7 +1753,7 @@ components:
       example: IPCA
       enum: [INDICE_REMUNERACAO_BASICA_DEPOSITOS_POUPANCA, IPCA, INCC, INPC, IGPM, OUTROS]
     Frequency:
-      type: string         
+      type: string
       description: Tipo de Contribuição - pagamento único, pagamento mensal ou periódico
       example: MENSAL
       enum: [UNICO, MENSAL, PERIODICO]
@@ -1985,7 +1985,7 @@ components:
         - meta
       properties:
         data:
-            $ref: '#/components/schemas/CapitalizationTitleEvents'                    
+            $ref: '#/components/schemas/CapitalizationTitleEvents'
         links:
             $ref: '#/components/schemas/Links'
         meta:
@@ -2000,7 +2000,7 @@ components:
         titleId:
           description: Código identificador do título na sociedade.
           type: string
-          maxLength: 80        
+          maxLength: 80
         eventType:
           $ref: '#/components/schemas/CapitalizationTitleEventType'
         event:
@@ -2082,7 +2082,7 @@ components:
         - meta
       properties:
         data:
-          $ref: '#/components/schemas/CapitalizationTitleSettlements'                    
+          $ref: '#/components/schemas/CapitalizationTitleSettlements'
         links:
           $ref: '#/components/schemas/Links'
         meta:

@@ -1,5 +1,5 @@
 package: api
-output: internal/api/api.go
+output: ../internal/api/api.go
 generate:
   std-http-server: true
   strict-server: true

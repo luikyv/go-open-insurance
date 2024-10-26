@@ -2,14 +2,11 @@ module github.com/luikyv/go-open-insurance
 
 go 1.22.4
 
-replace github.com/luikyv/go-oidc => ../go-oidc
-
 require (
 	github.com/getkin/kin-openapi v0.127.0
 	github.com/go-jose/go-jose/v4 v4.0.4
 	github.com/google/uuid v1.6.0
-	github.com/luikyv/go-oidc v0.0.0-20240728143250-7ad2b6c6b704
-	github.com/oapi-codegen/nethttp-middleware v1.0.2
+	github.com/luikyv/go-oidc v0.4.0
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
 	go.mongodb.org/mongo-driver v1.16.0

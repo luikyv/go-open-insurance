@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"slices"
 	"strings"
 
@@ -20,7 +21,6 @@ import (
 	"github.com/luikyv/go-oidc/pkg/goidc"
 	"github.com/luikyv/go-oidc/pkg/provider"
 	"github.com/luikyv/go-open-insurance/internal/api"
-	"github.com/luikyv/go-open-insurance/internal/authn"
 	"github.com/luikyv/go-open-insurance/internal/consent"
 	"github.com/luikyv/go-open-insurance/internal/oidc"
 	"github.com/luikyv/go-open-insurance/internal/user"
@@ -40,17 +40,24 @@ func openidProvider(
 	provider.Provider,
 	error,
 ) {
-	ps256ServerKeyID := "ps256_key"
+
+	// Get the file path of the source file.
+	_, filename, _, _ := runtime.Caller(0)
+	sourceDir := filepath.Dir(filename)
+
+	keysDir := filepath.Join(sourceDir, "../../keys")
+	templatesDirPath := filepath.Join(sourceDir, "../../templates")
+
 	return provider.New(
 		goidc.ProfileOpenID,
 		host,
-		privateJWKS("../../keys/server_jwks.json"),
+		privateJWKS(filepath.Join(keysDir, "server.jwks")),
 		provider.WithPathPrefix(prefix),
 		provider.WithClientStorage(oidc.NewClientManager(db)),
 		provider.WithAuthnSessionStorage(oidc.NewAuthnSessionManager(db)),
 		provider.WithGrantSessionStorage(oidc.NewGrantSessionManager(db)),
 		provider.WithTokenAuthnMethods(goidc.ClientAuthnPrivateKeyJWT),
-		provider.WithScopes(oidc.Scopes...),
+		provider.WithScopes(api.Scopes...),
 		provider.WithMTLS(mtlsHost, clientCertFunc()),
 		provider.WithTLSCertTokenBindingRequired(),
 		provider.WithPAR(60),
@@ -66,20 +73,19 @@ func openidProvider(
 		provider.WithAuthorizationCodeGrant(),
 		provider.WithImplicitGrant(),
 		provider.WithRefreshTokenGrant(shoudIssueRefreshTokenFunc(), 600),
-		provider.WithACRs(oidc.ACROpenInsuranceLOA2, oidc.ACROpenInsuranceLOA3),
-		provider.WithTokenOptions(tokenOptionFunc(ps256ServerKeyID)),
-		provider.WithUserInfoEncryption(jose.RSA_OAEP_256),
-		provider.WithStaticClient(client("client_one")),
-		provider.WithStaticClient(client("client_two")),
+		provider.WithACRs(api.ACROpenInsuranceLOA2, api.ACROpenInsuranceLOA3),
+		provider.WithUserInfoEncryption(jose.RSA_OAEP),
+		provider.WithStaticClient(client("client_one", keysDir)),
+		provider.WithStaticClient(client("client_two", keysDir)),
 		provider.WithHandleGrantFunc(handleGrantFunc(consentService)),
-		provider.WithPolicy(authn.Policy(userService, consentService, host+prefix)),
+		provider.WithPolicy(oidc.Policy(templatesDirPath, host+prefix, userService, consentService)),
 		provider.WithNotifyErrorFunc(logErrorFun()),
 	)
 }
 
 func handleGrantFunc(consentService consent.Service) goidc.HandleGrantFunc {
 	return func(r *http.Request, gi *goidc.GrantInfo) error {
-		consentID, ok := oidc.ConsentID(gi.ActiveScopes)
+		consentID, ok := api.ConsentID(gi.ActiveScopes)
 		if !ok {
 			return nil
 		}
@@ -107,20 +113,14 @@ func shoudIssueRefreshTokenFunc() goidc.ShouldIssueRefreshTokenFunc {
 	}
 }
 
-func tokenOptionFunc(keyID string) goidc.TokenOptionsFunc {
-	return func(grantInfo goidc.GrantInfo) goidc.TokenOptions {
-		return goidc.NewJWTTokenOptions(keyID, 600)
-	}
-}
-
-func client(clientID string) *goidc.Client {
+func client(clientID string, keysDir string) *goidc.Client {
 
 	var scopes []string
-	for _, scope := range oidc.Scopes {
+	for _, scope := range api.Scopes {
 		scopes = append(scopes, scope.ID)
 	}
 
-	privateJWKS := privateJWKS(fmt.Sprintf("../../keys/%s_jwks.json", clientID))
+	privateJWKS := privateJWKS(filepath.Join(keysDir, clientID+".jwks"))
 	publicJWKS := jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
 	for _, jwk := range privateJWKS.Keys {
 		publicJWKS.Keys = append(publicJWKS.Keys, jwk.Public())
@@ -132,7 +132,7 @@ func client(clientID string) *goidc.Client {
 			TokenAuthnMethod: goidc.ClientAuthnPrivateKeyJWT,
 			ScopeIDs:         strings.Join(scopes, " "),
 			RedirectURIs: []string{
-				"https://localhost.emobix.co.uk:8443/test/a/gopin/callback",
+				"https://localhost.emobix.co.uk:8443/test/a/mockin/callback",
 			},
 			GrantTypes: []goidc.GrantType{
 				goidc.GrantAuthorizationCode,

@@ -13,7 +13,6 @@ import (
 	"github.com/getkin/kin-openapi/routers"
 	"github.com/google/uuid"
 	"github.com/luikyv/go-oidc/pkg/provider"
-	"github.com/luikyv/go-open-insurance/internal/oidc"
 	"github.com/luikyv/go-open-insurance/internal/opinerr"
 	"github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
@@ -79,7 +78,7 @@ func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
 
 			ctx = context.WithValue(ctx, ctxKeyClientID, tokenInfo.ClientID)
 			ctx = context.WithValue(ctx, ctxKeySubject, tokenInfo.Subject)
-			consentID, ok := oidc.ConsentID(tokenInfo.Scopes)
+			consentID, ok := ConsentID(tokenInfo.Scopes)
 			if ok {
 				ctx = context.WithValue(ctx, ctxKeyConsentID, consentID)
 			}

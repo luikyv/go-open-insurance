@@ -1,4 +1,4 @@
-package oidc
+package api
 
 import (
 	"strings"
@@ -7,7 +7,6 @@ import (
 )
 
 const (
-	// ACRs.
 	ACROpenInsuranceLOA2 goidc.ACR = "urn:brasil:openbanking:loa2"
 	ACROpenInsuranceLOA3 goidc.ACR = "urn:brasil:openbanking:loa3"
 )

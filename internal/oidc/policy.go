@@ -1,9 +1,11 @@
-package authn
+package oidc
 
 import (
 	"errors"
 	"html/template"
+	"log"
 	"net/http"
+	"path/filepath"
 	"slices"
 	"strings"
 	"time"
@@ -11,19 +13,27 @@ import (
 	"github.com/luikyv/go-oidc/pkg/goidc"
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/consent"
-	"github.com/luikyv/go-open-insurance/internal/oidc"
 	"github.com/luikyv/go-open-insurance/internal/user"
 )
 
 func Policy(
+	templatesDir, baseURL string,
 	userService user.Service,
 	consentService consent.Service,
-	baseURL string,
 ) goidc.AuthnPolicy {
+
+	loginTemplate := filepath.Join(templatesDir, "/login.html")
+	consentTemplate := filepath.Join(templatesDir, "/consent.html")
+	tmpl, err := template.ParseFiles(loginTemplate, consentTemplate)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	authenticator := authenticator{
+		tmpl:           tmpl,
+		baseURL:        baseURL,
 		userService:    userService,
 		consentService: consentService,
-		baseURL:        baseURL,
 	}
 	return goidc.NewPolicy(
 		"main",
@@ -56,16 +66,16 @@ const (
 )
 
 type authnPage struct {
-	BaseURL     string
 	CallbackID  string
 	Permissions []api.ConsentPermission
 	Error       string
 }
 
 type authenticator struct {
+	tmpl           *template.Template
+	baseURL        string
 	userService    user.Service
 	consentService consent.Service
-	baseURL        string
 }
 
 func (a authenticator) authenticate(
@@ -116,7 +126,7 @@ func (a authenticator) setUp(
 	goidc.AuthnStatus,
 	error,
 ) {
-	consentID, ok := oidc.ConsentID(session.Scopes)
+	consentID, ok := api.ConsentID(session.Scopes)
 	if !ok {
 		return goidc.StatusFailure, errors.New("missing consent ID")
 	}
@@ -130,7 +140,7 @@ func (a authenticator) setUp(
 		return goidc.StatusFailure, err
 	}
 
-	if consent.Status != api.ConsentStatusAWAITINGAUTHORISATION {
+	if !consent.IsAwaitingAuthorization() {
 		return goidc.StatusFailure, errors.New("consent not awaiting authorization")
 	}
 
@@ -160,14 +170,9 @@ func (a authenticator) login(
 
 	isLogin := r.PostFormValue(loginFormParam)
 	if isLogin == "" {
-		w.WriteHeader(http.StatusOK)
-		// TODO: Improve this.
-		tmpl, _ := template.ParseFiles("../../templates/login.html")
-		_ = tmpl.Execute(w, authnPage{
-			BaseURL:    a.baseURL,
+		return a.executeTemplate(w, "login.html", authnPage{
 			CallbackID: session.CallbackID,
 		})
-		return goidc.StatusInProgress, nil
 	}
 
 	if isLogin != "true" {
@@ -188,26 +193,18 @@ func (a authenticator) login(
 	username := r.PostFormValue(usernameFormParam)
 	user, err := a.userService.User(username)
 	if err != nil {
-		w.WriteHeader(http.StatusOK)
-		tmpl, _ := template.ParseFiles("../../templates/login.html")
-		_ = tmpl.Execute(w, authnPage{
-			BaseURL:    a.baseURL,
+		return a.executeTemplate(w, "login.html", authnPage{
 			CallbackID: session.CallbackID,
 			Error:      "invalid username",
 		})
-		return goidc.StatusInProgress, nil
 	}
 
 	password := r.PostFormValue(passwordFormParam)
 	if user.CPF != session.Parameter(paramConsentCPF) || password != correctPassword {
-		w.WriteHeader(http.StatusOK)
-		tmpl, _ := template.ParseFiles("../../templates/login.html")
-		_ = tmpl.Execute(w, authnPage{
-			BaseURL:    a.baseURL,
+		return a.executeTemplate(w, "login.html", authnPage{
 			CallbackID: session.CallbackID,
 			Error:      "invalid credentials",
 		})
-		return goidc.StatusInProgress, nil
 	}
 
 	session.StoreParameter(paramUserID, username)
@@ -232,14 +229,10 @@ func (a authenticator) grantConsent(
 	}
 	isConsented := r.PostFormValue(consentFormParam)
 	if isConsented == "" {
-		w.WriteHeader(http.StatusOK)
-		tmpl, _ := template.ParseFiles("../../templates/consent.html")
-		_ = tmpl.Execute(w, authnPage{
-			BaseURL:     a.baseURL,
+		return a.executeTemplate(w, "consent.html", authnPage{
 			CallbackID:  session.CallbackID,
 			Permissions: permissions,
 		})
-		return goidc.StatusInProgress, nil
 	}
 
 	consentID := session.Parameter(paramConsentID).(string)
@@ -272,18 +265,38 @@ func (a authenticator) finishFlow(
 	session.SetUserID(session.Parameter(paramUserID).(string))
 	// TODO: Grant scopes based on permissions.
 	session.GrantScopes(session.Scopes)
-	session.SetIDTokenClaimACR(oidc.ACROpenInsuranceLOA2)
+	session.SetIDTokenClaimACR(api.ACROpenInsuranceLOA2)
 	session.SetIDTokenClaimAuthTime(int(time.Now().Unix()))
 
 	if session.Claims != nil {
 		if slices.Contains(session.Claims.IDTokenEssentials(), goidc.ClaimACR) {
-			session.SetIDTokenClaimACR(oidc.ACROpenInsuranceLOA2)
+			session.SetIDTokenClaimACR(api.ACROpenInsuranceLOA2)
 		}
 
 		if slices.Contains(session.Claims.UserInfoEssentials(), goidc.ClaimACR) {
-			session.SetUserInfoClaimACR(oidc.ACROpenInsuranceLOA2)
+			session.SetUserInfoClaimACR(api.ACROpenInsuranceLOA2)
 		}
 	}
 
 	return goidc.StatusSuccess, nil
+}
+
+func (a authenticator) executeTemplate(
+	w http.ResponseWriter,
+	templateName string,
+	params authnPage,
+) (
+	goidc.AuthnStatus,
+	error,
+) {
+	type page struct {
+		BaseURL string
+		authnPage
+	}
+	w.WriteHeader(http.StatusOK)
+	_ = a.tmpl.ExecuteTemplate(w, templateName, page{
+		BaseURL:   a.baseURL,
+		authnPage: params,
+	})
+	return goidc.StatusInProgress, nil
 }

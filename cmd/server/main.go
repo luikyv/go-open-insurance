@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"os"
 
 	"github.com/getkin/kin-openapi/routers/gorillamux"
 	"github.com/luikyv/go-open-insurance/internal/api"
@@ -24,17 +25,20 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const (
-	databaseSchema           = "gopin"
-	databaseStringConnection = "mongodb://localhost:27017/gopin"
-	port                     = "80"
-	host                     = "https://gopin.local"
-	mtlsHost                 = "https://matls-gopin.local"
+var (
+	databaseSchema           = getEnv("MOCKIN_DB_SCHEMA", "mockin")
+	databaseStringConnection = getEnv("MOCKIN_DB_CONNECTION", "mongodb://localhost:27017/mockin")
+	port                     = getEnv("MOCKIN_PORT", "80")
+	host                     = getEnv("MOCKIN_HOST", "https://mockin.local")
+	mtlsHost                 = getEnv("MOCKIN_MTLS_HOST", "https://matls-mockin.local")
 	apiPrefixOIDC            = "/auth"
-	baseURLOIDC              = host + apiPrefixOIDC
 	apiPrefixOPIN            = "/open-insurance"
 	baseURLOPIN              = mtlsHost + apiPrefixOPIN
 )
+
+func init() {
+
+}
 
 func main() {
 	db, err := dbConnection()
@@ -124,7 +128,9 @@ func main() {
 		Handler: mux,
 		Addr:    net.JoinHostPort("0.0.0.0", port),
 	}
-	log.Fatal(s.ListenAndServe())
+	if err := s.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func dbConnection() (*mongo.Database, error) {
@@ -141,4 +147,12 @@ func dbConnection() (*mongo.Database, error) {
 		return nil, err
 	}
 	return conn.Database(databaseSchema), nil
+}
+
+// getEnv retrieves an environment variable or returns a fallback value if not found
+func getEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
 }

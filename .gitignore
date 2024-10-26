@@ -21,14 +21,10 @@
 go.work
 go.work.sum
 
-# Certificates and private keys.
-keys/*.key
-keys/*.crt
-
+# Others.
 logs/
-
-# Random folders and files.
 conformance-suite
+keys/
 *.zip
 *.bkp
 .vscode

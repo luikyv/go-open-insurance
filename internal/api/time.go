@@ -1,6 +1,5 @@
 package api
 
-// TODO: Move this.
 import (
 	"encoding/json"
 	"time"
