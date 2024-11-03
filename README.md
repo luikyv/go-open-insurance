@@ -14,15 +14,20 @@ The following Open Insurance Open API Specifications are implemented.
 * [API Endorsements v1.2.0](https://raw.githubusercontent.com/br-openinsurance/areadesenvolvedor/2f76347b669236ab39c184b68d6e154148f69685/documentation/source/files/swagger/endorsement.yaml)
 * [API Quote Auto v1.8.0](https://br-openinsurance.github.io/areadesenvolvedor/files/swagger/quote-auto.yaml)
 
-## Development Setup and Usage Guide
+## Usage and Development Guide
 
-To ensure MockIn works correctly in your local environment, you need to update your system's hosts file. This step allows your machine to resolve the required domains for MockIn.
+To ensure MockIn works correctly in your local environment, you need to update your system's hosts file (usually located at /etc/hosts on Unix-based systems or C:\Windows\System32\drivers\etc\hosts on Windows). This step allows your machine to resolve the required domains for MockIn.
 ```bash
 127.0.0.1 mockin.local
 127.0.0.1 matls-mockin.local
 ```
 
-This project also includes a series of Makefile targets to streamline the setup, run, and development process. Down below there is a breakdown of the available commands and their purposes.
+If you’re running MockIn directly on your machine instead of in a Docker container, add this additional entry. It ensures MockIn can resolve the mocked directory served by the NGINX container:
+```bash
+127.0.0.1 directory
+```
+
+This project includes a series of Makefile targets to streamline the setup, run, and development process. Down below there is a breakdown of the available commands and their purposes.
 
 If you are developing or modifying this project, start by running `make setup-dev`. For this you will need:
 * Docker and Docker Compose installed.
@@ -32,14 +37,14 @@ If you are developing or modifying this project, start by running `make setup-de
 Once the setup is complete, you’ll be able to use all other make commands.
 
 If you only need to run the project without modifying it, you can use the simpler setup with `make setup`. For this you only need Docker and Docker Compose installed.
-After this setup, you can start the services using `make run` and `make run-with-cs`.
+After this setup, you can start the services using `make run` and `make run-with-cs` which also spins up the Open Insurance Conformance Suite.
 
 ### Setup Commands
 `make setup` \
-Prepares the environment by generating keys and setting up the Open Insurance Conformance Suite:
+Prepares the environment by generating keys and setting up the Open Insurance Conformance Suite.
 
 `make setup-dev` \
-Sets up the development environment by installing pre-commit hooks, generating keys, and setting up the Open Insurance Conformance Suite.
+Sets up the development environment by downloading dependencies installing pre-commit hooks, generating keys, and setting up the Open Insurance Conformance Suite.
 
 `make setup-cs` \
 Clones and prepares the Open Insurance Conformance Suite for use.
@@ -65,20 +70,31 @@ Starts only the Conformance Suite.
 `make build-mockin` \
 Build the MockIn Docker Image.
 
+`make build-cs` \
+Build the Conformance Suite JAR file.
+
 `make keys` \
 Generates certificates, private keys, and JWKS files for both the server and clients.
 
 `make models` \
 Generates API models from the Open Insurance OpenAPI specification.
 
+## For Developers
+This project relies significantly on some Go dependencies that streamline development and reduce boilerplate code.
+
+### oapi-codegen
+[oapi-codegen](https://github.com/oapi-codegen/oapi-codegen) is used for generating Go code based on the Open Insurance OpenAPI specifications. It simplifies the process of creating schemas, reducing the need to handle HTTP requests directly with the Go standard library.
+We recommend reviewing the oapi-codegen documentation, particularly the section on [Strict Server](https://github.com/oapi-codegen/oapi-codegen?tab=readme-ov-file#strict-server), which includes some examples.
+
+The configurations for this module are located in `tools/oapi-config.yml`.
+
+### go-oidc
+[go-oidc](https://github.com/luikyv/go-oidc) is a configurable OpenID provider written in Go. It handles OAuth-related functionalities, including authentication, token issuance, and scopes. Familiarity with this library’s concepts is important for understanding the project's implementation of these aspects.
+
 ## TODOs
-* Document Directory.
-* Generate pub client jwks.
+* Env
 * Dynamic fields.
-* Webhooks.
-* Go workspace.
 * Implement user session.
 * Generate cs config file.
 * Data generators.
 * Business.
-* Mock calls to the directory.

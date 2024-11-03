@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 	"net/url"
@@ -15,6 +16,8 @@ import (
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+const webhookBasePath string = "/open-insurance/webhook/v1"
 
 type Service struct {
 	op             provider.Provider
@@ -36,7 +39,7 @@ func (s Service) Notify(ctx context.Context, clientID, endpointPath string) {
 
 	webhookURL, _ := url.JoinPath(
 		baseWebhookURL,
-		"/open-insurance/webhook/v1/quote/v1",
+		webhookBasePath,
 		endpointPath,
 	)
 	go func() {
@@ -62,12 +65,13 @@ func (s Service) clientBaseWebhookURL(
 	rawWebhookURIs := client.Attribute("webhook_uris")
 	if rawWebhookURIs == nil {
 		api.Logger(ctx).Info("client does not have webhook uris defined")
-		return "", err
+		return "", errors.New("the client has no webhook uris defined")
 	}
 
 	webhookURIs := rawWebhookURIs.(primitive.A)
 	if len(webhookURIs) == 0 {
 		api.Logger(ctx).Info("client has 0 webhook uris defined")
+		return "", errors.New("client has 0 webhook uris defined")
 	}
 
 	return webhookURIs[0].(string), nil

@@ -220,6 +220,21 @@ func generateJWKS(
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	var publicJWKS jose.JSONWebKeySet
+	for _, jwk := range jwks.Keys {
+		publicJWKS.Keys = append(publicJWKS.Keys, jwk.Public())
+	}
+
+	jwksBytes, err = json.MarshalIndent(jwks, "", " ")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = os.WriteFile(filepath.Join(dir, name+"_pub.jwks"), jwksBytes, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func generateEncryptionJWK() jose.JSONWebKey {

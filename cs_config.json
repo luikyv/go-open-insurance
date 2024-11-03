@@ -18,7 +18,7 @@
         "productType": "personal"
     },
     "directory": {
-        "discoveryUrl": "http://directory/.well-known/openid-configuration",
+        "discoveryUrl": "https://directory/.well-known/openid-configuration",
         "client_id": "random_client"
     }
 }

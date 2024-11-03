@@ -45,7 +45,7 @@ func validatePermissions(_ context.Context, requestedPermissions []api.ConsentPe
 	isPhase2 := containsAny(permissionsPhase2, requestedPermissions...)
 	isPhase3 := containsAny(permissionsPhase3, requestedPermissions...)
 	if isPhase2 && isPhase3 {
-		return api.NewError("INVALID_PERMISSION", http.StatusUnprocessableEntity,
+		return api.NewError("NAO_INFORMADO", http.StatusUnprocessableEntity,
 			"cannot request permission from phase 2 and 3 in the same request")
 	}
 
@@ -63,13 +63,13 @@ func validatePermissions(_ context.Context, requestedPermissions []api.ConsentPe
 func validatePermissionsPhase2(requestedPermissions []api.ConsentPermission) error {
 
 	if !slices.Contains(requestedPermissions, api.ConsentPermissionRESOURCESREAD) {
-		return api.NewError("INVALID_PERMISSION", http.StatusBadRequest,
+		return api.NewError("NAO_INFORMADO", http.StatusBadRequest,
 			fmt.Sprintf("the permission %s is required for phase 2", api.ConsentPermissionRESOURCESREAD))
 	}
 
 	// RESOURCES_READ cannot be the only permission requested.
 	if len(requestedPermissions) == 1 {
-		return api.NewError("INVALID_PERMISSION", http.StatusBadRequest,
+		return api.NewError("NAO_INFORMADO", http.StatusBadRequest,
 			fmt.Sprintf("the permission %s cannot be requested alone", api.ConsentPermissionRESOURCESREAD))
 	}
 
@@ -80,12 +80,12 @@ func validatePermissionsPhase3(requestedPermissions []api.ConsentPermission) err
 	categories := categories(requestedPermissions)
 
 	if len(categories) != 1 {
-		return api.NewError("INVALID_PERMISSION", http.StatusUnprocessableEntity,
+		return api.NewError("NAO_INFORMADO", http.StatusUnprocessableEntity,
 			"permissions of different phase 3 categories were requested")
 	}
 
 	if !containsAll(requestedPermissions, categories[0]...) {
-		return api.NewError("INVALID_PERMISSION", http.StatusBadRequest,
+		return api.NewError("NAO_INFORMADO", http.StatusBadRequest,
 			"all the permission from one category must be requested")
 	}
 

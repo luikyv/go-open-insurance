@@ -122,7 +122,7 @@ func (s Service) Verify(
 	}
 
 	if !consent.HasPermissions(permissions) {
-		return api.NewError("INVALID_PERMISSIONS", http.StatusBadRequest,
+		return api.NewError("NAO_INFORMADO", http.StatusBadRequest,
 			"consent missing permissions")
 	}
 
