@@ -138,10 +138,10 @@ func loadMocks(
 			SettlementId:          "random_settlement",
 			SettlementDueDate:     api.DateNow(),
 			SettlementPaymentDate: api.DateNow(),
-			SettlementFinancialAmount: api.AmountDetails{
-				Amount:   100.0,
-				Currency: "BRL",
-			},
+			// SettlementFinancialAmount: api.AmountDetails{
+			// 	Amount:   100.0,
+			// 	Currency: "BRL",
+			// },
 		},
 	)
 

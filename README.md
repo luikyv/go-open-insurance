@@ -12,6 +12,7 @@ The following Open Insurance Open API Specifications are implemented.
 
 ### Phase 3
 * [API Endorsements v1.2.0](https://raw.githubusercontent.com/br-openinsurance/areadesenvolvedor/2f76347b669236ab39c184b68d6e154148f69685/documentation/source/files/swagger/endorsement.yaml)
+* [API Quote Auto v1.8.0](https://br-openinsurance.github.io/areadesenvolvedor/files/swagger/quote-auto.yaml)
 
 ## Development Setup and Usage Guide
 
@@ -60,6 +61,10 @@ Runs the local development environment with both MockIn and the Conformance Suit
 Starts only the Conformance Suite.
 
 ### Utility Commands
+
+`make build-mockin` \
+Build the MockIn Docker Image.
+
 `make keys` \
 Generates certificates, private keys, and JWKS files for both the server and clients.
 
@@ -67,6 +72,11 @@ Generates certificates, private keys, and JWKS files for both the server and cli
 Generates API models from the Open Insurance OpenAPI specification.
 
 ## TODOs
+* Document Directory.
+* Generate pub client jwks.
+* Dynamic fields.
+* Webhooks.
+* Go workspace.
 * Implement user session.
 * Generate cs config file.
 * Data generators.

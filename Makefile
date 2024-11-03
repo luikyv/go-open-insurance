@@ -19,7 +19,7 @@ setup-cs:
 	  echo 'FROM openjdk:17-jdk-slim\n\nRUN apt-get update && apt-get install redir' > conformance-suite/server-dev/Dockerfile; \
 	fi
 
-	@docker compose run cs-builder
+	@make build-cs
 
 # Run MockIn.
 run:
@@ -48,3 +48,10 @@ keys:
 # Generate API models from the Open Insurance OpenAPI Specification.
 models:
 	@go generate ./...
+
+# Build the MockIn Docker Image.
+build-mockin:
+	@docker-compose build mockin
+
+build-cs:
+	@docker compose run cs-builder

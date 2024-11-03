@@ -43,6 +43,8 @@ services:
       - ./keys/server.key:/etc/nginx/ssl/server.key
       - ./keys/client_ca.crt:/etc/nginx/ssl/client_ca.crt
       - ./logs/:/var/log/nginx/
+      - ./participants.json:/etc/nginx/mocks/participants.json
+      - ./keys/client_one_pub.jwks:/etc/nginx/mocks/client_one_pub.jwks
     ports:
       - 443:443
     networks:
@@ -50,6 +52,7 @@ services:
         aliases:
           - mockin.local
           - matls-mockin.local
+          - directory
 
   cs-httpd:
     profiles:
@@ -63,6 +66,10 @@ services:
      - ./conformance-suite/src/main/resources/:/usr/local/apache2/htdocs/
     depends_on:
      - cs-server
+    networks:
+      default:
+        aliases:
+          - localhost.emobix.co.uk
 
   cs-server:
     profiles:
@@ -80,10 +87,12 @@ services:
       -Xdebug -Xrunjdwp:transport=dt_socket,address=*:9999,server=y,suspend=n
       -jar /server/libopin.jar
       -Djdk.tls.maxHandshakeMessageSize=65536
+      -Dcom.sun.net.ssl.checkRevocation=false -Dcom.sun.net.ssl.trustStoreType=JKS -Dcom.sun.net.ssl.trustStorePassword=changeit
       --fintechlabs.base_url=https://localhost.emobix.co.uk:8443
       --fintechlabs.base_mtls_url=https://localhost.emobix.co.uk:8444
       --fintechlabs.devmode=true
       --fintechlabs.startredir=true
+      --fintechlabs.yacs.directory.uri=http://directory/participants
     links:
      - mongodb:mongodb
     depends_on:

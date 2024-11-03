@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
@@ -73,13 +75,18 @@ func openidProvider(
 		provider.WithAuthorizationCodeGrant(),
 		provider.WithImplicitGrant(),
 		provider.WithRefreshTokenGrant(shoudIssueRefreshTokenFunc(), 600),
+		provider.WithClientCredentialsGrant(),
 		provider.WithACRs(api.ACROpenInsuranceLOA2, api.ACROpenInsuranceLOA3),
 		provider.WithUserInfoEncryption(jose.RSA_OAEP),
 		provider.WithStaticClient(client("client_one", keysDir)),
 		provider.WithStaticClient(client("client_two", keysDir)),
 		provider.WithHandleGrantFunc(handleGrantFunc(consentService)),
 		provider.WithPolicy(oidc.Policy(templatesDirPath, host+prefix, userService, consentService)),
-		provider.WithNotifyErrorFunc(logErrorFun()),
+		provider.WithNotifyErrorFunc(logErrorFunc()),
+		provider.WithDCR(dcrFunc(api.Scopes), func(r *http.Request, s string) error {
+			return nil
+		}),
+		provider.WithHTTPClientFunc(httpClientFunc()),
 	)
 }
 
@@ -93,7 +100,7 @@ func handleGrantFunc(consentService consent.Service) goidc.HandleGrantFunc {
 		meta := api.RequestMeta{
 			ClientID: gi.ClientID,
 		}
-		consent, err := consentService.Get(r.Context(), meta, consentID)
+		consent, err := consentService.Fetch(r.Context(), meta, consentID)
 		if err != nil {
 			return err
 		}
@@ -199,12 +206,36 @@ func clientCertFunc() goidc.ClientCertFunc {
 	}
 }
 
-func logErrorFun() goidc.NotifyErrorFunc {
+func logErrorFunc() goidc.NotifyErrorFunc {
 	return func(r *http.Request, err error) {
 		api.Logger(r.Context()).Info(
 			"error during request",
 			slog.String("uri", r.URL.RequestURI()),
 			slog.String("error", err.Error()),
 		)
+	}
+}
+
+func httpClientFunc() goidc.HTTPClientFunc {
+	return func(ctx context.Context) *http.Client {
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{
+				Renegotiation:      tls.RenegotiateOnceAsClient,
+				InsecureSkipVerify: true,
+			},
+		}
+		return &http.Client{Transport: tr}
+	}
+}
+
+func dcrFunc(scopes []goidc.Scope) goidc.HandleDynamicClientFunc {
+	var scopeIDs []string
+	for _, scope := range scopes {
+		scopeIDs = append(scopeIDs, scope.ID)
+	}
+	scopeIDsStr := strings.Join(scopeIDs, " ")
+	return func(r *http.Request, c *goidc.ClientMetaInfo) error {
+		c.ScopeIDs = scopeIDsStr
+		return nil
 	}
 }

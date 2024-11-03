@@ -9,7 +9,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/luikyv/go-open-insurance/internal/api"
-	"github.com/luikyv/go-open-insurance/internal/opinerr"
 )
 
 func ID() string {
@@ -19,12 +18,12 @@ func ID() string {
 func validate(ctx context.Context, consent Consent) error {
 	now := time.Now().UTC()
 	if now.After(consent.ExpiresAt) {
-		return opinerr.New("INVALID_REQUEST", http.StatusBadRequest,
+		return api.NewError("INVALID_REQUEST", http.StatusBadRequest,
 			"the expiration time cannot be in the past")
 	}
 
 	if consent.ExpiresAt.After(now.AddDate(1, 0, 0)) {
-		return opinerr.New("INVALID_REQUEST", http.StatusBadRequest,
+		return api.NewError("INVALID_REQUEST", http.StatusBadRequest,
 			"the expiration time cannot be greater than one year")
 	}
 
@@ -34,7 +33,7 @@ func validate(ctx context.Context, consent Consent) error {
 
 	if slices.Contains(consent.Permissions, api.ConsentPermissionENDORSEMENTREQUESTCREATE) &&
 		consent.EndorsementInfo == nil {
-		return opinerr.New("INVALID_REQUEST", http.StatusBadRequest,
+		return api.NewError("INVALID_REQUEST", http.StatusBadRequest,
 			"endorsement information is missing")
 	}
 
@@ -46,7 +45,7 @@ func validatePermissions(_ context.Context, requestedPermissions []api.ConsentPe
 	isPhase2 := containsAny(permissionsPhase2, requestedPermissions...)
 	isPhase3 := containsAny(permissionsPhase3, requestedPermissions...)
 	if isPhase2 && isPhase3 {
-		return opinerr.New("INVALID_PERMISSION", http.StatusUnprocessableEntity,
+		return api.NewError("INVALID_PERMISSION", http.StatusUnprocessableEntity,
 			"cannot request permission from phase 2 and 3 in the same request")
 	}
 
@@ -64,13 +63,13 @@ func validatePermissions(_ context.Context, requestedPermissions []api.ConsentPe
 func validatePermissionsPhase2(requestedPermissions []api.ConsentPermission) error {
 
 	if !slices.Contains(requestedPermissions, api.ConsentPermissionRESOURCESREAD) {
-		return opinerr.New("INVALID_PERMISSION", http.StatusBadRequest,
+		return api.NewError("INVALID_PERMISSION", http.StatusBadRequest,
 			fmt.Sprintf("the permission %s is required for phase 2", api.ConsentPermissionRESOURCESREAD))
 	}
 
 	// RESOURCES_READ cannot be the only permission requested.
 	if len(requestedPermissions) == 1 {
-		return opinerr.New("INVALID_PERMISSION", http.StatusBadRequest,
+		return api.NewError("INVALID_PERMISSION", http.StatusBadRequest,
 			fmt.Sprintf("the permission %s cannot be requested alone", api.ConsentPermissionRESOURCESREAD))
 	}
 
@@ -81,12 +80,12 @@ func validatePermissionsPhase3(requestedPermissions []api.ConsentPermission) err
 	categories := categories(requestedPermissions)
 
 	if len(categories) != 1 {
-		return opinerr.New("INVALID_PERMISSION", http.StatusUnprocessableEntity,
+		return api.NewError("INVALID_PERMISSION", http.StatusUnprocessableEntity,
 			"permissions of different phase 3 categories were requested")
 	}
 
 	if !containsAll(requestedPermissions, categories[0]...) {
-		return opinerr.New("INVALID_PERMISSION", http.StatusBadRequest,
+		return api.NewError("INVALID_PERMISSION", http.StatusBadRequest,
 			"all the permission from one category must be requested")
 	}
 

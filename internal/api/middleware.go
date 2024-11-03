@@ -12,8 +12,6 @@ import (
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/getkin/kin-openapi/routers"
 	"github.com/google/uuid"
-	"github.com/luikyv/go-oidc/pkg/provider"
-	"github.com/luikyv/go-open-insurance/internal/opinerr"
 	"github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
 
@@ -23,125 +21,6 @@ const (
 	headerCacheControl       = "Cache-Control"
 	headerPragma             = "Pragma"
 )
-
-func AuthScopeMiddleware(op provider.Provider) StrictMiddlewareFunc {
-	return func(
-		f nethttp.StrictHTTPHandlerFunc,
-		operationID string,
-	) nethttp.StrictHTTPHandlerFunc {
-		return func(
-			ctx context.Context,
-			w http.ResponseWriter,
-			r *http.Request,
-			request interface{},
-		) (
-			response interface{},
-			err error,
-		) {
-			opts := newOperationOptions(operationID)
-			if len(opts.scopes) == 0 {
-				Logger(ctx).Debug("no scopes are required for the request")
-				return f(ctx, w, r, request)
-			}
-
-			token, ok := bearerToken(r)
-			if !ok {
-				Logger(ctx).Debug("bearer token is required")
-				return nil, opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
-					"missing token")
-			}
-
-			tokenInfo, err := op.TokenInfo(ctx, token)
-			if err != nil {
-				Logger(ctx).Debug("the token is not active")
-				return nil, opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
-					"invalid token")
-			}
-
-			if err := op.ValidateTokenPoP(
-				r,
-				token,
-				*tokenInfo.Confirmation,
-			); err != nil {
-				Logger(ctx).Debug("invalid proof of possesion")
-				return nil, opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
-					"invalid token")
-			}
-
-			tokenScopes := strings.Split(tokenInfo.Scopes, " ")
-			if !areScopesValid(opts.scopes, tokenScopes) {
-				Logger(ctx).Debug("invalid scopes",
-					slog.String("token_scopes", tokenInfo.Scopes))
-				return nil, opinerr.New("UNAUTHORISED", http.StatusUnauthorized,
-					"token missing scopes")
-			}
-
-			ctx = context.WithValue(ctx, ctxKeyClientID, tokenInfo.ClientID)
-			ctx = context.WithValue(ctx, ctxKeySubject, tokenInfo.Subject)
-			consentID, ok := ConsentID(tokenInfo.Scopes)
-			if ok {
-				ctx = context.WithValue(ctx, ctxKeyConsentID, consentID)
-			}
-
-			return f(ctx, w, r, request)
-		}
-	}
-}
-
-func bearerToken(r *http.Request) (string, bool) {
-	tokenHeader := r.Header.Get("Authorization")
-	if tokenHeader == "" {
-		return "", false
-	}
-
-	tokenParts := strings.Split(tokenHeader, " ")
-	if len(tokenParts) != 2 {
-		return "", false
-	}
-
-	return tokenParts[1], true
-}
-
-func AuthPermissionMiddleware(
-	consentService interface {
-		Verify(
-			ctx context.Context,
-			meta RequestMeta,
-			consentID string,
-			permissions ...ConsentPermission,
-		) error
-	},
-) StrictMiddlewareFunc {
-	return func(
-		f nethttp.StrictHTTPHandlerFunc,
-		operationID string,
-	) nethttp.StrictHTTPHandlerFunc {
-		return func(
-			ctx context.Context,
-			w http.ResponseWriter,
-			r *http.Request,
-			request interface{},
-		) (
-			response interface{},
-			err error,
-		) {
-			opts := newOperationOptions(operationID)
-			if len(opts.permissions) == 0 {
-				return f(ctx, w, r, request)
-			}
-
-			meta := NewRequestMeta(ctx)
-			if err = consentService.Verify(ctx, meta, meta.ConsentID, opts.permissions...); err != nil {
-				Logger(ctx).Debug("the consent is not valid for the request",
-					slog.Any("error", err))
-				return nil, opinerr.New("UNAUTHORIZED", http.StatusUnauthorized,
-					"invalid consent")
-			}
-
-			return f(ctx, w, r, request)
-		}
-	}
-}
 
 // IdempotencyMiddleware ensures that requests with the same idempotency ID
 // are not processed multiple times, returning a cached response if available.
@@ -168,7 +47,7 @@ func IdempotencyMiddleware(
 
 			idempotencyID := r.Header.Get(headerIdempotencyID)
 			if idempotencyID == "" {
-				return nil, opinerr.New("ERRO_IDEMPOTENCIA", http.StatusUnprocessableEntity,
+				return nil, NewError("ERRO_IDEMPOTENCIA", http.StatusUnprocessableEntity,
 					"missing idempotency id header")
 			}
 
@@ -190,7 +69,7 @@ func IdempotencyMiddleware(
 			// If the error was not due to "idempotency not found", return an
 			// internal error.
 			if !errors.Is(err, errIdempotencyNotFound) {
-				return nil, opinerr.New("ERRO_IDEMPOTENCIA", http.StatusUnprocessableEntity,
+				return nil, NewError("ERRO_IDEMPOTENCIA", http.StatusUnprocessableEntity,
 					err.Error())
 			}
 
@@ -253,7 +132,7 @@ func FAPIIDMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 			w.Header().Add(headerXFAPIInteractionID, interactionID)
 
 			if interactionIDIsRequired && !interactionIDIsValid {
-				return nil, opinerr.New(
+				return nil, NewError(
 					"INVALID_INTERACTION_ID",
 					http.StatusUnprocessableEntity,
 					"The FAPI interaction ID is missing or invalid",
@@ -266,7 +145,7 @@ func FAPIIDMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 	}
 }
 
-func MetaMiddleware() nethttp.StrictHTTPMiddlewareFunc {
+func MetaMiddleware(opinHost string) nethttp.StrictHTTPMiddlewareFunc {
 	return func(
 		f nethttp.StrictHTTPHandlerFunc,
 		operationID string,
@@ -280,13 +159,15 @@ func MetaMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 			response interface{},
 			err error,
 		) {
-			// TODO: Fill the params here.
+			ctx = context.WithValue(ctx, ctxKeyHostURL, opinHost)
 			ctx = context.WithValue(ctx, ctxKeyRequestURI, r.URL.RequestURI())
 			return f(ctx, w, r, request)
 		}
 	}
 }
 
+// SchemaValidationMiddleware validates incoming requests against an OpenAPI schema.
+// If validation fails, it stores the error in the request context.
 func SchemaValidationMiddleware(next http.Handler, router routers.Router) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		route, pathParams, _ := router.FindRoute(r)
@@ -297,6 +178,7 @@ func SchemaValidationMiddleware(next http.Handler, router routers.Router) http.H
 		}
 
 		ctx := r.Context()
+		// TODO: This results in nil pointer dereferencing when the path is not found.
 		if err := openapi3filter.ValidateRequest(ctx, requestValidationInput); err != nil {
 			ctx = context.WithValue(ctx, ctxKeyRequestError, err.Error())
 		}
@@ -329,7 +211,7 @@ func CacheControlMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 
 func RequestErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) {
 	Logger(r.Context()).Info("unexpected error", slog.Any("error", err))
-	opinErr := opinerr.New("NAO_INFORMADO", http.StatusBadRequest, err.Error())
+	opinErr := NewError("NAO_INFORMADO", http.StatusBadRequest, err.Error())
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(opinErr.StatusCode)
@@ -337,12 +219,12 @@ func RequestErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) {
 }
 
 func ResponseErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) {
-	var opinErr opinerr.Error
+	var opinErr Error
 	if !errors.As(err, &opinErr) {
 		Logger(r.Context()).Error("unexpected error", slog.Any("error", err))
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusInternalServerError)
-		_ = json.NewEncoder(w).Encode(opinerr.ErrInternal)
+		_ = json.NewEncoder(w).Encode(ErrInternal)
 		return
 	}
 
@@ -351,12 +233,12 @@ func ResponseErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) 
 	_ = json.NewEncoder(w).Encode(newResponseError(opinErr))
 }
 
-func newResponseError(err opinerr.Error) ResponseError {
+func newResponseError(err Error) ResponseError {
 	msg := err.Description
 	if len(msg) > 255 {
 		msg = msg[:255]
 	}
-	errData := Error{
+	errData := ErrorInfo{
 		Code:   err.Code,
 		Title:  msg,
 		Detail: msg,
@@ -371,9 +253,9 @@ func newResponseError(err opinerr.Error) ResponseError {
 	}
 
 	if err.StatusCode == http.StatusUnprocessableEntity {
-		_ = respErr.Errors.FromError(errData)
+		_ = respErr.Errors.FromErrorInfo(errData)
 	} else {
-		_ = respErr.Errors.FromErrors([]Error{errData})
+		_ = respErr.Errors.FromErrorInfos([]ErrorInfo{errData})
 	}
 
 	return respErr

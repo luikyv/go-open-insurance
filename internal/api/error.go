@@ -1,4 +1,4 @@
-package opinerr
+package api
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ func (err Error) Error() string {
 	return fmt.Sprintf("%s %s", err.Code, err.Description)
 }
 
-func New(code string, status int, description string) Error {
+func NewError(code string, status int, description string) Error {
 	err := Error{
 		Code:        code,
 		StatusCode:  status,

@@ -39,3 +39,19 @@ var resourceTypes = []api.ResourceType{
 	api.ResourceTypeQUOTERURAL,
 	api.ResourceTypeQUOTETRANSPORT,
 }
+
+func newResourcesResponse(
+	meta api.RequestMeta,
+	page api.Page[api.ResourceData],
+) api.GetResourcesResponse {
+	resp := api.GetResourcesResponse{
+		Data:  page.Records,
+		Links: api.PaginatedLinks(meta.RequestURL(), page),
+		Meta: api.Meta{
+			TotalPages:   int32(page.TotalPages),
+			TotalRecords: int32(page.TotalRecords),
+		},
+	}
+
+	return resp
+}

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"log/slog"
 
-	"github.com/luikyv/go-open-insurance/internal/opinerr"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -48,7 +47,7 @@ func (s IdempotencyService) FetchIdempotencyResponse(
 			slog.String("error", err.Error()),
 			slog.Any("request", req),
 		)
-		return "", opinerr.ErrInternal
+		return "", ErrInternal
 	}
 
 	if string(payload) != record.Request {

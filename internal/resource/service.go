@@ -7,7 +7,6 @@ import (
 
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/consent"
-	"github.com/luikyv/go-open-insurance/internal/opinerr"
 )
 
 type Service struct {
@@ -26,21 +25,38 @@ func (s Service) Add(sub string, resource api.ResourceData) {
 	s.storage.add(sub, resource)
 }
 
-func (s Service) Resources(
+func (s Service) Resource(
+	ctx context.Context,
+	meta api.RequestMeta,
+	id string,
+) (
+	api.ResourceData,
+	error,
+) {
+	r, err := s.storage.get(meta.Subject, id)
+	if err != nil {
+		return api.ResourceData{},
+			api.NewError("NAO_FOUND", http.StatusNotFound, err.Error())
+	}
+	return r, nil
+}
+
+func (s Service) resources(
 	ctx context.Context,
 	meta api.RequestMeta,
 	page api.Pagination,
 ) (
-	api.Page[api.ResourceData],
+	api.GetResourcesResponse,
 	error,
 ) {
-	consent, err := s.consentService.Get(ctx, meta, meta.ConsentID)
+	consent, err := s.consentService.Fetch(ctx, meta, meta.ConsentID)
 	if err != nil {
-		return api.Page[api.ResourceData]{}, err
+		return api.GetResourcesResponse{}, err
 	}
 
 	consentedTypes := consentedResourceTypes(consent.Permissions)
-	return s.storage.resources(meta.Subject, consentedTypes, page), nil
+	rs := s.storage.resources(meta.Subject, consentedTypes, page)
+	return newResourcesResponse(meta, rs), nil
 }
 
 func consentedResourceTypes(permissions []api.ConsentPermission) []api.ResourceType {
@@ -60,20 +76,4 @@ func consentedResourceTypes(permissions []api.ConsentPermission) []api.ResourceT
 		}
 	}
 	return consentedTypes
-}
-
-func (s Service) Get(
-	ctx context.Context,
-	meta api.RequestMeta,
-	id string,
-) (
-	api.ResourceData,
-	error,
-) {
-	r, err := s.storage.get(meta.Subject, id)
-	if err != nil {
-		return api.ResourceData{},
-			opinerr.New("NAO_FOUND", http.StatusNotFound, err.Error())
-	}
-	return r, nil
 }

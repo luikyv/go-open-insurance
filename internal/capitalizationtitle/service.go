@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/luikyv/go-open-insurance/internal/api"
-	"github.com/luikyv/go-open-insurance/internal/opinerr"
 	"github.com/luikyv/go-open-insurance/internal/resource"
 )
 
@@ -39,11 +38,12 @@ func (s Service) AddPlan(
 	}
 }
 
-func (s Service) Plans(
+func (s Service) plans(
 	meta api.RequestMeta,
 	page api.Pagination,
-) api.Page[api.CapitalizationTitlePlanData] {
-	return s.storage.plans(meta.Subject, page)
+) api.GetCapitalizationTitlePlansResponse {
+	plans := s.storage.plans(meta.Subject, page)
+	return newPlansResponse(meta, plans)
 }
 
 func (s Service) AddPlanInfo(
@@ -54,19 +54,19 @@ func (s Service) AddPlanInfo(
 	s.storage.addPlanInfo(sub, planID, info)
 }
 
-func (s Service) PlanInfo(
+func (s Service) planInfo(
 	meta api.RequestMeta,
 	planID string,
 ) (
-	api.CapitalizationTitlePlanInfo,
+	api.GetCapitalizationTitlePlanInfoResponse,
 	error,
 ) {
 	info, err := s.storage.planInfo(meta.Subject, planID)
 	if err != nil {
-		return api.CapitalizationTitlePlanInfo{},
-			opinerr.New("NOT_FOUND", http.StatusNotFound, err.Error())
+		return api.GetCapitalizationTitlePlanInfoResponse{},
+			api.NewError("NOT_FOUND", http.StatusNotFound, err.Error())
 	}
-	return info, nil
+	return newPlanInfoResponse(meta, info), nil
 }
 
 func (s Service) AddPlanEvent(
@@ -77,20 +77,20 @@ func (s Service) AddPlanEvent(
 	s.storage.addPlanEvent(sub, planID, event)
 }
 
-func (s Service) PlanEvents(
+func (s Service) planEvents(
 	meta api.RequestMeta,
 	planID string,
 	page api.Pagination,
 ) (
-	api.Page[api.CapitalizationTitleEvent],
+	api.GetCapitalizationTitleEventsResponse,
 	error,
 ) {
 	events, err := s.storage.planEvents(meta.Subject, planID, page)
 	if err != nil {
-		return api.Page[api.CapitalizationTitleEvent]{},
-			opinerr.New("NOT_FOUND", http.StatusNotFound, err.Error())
+		return api.GetCapitalizationTitleEventsResponse{},
+			api.NewError("NOT_FOUND", http.StatusNotFound, err.Error())
 	}
-	return events, nil
+	return newPlanEventsResponse(meta, events), nil
 }
 
 func (s Service) AddPlanSettlement(
@@ -101,18 +101,19 @@ func (s Service) AddPlanSettlement(
 	s.storage.addPlanSettlement(sub, planID, settlement)
 }
 
-func (s Service) PlanSettlements(
+func (s Service) planSettlements(
 	meta api.RequestMeta,
 	planID string,
 	page api.Pagination,
 ) (
-	api.Page[api.CapitalizationTitleSettlement],
+	api.GetCapitalizationTitleSettlementsResponse,
 	error,
 ) {
 	settlements, err := s.storage.planSettlements(meta.Subject, planID, page)
 	if err != nil {
-		return api.Page[api.CapitalizationTitleSettlement]{},
-			opinerr.New("NOT_FOUND", http.StatusNotFound, err.Error())
+		return api.GetCapitalizationTitleSettlementsResponse{},
+			api.NewError("NOT_FOUND", http.StatusNotFound, err.Error())
 	}
-	return settlements, nil
+	resp := newPlanSettlementsResponse(meta, settlements)
+	return resp, nil
 }

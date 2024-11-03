@@ -1,0 +1,9 @@
+{
+    "software_redirect_uris": [
+      "https://localhost.emobix.co.uk:8443/test/a/mockin/callback"
+    ],
+    "software_api_webhook_uris": [
+      "https://localhost.emobix.co.uk:8443/test-mtls/a/mockin"
+    ],
+    "software_jwks_uri": "https://directory/application.jwks"
+}

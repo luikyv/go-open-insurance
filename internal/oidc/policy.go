@@ -131,7 +131,7 @@ func (a authenticator) setUp(
 		return goidc.StatusFailure, errors.New("missing consent ID")
 	}
 
-	consent, err := a.consentService.Get(
+	consent, err := a.consentService.Fetch(
 		r.Context(),
 		meta,
 		consentID,
@@ -177,7 +177,7 @@ func (a authenticator) login(
 
 	if isLogin != "true" {
 		consentID := session.Parameter(paramConsentID).(string)
-		_ = a.consentService.RejectByID(
+		_ = a.consentService.Reject(
 			r.Context(),
 			meta,
 			consentID,
@@ -238,7 +238,7 @@ func (a authenticator) grantConsent(
 	consentID := session.Parameter(paramConsentID).(string)
 
 	if isConsented != "true" {
-		_ = a.consentService.RejectByID(
+		_ = a.consentService.Reject(
 			r.Context(),
 			meta,
 			consentID,

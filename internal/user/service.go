@@ -2,7 +2,9 @@ package user
 
 import (
 	"context"
-	"slices"
+	"net/http"
+
+	"github.com/luikyv/go-open-insurance/internal/api"
 )
 
 type Service struct {
@@ -20,13 +22,19 @@ func (s Service) Create(ctx context.Context, user User) error {
 }
 
 func (s Service) User(username string) (User, error) {
-	return s.storage.user(username)
+	user, err := s.storage.user(username)
+	if err != nil {
+		return User{}, api.NewError("USER_NOT_FOUND", http.StatusNotFound, "user not found")
+	}
+
+	return user, nil
 }
 
 func (s Service) UserByCPF(cpf string) (User, error) {
-	return s.storage.userByCPF(cpf)
-}
+	user, err := s.storage.userByCPF(cpf)
+	if err != nil {
+		return User{}, api.NewError("USER_NOT_FOUND", http.StatusNotFound, "cpf not found")
+	}
 
-func (s Service) UserBelongsToCompany(user User, businessCNPJ string) bool {
-	return slices.Contains(user.CompanyCNPJs, businessCNPJ)
+	return user, nil
 }

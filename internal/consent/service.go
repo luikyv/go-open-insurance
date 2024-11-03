@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/luikyv/go-open-insurance/internal/api"
-	"github.com/luikyv/go-open-insurance/internal/opinerr"
 	"github.com/luikyv/go-open-insurance/internal/user"
 )
 
@@ -30,7 +29,7 @@ func (s Service) Authorize(
 
 	api.Logger(ctx).Debug("trying to authorize consent",
 		slog.String("consent_id", id))
-	consent, err := s.get(ctx, id)
+	consent, err := s.fetchAndModify(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -38,7 +37,7 @@ func (s Service) Authorize(
 	if !consent.IsAwaitingAuthorization() {
 		api.Logger(ctx).Debug("cannot authorize a consent that is not awaiting authorization",
 			slog.String("consent_id", id), slog.Any("status", consent.Status))
-		return opinerr.New("INVALID_STATUS", http.StatusBadRequest,
+		return api.NewError("INVALID_STATUS", http.StatusBadRequest,
 			"invalid consent status")
 	}
 
@@ -49,20 +48,7 @@ func (s Service) Authorize(
 	return s.save(ctx, consent)
 }
 
-func (s Service) Create(
-	ctx context.Context,
-	meta api.RequestMeta,
-	consent Consent,
-) error {
-	if err := s.validate(ctx, meta, consent); err != nil {
-		return err
-	}
-
-	api.Logger(ctx).Info("creating consent", slog.String("consent_id", consent.ID))
-	return s.save(ctx, consent)
-}
-
-func (s Service) Get(
+func (s Service) Fetch(
 	ctx context.Context,
 	meta api.RequestMeta,
 	id string,
@@ -70,21 +56,21 @@ func (s Service) Get(
 	Consent,
 	error,
 ) {
-	consent, err := s.get(ctx, id)
+	consent, err := s.fetchAndModify(ctx, id)
 	if err != nil {
 		return Consent{}, err
 	}
 
 	if meta.ClientID != consent.ClientId {
 		api.Logger(ctx).Debug("client not allowed to fetch the consent")
-		return Consent{}, opinerr.New("UNAUTHORIZED", http.StatusForbidden,
+		return Consent{}, api.NewError("UNAUTHORIZED", http.StatusForbidden,
 			"client not authorized to perform this operation")
 	}
 
 	return consent, nil
 }
 
-func (s Service) GetAndConsume(
+func (s Service) FetchAndConsume(
 	ctx context.Context,
 	meta api.RequestMeta,
 	id string,
@@ -92,57 +78,29 @@ func (s Service) GetAndConsume(
 	Consent,
 	error,
 ) {
-	consent, err := s.Get(ctx, meta, id)
+	consent, err := s.Fetch(ctx, meta, id)
 	if err != nil {
 		return Consent{}, err
 	}
-	if err := s.Consume(ctx, consent); err != nil {
+	if err := s.consume(ctx, consent); err != nil {
 		return Consent{}, err
 	}
 
 	return consent, nil
 }
 
-func (s Service) RejectByID(
+func (s Service) Reject(
 	ctx context.Context,
 	meta api.RequestMeta,
 	id string,
 	info RejectionInfo,
 ) error {
-	consent, err := s.Get(ctx, meta, id)
+	consent, err := s.Fetch(ctx, meta, id)
 	if err != nil {
 		return err
 	}
 
-	return s.Reject(ctx, consent, info)
-}
-
-func (s Service) Reject(
-	ctx context.Context,
-	consent Consent,
-	info RejectionInfo,
-) error {
-	if consent.Status == api.ConsentStatusREJECTED {
-		return opinerr.New("INVALID_OPERATION", http.StatusBadRequest,
-			"the consent is already rejected")
-	}
-
-	consent.Status = api.ConsentStatusREJECTED
-	consent.RejectionInfo = &info
-	return s.save(ctx, consent)
-}
-
-func (s Service) Consume(
-	ctx context.Context,
-	consent Consent,
-) error {
-	if !consent.IsAuthorized() {
-		return opinerr.New("INVALID_OPERATION", http.StatusBadRequest,
-			"cannot consume a consent that is not authorized")
-	}
-
-	consent.Status = api.ConsentStatusCONSUMED
-	return s.save(ctx, consent)
+	return s.reject(ctx, consent, info)
 }
 
 // Verify checks if the consent with the given ID is authorized
@@ -153,22 +111,96 @@ func (s Service) Verify(
 	id string,
 	permissions ...api.ConsentPermission,
 ) error {
-	consent, err := s.Get(ctx, meta, id)
+	consent, err := s.Fetch(ctx, meta, id)
 	if err != nil {
 		return err
 	}
 
 	if !consent.IsAuthorized() {
-		return opinerr.New("INVALID_STATUS", http.StatusBadRequest,
+		return api.NewError("INVALID_STATUS", http.StatusBadRequest,
 			"consent is not authorized")
 	}
 
 	if !consent.HasPermissions(permissions) {
-		return opinerr.New("INVALID_PERMISSIONS", http.StatusBadRequest,
+		return api.NewError("INVALID_PERMISSIONS", http.StatusBadRequest,
 			"consent missing permissions")
 	}
 
 	return nil
+}
+
+func (s Service) create(
+	ctx context.Context,
+	meta api.RequestMeta,
+	req api.CreateConsentRequest,
+) (
+	api.ConsentResponse,
+	error,
+) {
+	consent := newConsent(meta, req)
+	if err := s.validate(ctx, meta, consent); err != nil {
+		return api.ConsentResponse{}, err
+	}
+
+	api.Logger(ctx).Info("creating consent", slog.String("consent_id", consent.ID))
+	if err := s.save(ctx, consent); err != nil {
+		return api.ConsentResponse{}, err
+	}
+
+	return newResponse(meta, consent), nil
+}
+
+func (s Service) consume(
+	ctx context.Context,
+	consent Consent,
+) error {
+	if !consent.IsAuthorized() {
+		return api.NewError("INVALID_OPERATION", http.StatusBadRequest,
+			"cannot consume a consent that is not authorized")
+	}
+
+	consent.Status = api.ConsentStatusCONSUMED
+	return s.save(ctx, consent)
+}
+
+func (s Service) delete(
+	ctx context.Context,
+	meta api.RequestMeta,
+	id string,
+) error {
+	c, err := s.Fetch(ctx, meta, id)
+	if err != nil {
+		return err
+	}
+
+	reason := api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREJECTED
+	if c.IsAuthorized() {
+		reason = api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREVOKED
+	}
+
+	if err := s.reject(ctx, c, RejectionInfo{
+		RejectedBy: api.ConsentRejectedByUSER,
+		Reason:     reason,
+	}); err != nil {
+		return err
+	}
+
+	return s.save(ctx, c)
+}
+
+func (s Service) reject(
+	ctx context.Context,
+	consent Consent,
+	info RejectionInfo,
+) error {
+	if consent.Status == api.ConsentStatusREJECTED {
+		return api.NewError("INVALID_OPERATION", http.StatusBadRequest,
+			"the consent is already rejected")
+	}
+
+	consent.Status = api.ConsentStatusREJECTED
+	consent.RejectionInfo = &info
+	return s.save(ctx, consent)
 }
 
 func (s Service) save(
@@ -177,16 +209,32 @@ func (s Service) save(
 ) error {
 	if err := s.storage.save(ctx, consent); err != nil {
 		api.Logger(ctx).Error("could not save the consent", slog.Any("error", err))
-		return opinerr.ErrInternal
+		return api.ErrInternal
 	}
 	return nil
 }
 
-func (s Service) get(ctx context.Context, id string) (Consent, error) {
-	consent, err := s.storage.get(ctx, id)
+func (s Service) fetch(
+	ctx context.Context,
+	meta api.RequestMeta,
+	id string,
+) (
+	api.ConsentResponse,
+	error,
+) {
+	consent, err := s.Fetch(ctx, meta, id)
+	if err != nil {
+		return api.ConsentResponse{}, err
+	}
+
+	return newResponse(meta, consent), nil
+}
+
+func (s Service) fetchAndModify(ctx context.Context, id string) (Consent, error) {
+	consent, err := s.storage.fetch(ctx, id)
 	if err != nil {
 		api.Logger(ctx).Debug("could not find the consent", slog.Any("error", err))
-		return Consent{}, opinerr.New("NOT_FOUND", http.StatusNotFound,
+		return Consent{}, api.NewError("NOT_FOUND", http.StatusNotFound,
 			"could not find the consent")
 	}
 
@@ -238,7 +286,7 @@ func (s Service) modify(ctx context.Context, consent *Consent) error {
 // information is compliant.
 func (s Service) validate(ctx context.Context, meta api.RequestMeta, consent Consent) error {
 	if meta.Error != nil {
-		return opinerr.New("NAO_INFORMADO", http.StatusBadRequest,
+		return api.NewError("NAO_INFORMADO", http.StatusBadRequest,
 			meta.Error.Error())
 	}
 

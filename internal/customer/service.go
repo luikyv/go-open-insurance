@@ -21,10 +21,11 @@ func (s Service) AddPersonalIdentification(
 	s.storage.addPersonalIdentification(sub, identification)
 }
 
-func (s Service) PersonalIdentifications(
+func (s Service) personalIdentifications(
 	meta api.RequestMeta,
-) []api.PersonalIdentificationData {
-	return s.storage.personalIdentifications(meta.Subject)
+) api.GetPersonalIdentificationResponse {
+	identifications := s.storage.personalIdentifications(meta.Subject)
+	return newPersonalIdentificationsResponse(meta, identifications)
 }
 
 func (s Service) AddPersonalQualification(
@@ -34,10 +35,11 @@ func (s Service) AddPersonalQualification(
 	s.storage.addPersonalQualification(sub, qualification)
 }
 
-func (s Service) PersonalQualifications(
+func (s Service) personalQualifications(
 	meta api.RequestMeta,
-) []api.PersonalQualificationData {
-	return s.storage.personalQualifications(meta.Subject)
+) api.GetPersonalQualificationResponse {
+	qualifications := s.storage.personalQualifications(meta.Subject)
+	return newPersonalQualificationsResponse(meta, qualifications)
 }
 
 func (s Service) AddPersonalComplimentaryInfo(
@@ -47,10 +49,11 @@ func (s Service) AddPersonalComplimentaryInfo(
 	s.storage.addPersonalComplimentaryInfo(sub, info)
 }
 
-func (s Service) PersonalComplimentaryInfos(
+func (s Service) personalComplimentaryInfos(
 	meta api.RequestMeta,
-) []api.PersonalComplimentaryInfoData {
-	return s.storage.personalComplimentaryInfos(meta.Subject)
+) api.GetPersonalComplimentaryInfoResponse {
+	infos := s.storage.personalComplimentaryInfos(meta.Subject)
+	return newPersonalComplimentaryInfoResponse(meta, infos)
 }
 
 type Storage struct {

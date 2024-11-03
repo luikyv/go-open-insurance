@@ -3,9 +3,9 @@ package user
 import (
 	"net/http"
 
-	"github.com/luikyv/go-open-insurance/internal/opinerr"
+	"github.com/luikyv/go-open-insurance/internal/api"
 )
 
 var (
-	errorUserNotFound = opinerr.New("USER_NOT_FOUND", http.StatusNotFound, "could not find user")
+	errorUserNotFound = api.NewError("USER_NOT_FOUND", http.StatusNotFound, "could not find user")
 )

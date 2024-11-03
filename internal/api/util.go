@@ -123,6 +123,32 @@ func newOperationOptions(operationID string) operationOptions {
 			fapiIDIsRequired: true,
 			isIdempotent:     true,
 		}
+	case "CreateQuoteAutoLeadV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				ScopeQuoteAutoLead,
+			},
+			isIdempotent: true,
+		}
+	case "RevokeQuoteAutoLeadV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				ScopeQuoteAutoLead,
+			},
+		}
+	case "CreateQuoteAutoV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				ScopeQuoteAuto,
+			},
+			isIdempotent: true,
+		}
+	case "QuoteAutoStatusV1":
+		return operationOptions{
+			scopes: []goidc.Scope{
+				ScopeQuoteAuto,
+			},
+		}
 	default:
 		return operationOptions{}
 	}
