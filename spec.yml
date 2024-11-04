@@ -1573,16 +1573,16 @@ components:
           items:
             $ref: "#/components/schemas/CapitalizationTitlePlanData"
         links:
-            $ref: '#/components/schemas/Links'
+          $ref: '#/components/schemas/Links'
         meta:
-            $ref: '#/components/schemas/Meta'
+          $ref: '#/components/schemas/Meta'
     CapitalizationTitlePlanData:
       type: object
       required:
         - brand
       properties:
         brand:
-            $ref: '#/components/schemas/CapitalizationTitleBrand'
+          $ref: "#/components/schemas/CapitalizationTitleBrand"
     CapitalizationTitleBrand:
       type: object
       description: Marca reportada pelo participante do Open Insurance
@@ -1657,7 +1657,7 @@ components:
           items:
             $ref: "#/components/schemas/CapitalizationTitleSeries"
     CapitalizationTitleSeries:
-      description: Dados Gerais da Série
+      description: Dados Gerais da SÃ©rie
       type: object
       required:
         - seriesId
@@ -1676,74 +1676,82 @@ components:
         - titles
       properties:
         planId:
-          description: Identificação do plano
+          description: IdentificaÃ§Ã£o do plano
           type: string
         seriesId:
-          description: Identificação da série
+          description: IdentificaÃ§Ã£o da sÃ©rie
           type: string
           maxLength: 60
         modality:
-          $ref: "#/components/schemas/CapitalizationTitleSeriesModality"
+          type: string
+          description: Modalidade
+          example: TRADICIONAL
+          enum: [TRADICIONAL, INSTRUMENTO_GARANTIA, COMPRA_PROGRAMADA, POPULAR, FILANTROPIA_PREMIAVEL]
         susepProcessNumber:
           type: string
-          description: Número do processo SUSEP.
+          description: NÃºmero do processo SUSEP.
           maxLength: 20
           example: "15414622222222222"
         commercialName:
           type: string
-          description: Denominação comercial do produto de propriedade exclusiva da sociedade de capitalização. Condicional, caso selecionada as opções "Filantropia Premiável" ou "Popular" no campo "Modalidade".
+          description: DenominaÃ§Ã£o comercial do produto de propriedade exclusiva da sociedade de capitalizaÃ§Ã£o. Condicional, caso selecionada as opÃ§Ãµes "Filantropia PremiÃ¡vel" ou "Popular" no campo "Modalidade".
           maxLength: 100
-          example: Denominação comercial do produto
+          example: DenominaÃ§Ã£o comercial do produto
         serieSize:
           type: integer
-          description: Quantidade máxima possível de títulos que pode ser emitida para uma mesma série
+          description: Quantidade mÃ¡xima possÃ­vel de tÃ­tulos que pode ser emitida para uma mesma sÃ©rie
           maxLength: 10
           example: 5000000
         uploadQuota:
-          description: Percentual da contribuição destinado aos custos de despesas com corretagem, colocação e administração do título de capitalização, emissão, divulgação, lucro da sociedade de capitalização e eventuais despesas relativas ao custeio da contemplação obrigatória e da distribuição de bônus
+          description: Percentual da contribuiÃ§Ã£o destinado aos custos de despesas com corretagem, colocaÃ§Ã£o e administraÃ§Ã£o do tÃ­tulo de capitalizaÃ§Ã£o, emissÃ£o, divulgaÃ§Ã£o, lucro da sociedade de capitalizaÃ§Ã£o e eventuais despesas relativas ao custeio da contemplaÃ§Ã£o obrigatÃ³ria e da distribuiÃ§Ã£o de bÃ´nus
           $ref: '#/components/schemas/PercentageDetails'
         capitalizationQuota:
-          description: Percentual da contribuição destinado à constituição de capital referente ao direito de resgate
+          description: Percentual da contribuiÃ§Ã£o destinado Ã  constituiÃ§Ã£o de capital referente ao direito de resgate
           $ref: '#/components/schemas/PercentageDetails'
         raffleQuota:
-          description: Percentual da contribuição destinado a custear os sorteios, se previstos no plano
+          description: Percentual da contribuiÃ§Ã£o destinado a custear os sorteios, se previstos no plano
           $ref: '#/components/schemas/PercentageDetails'
         gracePeriodRedemption:
           type: integer
-          description: Intervalo de tempo mínimo entre contratação e resgate parcial do direito, em meses.
+          description: Intervalo de tempo mÃ­nimo entre contrataÃ§Ã£o e resgate parcial do direito, em meses.
           maxLength: 3
           example: 48
         gracePeriodForFullRedemption:
           type: integer
-          description: Intervalo de tempo mínimo entre contratação e resgate total do direito, em meses
+          description: Intervalo de tempo mÃ­nimo entre contrataÃ§Ã£o e resgate total do direito, em meses
           maxLength: 3
           example: 48
         updateIndex:
-          $ref: "#/components/schemas/UpdateIndex"
+          type: string
+          description: Descreve o Ã­ndice de atualizaÃ§Ã£o das reservas.
+          example: IPCA
+          enum: [INDICE_REMUNERACAO_BASICA_DEPOSITOS_POUPANCA, IPCA, INCC, INPC, IGPM, OUTROS]
         updateIndexOthers:
           type: string
-          description: Descreve o índice de atualização utilizado quando outro que não previamente relacionado nos domínios do campo.
+          description: Descreve o Ã­ndice de atualizaÃ§Ã£o utilizado quando outro que nÃ£o previamente relacionado nos domÃ­nios do campo.
           maxLength: 100
-          example: Índice de atualização Outros
         readjustmentIndex:
-          $ref: "#/components/schemas/ReadjustmentIndex"
+          type: string
+          example: IPCA
+          enum: [INDICE_REMUNERACAO_BASICA_DEPOSITOS_POUPANCA, IPCA, INCC, INPC, IGPM, OUTROS]
         readjustmentIndexOthers:
           type: string
-          description: Descreve o índice de reajuste utilizado quando outro que não previamente relacionado nos domínios do campo.
+          description: Descreve o Ã­ndice de reajuste utilizado quando outro que nÃ£o previamente relacionado nos domÃ­nios do campo.
           maxLength: 100
-          example: Índice de reajuste Outros
         bonusClause:
           type: boolean
-          description: Cláusula de bônus
+          description: ClÃ¡usula de bÃ´nus
           example: false
         frequency:
-          $ref: "#/components/schemas/Frequency"
+          type: string
+          description: Tipo de ContribuiÃ§Ã£o - pagamento Ãºnico, pagamento mensal ou periÃ³dico
+          example: MENSAL
+          enum: [UNICO, MENSAL, PERIODICO]
         frequencyDescription:
           type: string
-          description: Descrição do Tipo de Contribuição (Quando o Tipo de Contribuição for 3. Pagamento Periódico)
           maxLength: 100
         interestRate:
-          description: Taxa de juros efetiva real mensal utilizada para remuneração do título de capitalização.
+          description: Taxa de juros efetiva real mensal utilizada para remuneraÃ§Ã£o do tÃ­tulo de capitalizaÃ§Ã£o.
           $ref: '#/components/schemas/PercentageDetails'
         broker:
           description: Dados do corretor (quando houver)
@@ -1751,7 +1759,7 @@ components:
           items:
             $ref: "#/components/schemas/CapitalizationTitleBroker"
         titles:
-          description: Dados Gerais do Título
+          description: Dados Gerais do TÃ­tulo
           type: array
           items:
             $ref: "#/components/schemas/CapitalizationTitleTitle"
@@ -1808,10 +1816,10 @@ components:
           example: "2023-01-30"
         rafflePremiumAmount:
           description: Valor do premio de sorteio
-          $ref: "#/components/schemas/AmountDetails"
+          $ref: "#/components/schemas/AmountNumberDetails"
         contributionAmount:
           description: Corresponde ao pagamento efetuado pelo subscritor à sociedade de capitalização para a aquisição do título de capitalização, podendo ser única, periódica ou mensal. Em todas as situações indicar para qual periodicidade de pagamento se aplicam os valores(pagamento mensal, pagamento único ou periódico).
-          $ref: "#/components/schemas/AmountDetails"
+          $ref: "#/components/schemas/AmountNumberDetails"
         subscriber:
           description: Dados Gerais do Título
           type: array
@@ -1846,6 +1854,21 @@ components:
       description: Tipo de Contribuição - pagamento único, pagamento mensal ou periódico
       example: MENSAL
       enum: [UNICO, MENSAL, PERIODICO]
+    AmountNumberDetails:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          type: number
+          pattern: '^\d{1,16}\.\d{2}$'
+          example: 2000.00
+        currency:
+          description: Moeda da Parcela, de acordo com ISO-4217.
+          type: string
+          pattern: '^(\w{3}){1}$'
+          example: BRL
     AmountDetails:
         type: object
         description: Detalhes de valores/limites
@@ -2062,16 +2085,16 @@ components:
       properties:
         pmcAmount:
           description: Valor da PMC (fim do mes) - Valor da Provisão Matemática para Capitalização (PMC), no fim de cada mês. Caso não haja saldo informar nulo
-          $ref: '#/components/schemas/AmountDetails'
+          $ref: '#/components/schemas/AmountNumberDetails'
         pdbAmount:
           description: Valor da PDB (fim do mes) - Valor da Provisão para Distribuição de Bônus (PDB), no fim de cada mês. Caso não haja saldo informar nulo
-          $ref: '#/components/schemas/AmountDetails'
+          $ref: '#/components/schemas/AmountNumberDetails'
         prAmount:
           description: Valor da PR (fim do mes) - Valor da Provisão para Resgate (PR), no fim de cada mês. Caso não haja saldo informar nulo
-          $ref: '#/components/schemas/AmountDetails'
+          $ref: '#/components/schemas/AmountNumberDetails'
         pspAmount:
           description: Valor da PSP (fim do mes) - Valor da Provisão de Sorteios a Pagar (PSP), no fim de cada mês. Caso não haja saldo informar nulo
-          $ref: '#/components/schemas/AmountDetails'
+          $ref: '#/components/schemas/AmountNumberDetails'
     GetCapitalizationTitleEventsResponse:
       type: object
       required:
@@ -2080,26 +2103,79 @@ components:
         - meta
       properties:
         data:
-            $ref: '#/components/schemas/CapitalizationTitleEvents'
+          type: array
+          items:
+            $ref: '#/components/schemas/CapitalizationTitleEvent'
         links:
-            $ref: '#/components/schemas/Links'
+          $ref: '#/components/schemas/Links'
         meta:
-            $ref: '#/components/schemas/Meta'
-    CapitalizationTitleEvents:
-      type: array
-      items:
-        $ref: '#/components/schemas/CapitalizationTitleEvent'
+          $ref: '#/components/schemas/Meta'
     CapitalizationTitleEvent:
       type: object
       properties:
-        titleId:
-          description: Código identificador do título na sociedade.
-          type: string
-          maxLength: 80
-        eventType:
-          $ref: '#/components/schemas/CapitalizationTitleEventType'
-        event:
-          $ref: '#/components/schemas/CapitalizationTitleEventInfo'
+          titleId:
+            description: CÃ³digo identificador do tÃ­tulo na sociedade.
+            type: string
+            maxLength: 80
+          eventType:
+            description: Tipo de Evento
+            type: string
+            enum: [SORTEIO, RESGATE]
+          event:
+            type: object
+            properties:
+              raffle:
+                type: object
+                required:
+                  - raffleAmount
+                  - raffleDate
+                  - raffleSettlementDate
+                properties:
+                  raffleAmount:
+                    description: Montante do capital sorteado (prÃªmio de sorteio bruto, livre de IOF, quando aplicÃ¡vel)
+                    $ref: '#/components/schemas/AmountNumberDetails'
+                  raffleDate:
+                    description: Data de realizaÃ§Ã£o do sorteio
+                    type: string
+                    format: date
+                    example: "2023-01-30"
+                  raffleSettlementDate:
+                    description: Data da liquidaÃ§Ã£o financeira do capital sorteado
+                    type: string
+                    format: date
+                    example: "2023-01-30"
+              redemption:
+                type: object
+                required:
+                  - redemptionType
+                  - redemptionAmount
+                  - redemptionBonusAmount
+                  - redemptionRequestDate
+                  - redemptionSettlementDate
+                properties:
+                  redemptionType:
+                    description: Tipo de resgate
+                    type: string
+                    enum: [ANTECIPADO_PARCIAL, ANTECIPADO_TOTAL, FINAL_VIGENCIA]
+                  redemptionAmount:
+                    description: Valor de resgate. (Valor bruto de resgate, livre de IOF, quando aplicÃ¡vel)
+                    $ref: '#/components/schemas/AmountNumberDetails'
+                  redemptionBonusAmount:
+                    description: Valor do Bonus. (Valor bruto do bonus resgatado, livre de IOF, quando aplicÃ¡vel)
+                    $ref: '#/components/schemas/AmountNumberDetails'
+                  unreturnedAmount:
+                    description: Valor nÃ£o restituido. (Valor bruto nÃ£o restituido ao titular em caso de resgate antecipado)
+                    $ref: '#/components/schemas/AmountNumberDetails'
+                  redemptionRequestDate:
+                    description: Data de solicitaÃ§Ã£o do resgate
+                    type: string
+                    format: date
+                    example: "2023-01-30"
+                  redemptionSettlementDate:
+                    description: Data da liquidaÃ§Ã£o financeira do resgate
+                    type: string
+                    format: date
+                    example: "2023-01-30"
     CapitalizationTitleEventType:
       description: Tipo de Evento
       type: string
@@ -2173,29 +2249,27 @@ components:
         - meta
       properties:
         data:
-          $ref: '#/components/schemas/CapitalizationTitleSettlements'
+          type: array
+          items:
+            $ref: '#/components/schemas/CapitalizationTitleSettlement'
         links:
           $ref: '#/components/schemas/Links'
         meta:
           $ref: '#/components/schemas/Meta'
-    CapitalizationTitleSettlements:
-      type: array
-      items:
-        $ref: '#/components/schemas/CapitalizationTitleSettlement'
     CapitalizationTitleSettlement:
       type: object
       required:
-        - settlementId
-        - settlementFinancialAmount
-        - settlementPaymentDate
-        - settlementDueDate
+          - settlementId
+          - settlementFinancialAmount
+          - settlementPaymentDate
+          - settlementDueDate
       properties:
         settlementId:
           description: Identificador da Contribuicao
           type: string
         settlementFinancialAmount:
           description: Valor da contribuicao
-          $ref: '#/components/schemas/AmountDetails'
+          $ref: '#/components/schemas/AmountNumberDetails'
         settlementPaymentDate:
           description: Data da Contribuicao
           type: string

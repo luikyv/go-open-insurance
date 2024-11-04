@@ -2,17 +2,27 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
+	"encoding/json"
+	"io"
 	"log"
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/getkin/kin-openapi/routers/gorillamux"
+	"github.com/go-jose/go-jose/v4"
+	"github.com/luikyv/go-oidc/pkg/goidc"
+	"github.com/luikyv/go-oidc/pkg/provider"
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/capitalizationtitle"
 	"github.com/luikyv/go-open-insurance/internal/consent"
 	"github.com/luikyv/go-open-insurance/internal/customer"
 	"github.com/luikyv/go-open-insurance/internal/endorsement"
+	"github.com/luikyv/go-open-insurance/internal/oidc"
 	"github.com/luikyv/go-open-insurance/internal/quoteauto"
 	"github.com/luikyv/go-open-insurance/internal/resource"
 	"github.com/luikyv/go-open-insurance/internal/user"
@@ -53,41 +63,28 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Storage.
 	userStorage := user.NewStorage()
 	consentStorage := consent.NewStorage(db)
-
-	userService := user.NewService(userStorage)
-	consentService := consent.NewService(consentStorage, userService)
-
-	// OpenID Provider.
-	op, err := openidProvider(
-		db,
-		userService,
-		consentService,
-		host,
-		mtlsHost,
-		apiPrefixOIDC,
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Storage.
 	idempotencyStorage := api.NewIdempotencyStorage(db)
 	resourceStorage := resource.NewStorage()
 	customerStorage := customer.NewStorage()
-	capitalizationtitleStorage := capitalizationtitle.NewStorage()
+	capTitleStorage := capitalizationtitle.NewStorage()
 	quoteAutoStorage := quoteauto.NewStorage(db)
 
 	// Services.
+	userService := user.NewService(userStorage)
+	consentService := consent.NewService(consentStorage, userService)
+	// OpenID Provider.
+	op, err := openidProvider(db, userService, consentService)
+	if err != nil {
+		log.Fatal(err)
+	}
 	webhookService := webhook.NewService(op, httpClientFunc())
 	idempotencyService := api.NewIdempotencyService(idempotencyStorage)
 	resourceService := resource.NewService(resourceStorage, consentService)
 	customerService := customer.NewService(customerStorage)
-	capitalizationtitleService := capitalizationtitle.NewService(
-		capitalizationtitleStorage,
-		resourceService,
-	)
+	capitalizationtitleService := capitalizationtitle.NewService(capTitleStorage, resourceService)
 	endorsementService := endorsement.NewService(consentService, resourceService)
 	quoteAutoService := quoteauto.NewService(quoteAutoStorage, webhookService)
 
@@ -101,14 +98,6 @@ func main() {
 		QuoteAutoServerV1:           quoteauto.NewServerV1(quoteAutoService),
 	}
 
-	swagger, err := api.GetSwagger()
-	if err != nil {
-		log.Fatal(err)
-	}
-	router, err := gorillamux.NewRouter(swagger)
-	if err != nil {
-		log.Fatal(err)
-	}
 	strictHandler := api.NewStrictHandlerWithOptions(
 		server,
 		[]nethttp.StrictHTTPMiddlewareFunc{
@@ -124,6 +113,15 @@ func main() {
 			ResponseErrorHandlerFunc: api.ResponseErrorMiddleware,
 		},
 	)
+
+	swagger, err := api.GetSwagger()
+	if err != nil {
+		log.Fatal(err)
+	}
+	router, err := gorillamux.NewRouter(swagger)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	opinHandler := api.HandlerFromMux(strictHandler, http.NewServeMux())
 	opinHandler = api.SchemaValidationMiddleware(opinHandler, router)
@@ -165,6 +163,136 @@ func dbConnection() (*mongo.Database, error) {
 	}
 
 	return conn.Database(dbSchema), nil
+}
+
+func openidProvider(
+	db *mongo.Database,
+	userService user.Service,
+	consentService consent.Service,
+) (
+	provider.Provider,
+	error,
+) {
+
+	// Get the file path of the source file.
+	_, filename, _, _ := runtime.Caller(0)
+	sourceDir := filepath.Dir(filename)
+
+	keysDir := filepath.Join(sourceDir, "../../keys")
+	templatesDirPath := filepath.Join(sourceDir, "../../templates")
+
+	return provider.New(
+		goidc.ProfileOpenID,
+		host,
+		privateJWKS(filepath.Join(keysDir, "server.jwks")),
+		provider.WithPathPrefix(apiPrefixOIDC),
+		provider.WithClientStorage(oidc.NewClientManager(db)),
+		provider.WithAuthnSessionStorage(oidc.NewAuthnSessionManager(db)),
+		provider.WithGrantSessionStorage(oidc.NewGrantSessionManager(db)),
+		provider.WithScopes(api.Scopes...),
+		provider.WithAuthorizationCodeGrant(),
+		provider.WithImplicitGrant(),
+		provider.WithRefreshTokenGrant(oidc.ShoudIssueRefreshTokenFunc(), 600),
+		provider.WithClientCredentialsGrant(),
+		provider.WithTokenAuthnMethods(goidc.ClientAuthnPrivateKeyJWT),
+		provider.WithPrivateKeyJWTSignatureAlgs(jose.PS256),
+		provider.WithMTLS(mtlsHost, oidc.ClientCertFunc()),
+		provider.WithTLSCertTokenBindingRequired(),
+		provider.WithPAR(60),
+		provider.WithJAR(jose.PS256),
+		provider.WithJAREncryption(jose.RSA_OAEP),
+		provider.WithJARContentEncryptionAlgs(jose.A256GCM),
+		provider.WithJARM(jose.PS256),
+		provider.WithIssuerResponseParameter(),
+		provider.WithPKCE(goidc.CodeChallengeMethodSHA256),
+		provider.WithACRs(api.ACROpenInsuranceLOA2, api.ACROpenInsuranceLOA3),
+		provider.WithUserInfoEncryption(jose.RSA_OAEP),
+		provider.WithStaticClient(client("client_one", keysDir)),
+		provider.WithStaticClient(client("client_two", keysDir)),
+		provider.WithHandleGrantFunc(oidc.HandleGrantFunc(consentService)),
+		provider.WithPolicy(oidc.Policy(templatesDirPath, host+apiPrefixOIDC, userService, consentService)),
+		provider.WithNotifyErrorFunc(oidc.LogErrorFunc()),
+		provider.WithDCR(
+			oidc.DCRFunc(api.Scopes),
+			func(r *http.Request, s string) error {
+				return nil
+			},
+		),
+		provider.WithHTTPClientFunc(httpClientFunc()),
+	)
+}
+
+func client(clientID string, keysDir string) *goidc.Client {
+	var scopes []string
+	for _, scope := range api.Scopes {
+		scopes = append(scopes, scope.ID)
+	}
+
+	privateJWKS := privateJWKS(filepath.Join(keysDir, clientID+".jwks"))
+	publicJWKS := jose.JSONWebKeySet{Keys: []jose.JSONWebKey{}}
+	for _, jwk := range privateJWKS.Keys {
+		publicJWKS.Keys = append(publicJWKS.Keys, jwk.Public())
+	}
+	rawPublicJWKS, _ := json.Marshal(publicJWKS)
+	return &goidc.Client{
+		ID: clientID,
+		ClientMetaInfo: goidc.ClientMetaInfo{
+			TokenAuthnMethod: goidc.ClientAuthnPrivateKeyJWT,
+			ScopeIDs:         strings.Join(scopes, " "),
+			RedirectURIs: []string{
+				"https://localhost.emobix.co.uk:8443/test/a/mockin/callback",
+			},
+			GrantTypes: []goidc.GrantType{
+				goidc.GrantAuthorizationCode,
+				goidc.GrantRefreshToken,
+				goidc.GrantClientCredentials,
+				goidc.GrantImplicit,
+			},
+			ResponseTypes: []goidc.ResponseType{
+				goidc.ResponseTypeCode,
+				goidc.ResponseTypeCodeAndIDToken,
+			},
+			PublicJWKS:           rawPublicJWKS,
+			IDTokenKeyEncAlg:     jose.RSA_OAEP,
+			IDTokenContentEncAlg: jose.A128CBC_HS256,
+		},
+	}
+}
+
+func privateJWKS(filePath string) jose.JSONWebKeySet {
+	absPath, _ := filepath.Abs(filePath)
+	jwksFile, err := os.Open(absPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer jwksFile.Close()
+
+	jwksBytes, err := io.ReadAll(jwksFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var jwks jose.JSONWebKeySet
+	if err := json.Unmarshal(jwksBytes, &jwks); err != nil {
+		log.Fatal(err)
+	}
+
+	return jwks
+}
+
+func httpClientFunc() goidc.HTTPClientFunc {
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				Renegotiation:      tls.RenegotiateOnceAsClient,
+				InsecureSkipVerify: true,
+			},
+		},
+	}
+
+	return func(ctx context.Context) *http.Client {
+		return client
+	}
 }
 
 // getEnv retrieves an environment variable or returns a fallback value if not found

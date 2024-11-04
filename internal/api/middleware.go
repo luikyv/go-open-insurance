@@ -145,6 +145,7 @@ func FAPIIDMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 	}
 }
 
+// MetaMiddleware creates middleware that injects metadata into the request context.
 func MetaMiddleware(opinHost string) nethttp.StrictHTTPMiddlewareFunc {
 	return func(
 		f nethttp.StrictHTTPHandlerFunc,
@@ -209,6 +210,8 @@ func CacheControlMiddleware() nethttp.StrictHTTPMiddlewareFunc {
 	}
 }
 
+// RequestErrorMiddleware handles unexpected errors that occur during an HTTP request.
+// It logs the error and returns a JSON response with an error message and HTTP status code.
 func RequestErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) {
 	Logger(r.Context()).Info("unexpected error", slog.Any("error", err))
 	opinErr := NewError("NAO_INFORMADO", http.StatusBadRequest, err.Error())
@@ -218,6 +221,10 @@ func RequestErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) {
 	_ = json.NewEncoder(w).Encode(newResponseError(opinErr))
 }
 
+// ResponseErrorMiddleware handles errors during an HTTP request by examining if
+// the error is of type [Error].
+// If it is, it sends a JSON response with the associated status code; otherwise,
+// it logs the error and returns a generic internal server error response.
 func ResponseErrorMiddleware(w http.ResponseWriter, r *http.Request, err error) {
 	var opinErr Error
 	if !errors.As(err, &opinErr) {
