@@ -22,7 +22,7 @@ To ensure MockIn works correctly in your local environment, you need to update y
 127.0.0.1 matls-mockin.local
 ```
 
-If you’re running MockIn directly on your machine instead of in a Docker container, add this additional entry. It ensures MockIn can resolve the mocked directory served by the NGINX container:
+If you're running MockIn directly on your machine instead of in a Docker container, add this additional entry. It ensures MockIn can resolve the mocked directory served by the NGINX container:
 ```bash
 127.0.0.1 directory
 ```
@@ -34,7 +34,7 @@ If you are developing or modifying this project, start by running `make setup-de
 * Go 1.22.x installed and properly configured in the development environment.
 * Pre-commit installed for managing Git hooks.
 
-Once the setup is complete, you’ll be able to use all other make commands.
+Once the setup is complete, you'll be able to use all other make commands.
 
 If you only need to run the project without modifying it, you can use the simpler setup with `make setup`. For this you only need Docker and Docker Compose installed.
 After this setup, you can start the services using `make run` and `make run-with-cs` which also spins up the Open Insurance Conformance Suite.
@@ -89,7 +89,7 @@ We recommend reviewing the oapi-codegen documentation, particularly the section 
 The configurations for this module are located in `tools/oapi-config.yml`.
 
 ### go-oidc
-[go-oidc](https://github.com/luikyv/go-oidc) is a configurable OpenID provider written in Go. It handles OAuth-related functionalities, including authentication, token issuance, and scopes. Familiarity with this library’s concepts is important for understanding the project's implementation of these aspects.
+[go-oidc](https://github.com/luikyv/go-oidc) is a configurable OpenID provider written in Go. It handles OAuth-related functionalities, including authentication, token issuance, and scopes. Familiarity with this library's concepts is important for understanding the project's implementation of these aspects.
 
 ## TODOs
 * Env

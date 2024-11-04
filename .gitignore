@@ -29,3 +29,4 @@ keys/
 *.bkp
 .vscode
 .DS_store
+cs_config.json

@@ -19,6 +19,7 @@
     },
     "directory": {
         "discoveryUrl": "https://directory/.well-known/openid-configuration",
+        "apibase": "https://directory",
         "client_id": "random_client"
     }
 }

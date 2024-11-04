@@ -30,6 +30,7 @@ import (
 	"github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
 var (
@@ -150,8 +151,10 @@ func main() {
 }
 
 func dbConnection() (*mongo.Database, error) {
+	ctx := context.Background()
+
 	conn, err := mongo.Connect(
-		context.Background(),
+		ctx,
 		options.Client().ApplyURI(dbStringConnection).SetBSONOptions(&options.BSONOptions{
 			UseJSONStructTags: true,
 			NilMapAsEmpty:     true,
@@ -159,6 +162,10 @@ func dbConnection() (*mongo.Database, error) {
 		}),
 	)
 	if err != nil {
+		return nil, err
+	}
+
+	if err := conn.Ping(ctx, readpref.Primary()); err != nil {
 		return nil, err
 	}
 
