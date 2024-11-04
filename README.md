@@ -33,6 +33,7 @@ If you are developing or modifying this project, start by running `make setup-de
 * Docker and Docker Compose installed.
 * Go 1.22.x installed and properly configured in the development environment.
 * Pre-commit installed for managing Git hooks.
+* `jq` installed for JSON processing in the Makefile commands.
 
 Once the setup is complete, you'll be able to use all other make commands.
 

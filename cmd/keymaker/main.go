@@ -226,12 +226,12 @@ func generateJWKS(
 		publicJWKS.Keys = append(publicJWKS.Keys, jwk.Public())
 	}
 
-	jwksBytes, err = json.MarshalIndent(jwks, "", " ")
+	publicJWKSBytes, err := json.MarshalIndent(publicJWKS, "", " ")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = os.WriteFile(filepath.Join(dir, name+"_pub.jwks"), jwksBytes, 0644)
+	err = os.WriteFile(filepath.Join(dir, name+"_pub.jwks"), publicJWKSBytes, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}

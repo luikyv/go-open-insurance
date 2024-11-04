@@ -1,3 +1,5 @@
+.PHONY: keys
+
 setup:
 	@make keys
 	@make setup-cs
@@ -44,6 +46,7 @@ run-cs:
 # Generate certificates, private keys, and JWKS files for both the server and clients.
 keys:
 	@go run cmd/keymaker/main.go
+	@make cs-config
 
 # Generate API models from the Open Insurance OpenAPI Specification.
 models:
@@ -56,24 +59,24 @@ build-mockin:
 build-cs:
 	@docker compose run cs-builder
 
+# Create a Conformance Suite configuration file using the client keys in /keys.
 cs-config:
-	@client_one_jwks=$$(jq . < "keys/client_one.jwks"); \
-	client_one_cert=$$(< "keys/client_one.crt"); \
-	client_one_key=$$(< "keys/client_one.key"); \
-	client_two_jwks=$$(jq . < "keys/client_two.jwks"); \
-	client_two_cert=$$(< "keys/client_two.crt"); \
-	client_two_key=$$(< "keys/client_two.key"); \
-	jq --arg clientOneCert "$$client_one_cert" \
+	@jq --arg clientOneCert "$$(<keys/client_one.crt)" \
+	   --arg clientOneKey "$$(<keys/client_one.key)" \
+	   --arg clientTwoCert "$$(<keys/client_two.crt)" \
+	   --arg clientTwoKey "$$(<keys/client_two.key)" \
+	   --argjson clientOneJwks "$$(jq . < keys/client_one.jwks)" \
+	   --argjson clientTwoJwks "$$(jq . < keys/client_two.jwks)" \
 	   --arg clientOneKey "$$client_one_key" \
 	   --arg clientTwoCert "$$client_two_cert" \
 	   --arg clientTwoKey "$$client_two_key" \
 	   --argjson clientOneJwks "$$client_one_jwks" \
 	   --argjson clientTwoJwks "$$client_two_jwks" \
 	   '.client.jwks = $$clientOneJwks | \
-	    .client.mtls.cert = $$clientOneCert | \
-	    .client.mtls.key = $$clientOneKey | \
+	    .mtls.cert = $$clientOneCert | \
+	    .mtls.key = $$clientOneKey | \
 	    .client2.jwks = $$clientTwoJwks | \
-	    .client2.mtls.cert = $$clientTwoCert | \
-	    .client2.mtls.key = $$clientTwoKey' cs_config_base.json > cs_config.json
+	    .mtls2.cert = $$clientTwoCert | \
+	    .mtls2.key = $$clientTwoKey' cs_config_base.json > cs_config.json
 
 	@echo "Conformance Suite config successfully written to cs_config.json"

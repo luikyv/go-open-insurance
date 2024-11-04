@@ -185,6 +185,7 @@ func openidProvider(
 	_, filename, _, _ := runtime.Caller(0)
 	sourceDir := filepath.Dir(filename)
 
+	// TODO: This will cause problems for the docker file.
 	keysDir := filepath.Join(sourceDir, "../../keys")
 	templatesDirPath := filepath.Join(sourceDir, "../../templates")
 
