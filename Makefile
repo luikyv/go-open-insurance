@@ -1,10 +1,15 @@
 .PHONY: keys
 
+# Prepares the environment by generating keys and setting up the Open Insurance
+# Conformance Suite.
 setup:
 	@make keys
 	@make cs-config
 	@make setup-cs
 
+# Sets up the development environment by downloading dependencies installing
+# pre-commit hooks, generating keys, and setting up the Open Insurance
+# Conformance Suite.
 setup-dev:
 	@go mod download
 	@pre-commit install
@@ -25,19 +30,22 @@ setup-cs:
 
 	@make build-cs
 
-# Run MockIn.
+# Runs the main MockIn components using Docker Compose.
 run:
 	@docker-compose --profile main up
 
-# Run MockIn alongside the Conformance Suite.
+# Starts MockIn along with the Open Insurance Conformance Suite.
 run-with-cs:
 	@docker-compose --profile main --profile conformance up
 
-# Run only the MockIn dependencies for local development.
+# Runs only the MockIn dependencies necessary for local development. With this
+# command the MockIn server can run and be debugged in the local host.
 run-dev:
 	@docker-compose --profile dev up
 
-# Run only the MockIn dependencies for local development alongside the Conformance Suite.
+# Runs the local development environment with both MockIn and the Conformance
+# Suite. With this command the MockIn server can run and be debugged in the
+# local host with the Conformance Suite.
 run-dev-with-cs:
 	@docker-compose --profile dev --profile conformance up
 
@@ -58,6 +66,7 @@ models:
 build-mockin:
 	@docker-compose build mockin
 
+# Build the Conformance Suite JAR file.
 build-cs:
 	@docker compose run cs-builder
 

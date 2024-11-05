@@ -44,3 +44,12 @@ Dockerfile
 # Ignore Go workspace configuration
 go.work
 go.work.sum
+
+# Others
+logs/
+conformance-suite
+*.zip
+*.bkp
+.vscode
+.DS_store
+cs_config.json

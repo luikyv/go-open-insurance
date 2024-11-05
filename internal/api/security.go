@@ -106,7 +106,7 @@ func AuthPermissionMiddleware(
 			if err = consentService.Verify(ctx, meta, meta.ConsentID, opts.permissions...); err != nil {
 				Logger(ctx).Debug("the consent is not valid for the request",
 					slog.Any("error", err))
-				return nil, NewError("UNAUTHORIZED", http.StatusUnauthorized,
+				return nil, NewError("UNAUTHORIZED", http.StatusForbidden,
 					"invalid consent")
 			}
 

@@ -122,6 +122,8 @@ func loadMocks(
 					Modality:          api.CapitalizationTitleSeriesModalityPOPULAR,
 					UpdateIndex:       api.CapitalizationTitleSeriesUpdateIndexIGPM,
 					ReadjustmentIndex: api.CapitalizationTitleSeriesReadjustmentIndexIPCA,
+					Frequency:         api.CapitalizationTitleSeriesFrequencyMENSAL,
+					Titles:            []api.CapitalizationTitleTitle{},
 				},
 			},
 		},
