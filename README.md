@@ -35,8 +35,7 @@ If you are developing or modifying this project, start by running `make setup-de
 
 Once the setup is complete, you'll be able to use all other make commands.
 
-If you only need to run the project without modifying it, you can use the simpler setup with `make setup`. For this you only need Docker and Docker Compose installed.
-After this setup, you can start the services using `make run` and `make run-with-cs` which also spins up the Open Insurance Conformance Suite.
+If you only need to run the project without modifying it, you can use the simpler setup with `make setup`. For this you only need Docker and Docker Compose installed. After this setup, you can start the services using `make run`.
 
 ## Dependencies
 This project relies significantly on some Go dependencies that streamline development and reduce boilerplate code.

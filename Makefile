@@ -4,8 +4,6 @@
 # Conformance Suite.
 setup:
 	@make keys
-	@make cs-config
-	@make setup-cs
 
 # Sets up the development environment by downloading dependencies installing
 # pre-commit hooks, generating keys, and setting up the Open Insurance
@@ -14,10 +12,11 @@ setup-dev:
 	@go mod download
 	@pre-commit install
 	@make keys
-	@make cs-config
 	@make setup-cs
 
 # Clone and build the Open Insurance Conformance Suite.
+# Also, generate a configuration file for the suite using files in /keys.
+# A configuration file for the conformance suite is also generated based on the files inside /keys.
 # Note: The Dockerfile to build the conformance suite jar is missing, then it is
 # being added it manually.
 setup-cs:
@@ -29,6 +28,8 @@ setup-cs:
 	fi
 
 	@make build-cs
+
+	@make cs-config
 
 # Runs the main MockIn components using Docker Compose.
 run:
