@@ -406,125 +406,38 @@ components:
         - data
       properties:
         data:
-          type: object
-          required:
-            - permissions
-            - loggedUser
-            - expirationDateTime
-          properties:
-            loggedUser:
-              $ref: '#/components/schemas/LoggedUser'
-            businessEntity:
-              $ref: '#/components/schemas/BusinessEntity'
-            permissions:
-              type: array
-              items:
-                $ref: '#/components/schemas/ConsentPermission'
-              minItems: 1
-            expirationDateTime:
-              type: string
-              maxLength: 20
-              format: date-time
-            endorsementInformation:
-              type: object
-              required:
-                - policyNumber
-                - endorsementType
-                - requestDescription
-              properties:
-                policyNumber:
-                  type: string
-                  maxLength: 60
-                  example: "111111"
-                endorsementType:
-                  $ref: '#/components/schemas/EndorsementType'
-                requestDescription:
-                  type: string
-                  maxLength: 1024
-            claimNotificationInformation:
-              type: object
-              required:
-                - documentType
-                - policyNumber
-                - occurrenceDate
-                - occurrenceDescription
-              properties:
-                documentType:
-                  type: string
-                  enum: [APOLICE_INDIVIDUAL,
-                         BILHETE,
-                         CERTIFICADO,
-                         APOLICE_INDIVIDUAL_AUTOMOVEL,
-                         APOLICE_FROTA_AUTOMOVEL,
-                         CERTIFICADO_AUTOMOVEL]
-                policyNumber:
-                  type: string
-                  maxLength: 60
-                  example: "111111"
-                groupCertificateId:
-                  type: string
-                  maxLength: 60
-                occurrenceDate:
-                  type: string
-                  format: date
-                  maxLength: 10
-                occurrenceTime:
-                  type: string
-                  pattern: '[0-2][0-3]:[0-5][0-9]:[0-5][0-9]'
-                occurrenceDescription:
-                  type: string
-                  maxLength: 10000
-          additionalProperties: false
+          $ref: "#/components/schemas/ConsentData"
       additionalProperties: false
-    ConsentResponse:
+    ConsentData:
       type: object
       required:
-        - data
-      properties:
-        data:
-          $ref: '#/components/schemas/ConsentDataV2'
-        links:
-          $ref: '#/components/schemas/Links'
-        meta:
-          $ref: '#/components/schemas/Meta'
-      additionalProperties: false
-    ConsentDataV2:
-      type: object
-      required:
-        - consentId
-        - creationDateTime
-        - status
-        - statusUpdateDateTime
         - permissions
+        - loggedUser
         - expirationDateTime
       properties:
-        consentId:
-          type: string
-          pattern: '^urn:[a-zA-Z0-9][a-zA-Z0-9-]{0,31}:[a-zA-Z0-9()+,\-.:=@;$_!*''%\/?#]+$'
-          maxLength: 256
-          example: 'urn:prudential:C1DD93123'
-        creationDateTime:
-          type: string
-          format: date-time
-          maxLength: 20
-        status:
-          $ref: '#/components/schemas/ConsentStatus'
-        statusUpdateDateTime:
-          type: string
-          format: date-time
-          maxLength: 20
+        loggedUser:
+          $ref: '#/components/schemas/LoggedUser'
+        businessEntity:
+          $ref: '#/components/schemas/BusinessEntity'
         permissions:
           type: array
-          minItems: 1
           items:
-            $ref: '#/components/schemas/ConsentPermission'
+            description: Especifica os tipos de permissÃµes de acesso Ã s APIs no escopo do Open Insurance Brasil - Fase 2 e 3, de acordo com os blocos de consentimento fornecidos pelo usuÃ¡rio e necessÃ¡rios ao acesso a cada endpoint das APIs.
+            $ref: "#/components/schemas/ConsentPermission"
+          minItems: 1
+          example:
+            - CAPITALIZATION_TITLE_READ
+            - RESOURCES_READ
         expirationDateTime:
+          description: Data e hora de expiraÃ§Ã£o da permissÃ£o. De preenchimento obrigatÃ³rio, reflete a data limite de validade do consentimento. Uma string com data e hora conforme especificaÃ§Ã£o RFC-3339, sempre com a utilizaÃ§Ã£o de timezone UTC(UTC time format).
           type: string
-          format: date-time
           maxLength: 20
+          format: date-time
+          example: '2021-05-21T08:30:00Z'
         endorsementInformation:
-          $ref: '#/components/schemas/EndorsementInfo'
+          $ref: "#/components/schemas/EndorsementInfo"
         claimNotificationInformation:
+          description: Objeto contendo dados do aviso de sinistro. ObrigatÃ³rio para as permissÃµes CLAIM_NOTIFICATION_REQUEST_DAMAGE_CREATE e CLAIM_NOTIFICATION_REQUEST_PERSON_CREATE
           type: object
           required:
             - documentType
@@ -535,30 +448,410 @@ components:
             documentType:
               description: Tipo de Documento Emitido.
               type: string
-              enum: [APOLICE_INDIVIDUAL,
-                      BILHETE,
-                      CERTIFICADO,
-                      APOLICE_INDIVIDUAL_AUTOMOVEL,
-                      APOLICE_FROTA_AUTOMOVEL,
-                      CERTIFICADO_AUTOMOVEL]
+              enum:
+                - APOLICE_INDIVIDUAL
+                - BILHETE
+                - CERTIFICADO
+                - APOLICE_INDIVIDUAL_AUTOMOVEL
+                - APOLICE_FROTA_AUTOMOVEL
+                - CERTIFICADO_AUTOMOVEL
             policyNumber:
+              description: NÃºmero da apÃ³lice, conforme regulamentaÃ§Ã£o vigente
               type: string
               maxLength: 60
+              example: '111111'
             groupCertificateId:
+              description: Identificador do Certificado(Caso Tipo de Documento Emitido for certificado)
               type: string
               maxLength: 60
             occurrenceDate:
+              description: Data de OcorrÃªncia do Sinistro
               type: string
               format: date
               maxLength: 10
+              example: '2022-01-01'
             occurrenceTime:
+              description: HorÃ¡rio de ocorrÃªncia do sinistro
               type: string
-              pattern: '[0-2][0-3]:[0-5][0-9]:[0-5][0-9]'
+              pattern: ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]
+              example: '22:18:54'
             occurrenceDescription:
+              description: DescriÃ§Ã£o da OcorrÃªncia/Relato da ocorrÃªncia
               type: string
               maxLength: 10000
-        rejection:
-          $ref: '#/components/schemas/ConsentRejection'
+        withdrawalCaptalizationInformation:
+          type: object
+          description: Objeto contendo dados de InformaÃ§Ãµes do Produto. ObrigatÃ³rio para a permission "CAPITALIZATION_TITLE_WITHDRAWAL_CREATE"
+          required:
+            - capitalizationTitleName
+            - planId
+            - titleId
+            - seriesId
+            - termEndDate
+            - withdrawalReason
+            - withdrawalTotalAmount
+          properties:
+            capitalizationTitleName:
+              type: string
+              description: Nome comercial do produto, pelo qual Ã© identificado
+                            nos canais de distribuiÃ§Ã£o e atendimento da sociedade.
+              maxLength: 100
+            planId:
+              description: IdentificaÃ§Ã£o do plano
+              type: string
+              maxLength: 60
+            titleId:
+              description: IdentificaÃ§Ã£o do tÃ­tulo de capitalizaÃ§Ã£o
+              type: string
+              maxLength: 60
+            seriesId:
+              description: IdentificaÃ§Ã£o da sÃ©rie
+              type: string
+              maxLength: 60
+            termEndDate:
+              description: Data de fim de vigÃªncia do tÃ­tulo
+              type: string
+              format: date
+              maxLength: 10
+              pattern: '^(\d{4})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])$'
+              example: '2022-10-27'
+            withdrawalReason:
+              description:  Motivo do resgate.
+              type: string
+              enum: [IMPOSSIBILIDADE_DE_PAGAMENTO_DAS_PARCELAS,
+                    COMPROMISSOS_PESSOAIS_EMERGENCIAIS,
+                    INSATISFACAO_COM_CARACTERISTICAS_DO_PRODUTO,
+                    INSATISFACAO_NO_RELACIONAMENTO_COM_SOCIEDADE_CAPITALIZACAO,
+                    AQUISICAO_DE_OUTROS_BENS_OU_PRODUTOS,
+                    PERDA_DE_INTERESSE,
+                    PREFIRO_NAO_RESPONDER,
+                    OUTROS]
+            withdrawalReasonOthers:
+              description:  Motivo do resgate para 'Outros'.
+              type: string
+              maxLength: 500
+            withdrawalTotalAmount:
+              description: Valor bruto a resgatar. O pedido de resgate serÃ¡ analisado e o valor serÃ¡ submetido a anÃ¡lise e estarÃ¡ sujeito as alteraÃ§Ãµes (aplicaÃ§Ã£o de impostos, variaÃ§Ã£o de saldos, viabilidade do pedido de resgate, entre outros). Ocorrendo o resgate do tÃ­tulo, este serÃ¡ automaticamente cancelado.
+              allOf:
+                - $ref: '#/components/schemas/AmountDetails'
+        withdrawalLifePensionInformation:
+          type: object
+          description: Objeto contendo dados de InformaÃ§Ãµes do Produto. ObrigatÃ³rio para a permission "PENSION_WITHDRAWAL_CREATE" ou "PENSION_WITHDRAWAL_LEAD_CREATE".
+          required:
+            - certificateId
+            - productName
+            - withdrawalType
+            - withdrawalReason
+            - pmbacAmount
+          properties:
+            certificateId:
+              description: Identificador do Certificado
+              type: string
+              maxLength: 60
+            productName:
+              description: Nome comercial do produto, pelo qual Ã© identificado nos canais de distribuiÃ§Ã£o e atendimento da sociedade
+              type: string
+              maxLength: 100
+              example: Produto A PrevidÃªncia
+            withdrawalType:
+              description: Tipo de resgate. Este valor serÃ¡ submetido a anÃ¡lise e estarÃ¡
+                            sujeito as alteraÃ§Ãµes (aplicaÃ§Ã£o de impostos, variaÃ§Ã£o de saldos,
+                            e condiÃ§Ãµes contratuais).
+              type: string
+              enum: [1_TOTAL,
+                    2_PARCIAL]
+            withdrawalReason:
+              description:  Motivo do resgate. ObrigatÃ³rio para PrevidÃªncia SobrevivÃªncia.
+              type: string
+              enum: [ 1_EMERGENCIAS_DE_SAUDE,
+                      2_APLICACAO_EM_OUTROS_INVESTIMENTOS,
+                      3_INSATISFACAO_COM_A_ENTIDADE,
+                      4_INSATISFACAO_COM_A_RENTABILIDADE_DO_PRODUTO,
+                      5_INSATISFACAO_COM_O_PRODUTO,
+                      6_AQUISICAO_DE_BENS,
+                      7_LIQUIDEZ_FINANCEIRA,
+                      8_REALIZACAO_DO_OBJETIVO_DO_INVESTIMENTO,
+                      9_OUTROS]
+            withdrawalReasonOthers:
+              description:  Motivo do resgate para 'Outros'. ObrigatÃ³rio, caso selecionado "outros"
+                          na pergunta " Motivo do resgate ".
+              type: string
+              maxLength: 100
+            desiredTotalAmount:
+              description: 'Valor bruto desejado do resgate. Este valor serÃ¡ submetido a
+                            anÃ¡lise e estarÃ¡ sujeito as alteraÃ§Ãµes (aplicaÃ§Ã£o de impostos,
+                            variaÃ§Ã£o de saldos, e condiÃ§Ãµes contratuais). Este campo nÃ£o
+                            deverÃ¡ permitir a inclusÃ£o de valores maiores que o saldo atual
+                            dele. Condicional, caso a opÃ§Ã£o "2. Parcial" seja selecionada no
+                            campo "Tipo de resgate".'
+              $ref: '#/components/schemas/AmountDetails'
+            pmbacAmount:
+              description: Valor PMBaC (fim do mÃªs). O valor exibido refere-se ao mÃªs anterior, podendo estar sujeito a variaÃ§Ãµes
+              $ref: '#/components/schemas/AmountDetails'
+        raffleCaptalizationTitleInformation:
+          type: object
+          description: Objeto contendo dados de InformaÃ§Ãµes do Produto. ObrigatÃ³rio para a permission "QUOTE_CAPITALIZATION_TITLE_RAFFLE_CREATE"
+          required:
+            - contactType
+          properties:
+            contactType:
+              type: string
+              description: Forma de recebimento do contato informado pelo cliente.
+              enum:
+                - EMAIL
+                - TELEFONE
+            email:
+              type: string
+              description: Email informado pelo cliente. Obrigatorio no caso da seleÃ§Ã£o do valor "EMAIL" no campo contactType.
+              pattern: ^\S+@\S+\.\S+$
+            phone:
+              type: string
+              description: Telefone informado pelo cliente. Obrigatorio no caso da seleÃ§Ã£o do valor "TELEFONE" no campo contactType.
+      additionalProperties: false
+    ConsentResponse:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - consentId
+            - creationDateTime
+            - status
+            - statusUpdateDateTime
+            - permissions
+            - expirationDateTime
+          properties:
+            consentId:
+              description: |
+                O consentId Ã© o identificador Ãºnico do consentimento e deverÃ¡ ser um URN - Uniform Resource Name.
+                Um URN, conforme definido na [RFC8141](https://tools.ietf.org/html/rfc8141) Ã© um Uniform Resource
+                Identifier - URI - que Ã© atribuÃ­do sob o URI scheme "urn" e um namespace URN especÃ­fico, com a intenÃ§Ã£o de que o URN
+                seja um identificador de recurso persistente e independente da localizaÃ§Ã£o.
+                Considerando a string urn:prudential:C1DD93123 como exemplo para consentId temos:
+                - o namespace(urn)
+                - o identificador associado ao namespace da instituiÃ§Ã£o transnmissora (prudential)
+                - o identificador especÃ­fico dentro do namespace (C1DD93123).
+                InformaÃ§Ãµes mais detalhadas sobre a construÃ§Ã£o de namespaces devem ser consultadas na [RFC8141](https://tools.ietf.org/html/rfc8141).
+              type: string
+              pattern: ^urn:[a-zA-Z0-9][a-zA-Z0-9-]{0,31}:[a-zA-Z0-9()+,\-.:=@;$_!*'%\/?#]+$
+              maxLength: 256
+              example: urn:prudential:C1DD93123
+            creationDateTime:
+              description: Data e hora em que o recurso foi criado. Uma string com data e hora conforme especificaÃ§Ã£o RFC-3339, sempre com a utilizaÃ§Ã£o de timezone UTC(UTC time format).
+              type: string
+              format: date-time
+              example: '2021-05-21T08:30:00Z'
+              maxLength: 20
+            status:
+              description: Estado atual do consentimento cadastrado.
+              $ref: "#/components/schemas/ConsentStatus"
+            statusUpdateDateTime:
+              description: Data e hora em que o recurso foi atualizado. Uma string com data e hora conforme especificaÃ§Ã£o RFC-3339, sempre com a utilizaÃ§Ã£o de timezone UTC(UTC time format).
+              type: string
+              format: date-time
+              example: '2021-05-21T08:30:00Z'
+              maxLength: 20
+            permissions:
+              type: array
+              minItems: 1
+              items:
+                $ref: "#/components/schemas/ConsentPermission"
+            expirationDateTime:
+              description: Data e hora de expiraÃ§Ã£o da permissÃ£o. De preenchimento obrigatÃ³rio, reflete a data limite de validade do consentimento. Uma string com data e hora conforme especificaÃ§Ã£o RFC-3339, sempre com a utilizaÃ§Ã£o de timezone UTC(UTC time format).
+              type: string
+              format: date-time
+              example: '2021-05-21T08:30:00Z'
+              maxLength: 20
+            endorsementInformation:
+              $ref: "#/components/schemas/EndorsementInfo"
+            claimNotificationInformation:
+              description: Objeto contendo dados do aviso de sinistro. ObrigatÃ³rio para as permissÃµes CLAIM_NOTIFICATION_REQUEST_DAMAGE_CREATE e CLAIM_NOTIFICATION_REQUEST_PERSON_CREATE
+              type: object
+              required:
+                - documentType
+                - policyNumber
+                - occurrenceDate
+                - occurrenceDescription
+              properties:
+                documentType:
+                  description: Tipo de Documento Emitido.
+                  type: string
+                  enum:
+                    - APOLICE_INDIVIDUAL
+                    - BILHETE
+                    - CERTIFICADO
+                    - APOLICE_INDIVIDUAL_AUTOMOVEL
+                    - APOLICE_FROTA_AUTOMOVEL
+                    - CERTIFICADO_AUTOMOVEL
+                policyNumber:
+                  description: NÃºmero da apÃ³lice, conforme regulamentaÃ§Ã£o vigente
+                  type: string
+                  maxLength: 60
+                  example: '111111'
+                groupCertificateId:
+                  description: Identificador do Certificado(Caso Tipo de Documento Emitido for certificado)
+                  type: string
+                  maxLength: 60
+                occurrenceDate:
+                  description: Data de OcorrÃªncia do Sinistro
+                  type: string
+                  format: date
+                  maxLength: 10
+                  example: '2022-01-01'
+                occurrenceTime:
+                  description: HorÃ¡rio de ocorrÃªncia do sinistro
+                  type: string
+                  pattern: ([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]
+                  example: '22:18:54'
+                occurrenceDescription:
+                  description: DescriÃ§Ã£o da OcorrÃªncia/Relato da ocorrÃªncia
+                  type: string
+                  maxLength: 10000
+            withdrawalCaptalizationInformation:
+              type: object
+              description: Objeto contendo dados de InformaÃ§Ãµes do Produto. ObrigatÃ³rio para a permission "CAPITALIZATION_TITLE_WITHDRAWAL_CREATE"
+              required:
+                - capitalizationTitleName
+                - planId
+                - titleId
+                - seriesId
+                - termEndDate
+                - withdrawalReason
+                - withdrawalTotalAmount
+              properties:
+                capitalizationTitleName:
+                  type: string
+                  description: Nome comercial do produto, pelo qual Ã© identificado
+                                nos canais de distribuiÃ§Ã£o e atendimento da sociedade.
+                  maxLength: 100
+                planId:
+                  description: IdentificaÃ§Ã£o do plano
+                  type: string
+                  maxLength: 60
+                titleId:
+                  description: IdentificaÃ§Ã£o do tÃ­tulo de capitalizaÃ§Ã£o
+                  type: string
+                  maxLength: 60
+                seriesId:
+                  description: IdentificaÃ§Ã£o da sÃ©rie
+                  type: string
+                  maxLength: 60
+                termEndDate:
+                  description: Data de fim de vigÃªncia do tÃ­tulo
+                  type: string
+                  format: date
+                  maxLength: 10
+                  pattern: '^(\d{4})-(1[0-2]|0?[1-9])-(3[01]|[12][0-9]|0?[1-9])$'
+                  example: '2022-10-27'
+                withdrawalReason:
+                  description:  Motivo do resgate.
+                  type: string
+                  enum: [IMPOSSIBILIDADE_DE_PAGAMENTO_DAS_PARCELAS,
+                        COMPROMISSOS_PESSOAIS_EMERGENCIAIS,
+                        INSATISFACAO_COM_CARACTERISTICAS_DO_PRODUTO,
+                        INSATISFACAO_NO_RELACIONAMENTO_COM_SOCIEDADE_CAPITALIZACAO,
+                        AQUISICAO_DE_OUTROS_BENS_OU_PRODUTOS,
+                        PERDA_DE_INTERESSE,
+                        PREFIRO_NAO_RESPONDER,
+                        OUTROS]
+                withdrawalReasonOthers:
+                  description:  Motivo do resgate para 'Outros'.
+                  type: string
+                  maxLength: 500
+                withdrawalTotalAmount:
+                  description: Valor bruto a resgatar. O pedido de resgate serÃ¡ analisado e o valor serÃ¡ submetido a anÃ¡lise e estarÃ¡ sujeito as alteraÃ§Ãµes (aplicaÃ§Ã£o de impostos, variaÃ§Ã£o de saldos, viabilidade do pedido de resgate, entre outros). Ocorrendo o resgate do tÃ­tulo, este serÃ¡ automaticamente cancelado.
+                  $ref: '#/components/schemas/AmountDetails'
+            withdrawalLifePensionInformation:
+              type: object
+              description: Objeto contendo dados de InformaÃ§Ãµes do Produto. ObrigatÃ³rio para a permission "PENSION_WITHDRAWAL_CREATE" ou "PENSION_WITHDRAWAL_LEAD_CREATE".
+              required:
+                - certificateId
+                - productName
+                - withdrawalType
+                - withdrawalReason
+                - pmbacAmount
+              properties:
+                certificateId:
+                  description: Identificador do Certificado
+                  type: string
+                  maxLength: 60
+                productName:
+                  description: Nome comercial do produto, pelo qual Ã© identificado nos canais de distribuiÃ§Ã£o e atendimento da sociedade
+                  type: string
+                  maxLength: 100
+                  example: Produto A PrevidÃªncia
+                withdrawalType:
+                  description: Tipo de resgate. Este valor serÃ¡ submetido a anÃ¡lise e estarÃ¡
+                                sujeito as alteraÃ§Ãµes (aplicaÃ§Ã£o de impostos, variaÃ§Ã£o de saldos,
+                                e condiÃ§Ãµes contratuais).
+                  type: string
+                  enum: [1_TOTAL,
+                        2_PARCIAL]
+                withdrawalReason:
+                  description:  Motivo do resgate. ObrigatÃ³rio para PrevidÃªncia SobrevivÃªncia.
+                  type: string
+                  enum: [ 1_EMERGENCIAS_DE_SAUDE,
+                          2_APLICACAO_EM_OUTROS_INVESTIMENTOS,
+                          3_INSATISFACAO_COM_A_ENTIDADE,
+                          4_INSATISFACAO_COM_A_RENTABILIDADE_DO_PRODUTO,
+                          5_INSATISFACAO_COM_O_PRODUTO,
+                          6_AQUISICAO_DE_BENS,
+                          7_LIQUIDEZ_FINANCEIRA,
+                          8_REALIZACAO_DO_OBJETIVO_DO_INVESTIMENTO,
+                          9_OUTROS]
+                withdrawalReasonOthers:
+                  description:  Motivo do resgate para 'Outros'. ObrigatÃ³rio, caso selecionado "outros"
+                              na pergunta " Motivo do resgate ".
+                  type: string
+                  maxLength: 100
+                desiredTotalAmount:
+                  description: 'Valor bruto desejado do resgate. Este valor serÃ¡ submetido a
+                                anÃ¡lise e estarÃ¡ sujeito as alteraÃ§Ãµes (aplicaÃ§Ã£o de impostos,
+                                variaÃ§Ã£o de saldos, e condiÃ§Ãµes contratuais). Este campo nÃ£o
+                                deverÃ¡ permitir a inclusÃ£o de valores maiores que o saldo atual
+                                dele. Condicional, caso a opÃ§Ã£o "2. Parcial" seja selecionada no
+                                campo "Tipo de resgate".'
+                  $ref: '#/components/schemas/AmountDetails'
+                pmbacAmount:
+                  description: Valor PMBaC (fim do mÃªs). O valor exibido refere-se ao mÃªs anterior, podendo estar sujeito a variaÃ§Ãµes
+                  $ref: '#/components/schemas/AmountDetails'
+            raffleCaptalizationTitleInformation:
+              type: object
+              description: Objeto contendo dados de InformaÃ§Ãµes do Produto. ObrigatÃ³rio para a permission "QUOTE_CAPITALIZATION_TITLE_RAFFLE_CREATE"
+              required:
+                - contactType
+              properties:
+                contactType:
+                  type: string
+                  description: Forma de recebimento do contato informado pelo cliente.
+                  enum:
+                    - EMAIL
+                    - TELEFONE
+                email:
+                  type: string
+                  description: Email informado pelo cliente. Obrigatorio no caso da seleÃ§Ã£o do valor "EMAIL" no campo contactType.
+                  pattern: ^\S+@\S+\.\S+$
+                phone:
+                  type: string
+                  description: Telefone informado pelo cliente. Obrigatorio no caso da seleÃ§Ã£o do valor "TELEFONE" no campo contactType.
+            rejection:
+              type: object
+              description: Objeto a ser retornado caso o consentimento seja rejeitado.
+              required:
+                - rejectedBy
+                - reason
+              properties:
+                rejectedBy:
+                  $ref: '#/components/schemas/ConsentRejectedBy'
+                reason:
+                  $ref: '#/components/schemas/ConsentRejectedReason'
+          additionalProperties: false
+        links:
+          $ref: '#/components/schemas/Links'
+        meta:
+          $ref: '#/components/schemas/Meta'
     ConsentStatus:
       type: string
       enum:
@@ -678,6 +971,9 @@ components:
         - QUOTE_CAPITALIZATION_TITLE_CREATE
         - QUOTE_CAPITALIZATION_TITLE_UPDATE
         - QUOTE_CAPITALIZATION_TITLE_RAFFLE_CREATE
+        - CONTRACT_LIFE_PENSION_CREATE
+        - CONTRACT_LIFE_PENSION_UPDATE
+        - CONTRACT_LIFE_PENSION_READ
         - CONTRACT_LIFE_PENSION_LEAD_CREATE
         - CONTRACT_LIFE_PENSION_LEAD_UPDATE
         - CONTRACT_LIFE_PENSION_LEAD_PORTABILITY_CREATE
@@ -687,6 +983,7 @@ components:
         - CONTRACT_PENSION_PLAN_LEAD_PORTABILITY_CREATE
         - CONTRACT_PENSION_PLAN_LEAD_PORTABILITY_UPDATE
         - PENSION_WITHDRAWAL_CREATE
+        - PENSION_WITHDRAWAL_LEAD_CREATE
         - CAPITALIZATION_TITLE_WITHDRAWAL_CREATE
         - RESOURCES_READ
     EndorsementInfo:
@@ -711,16 +1008,6 @@ components:
         - CANCELAMENTO
         - INCLUSAO
         - EXCLUSAO
-    ConsentRejection:
-      type: object
-      required:
-        - rejectedBy
-        - reason
-      properties:
-        rejectedBy:
-          $ref: '#/components/schemas/ConsentRejectedBy'
-        reason:
-          $ref: '#/components/schemas/ConsentRejectedReason'
     ConsentRejectedBy:
       type: string
       enum:

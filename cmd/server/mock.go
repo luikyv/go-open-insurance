@@ -117,9 +117,11 @@ func loadMocks(
 		api.CapitalizationTitlePlanInfo{
 			Series: []api.CapitalizationTitleSeries{
 				{
-					PlanId:   &capitalizationTitlePlanID1,
-					SeriesId: capitalizationTitleSeriesID1,
-					Modality: api.CapitalizationTitleSeriesModalityPOPULAR,
+					PlanId:            &capitalizationTitlePlanID1,
+					SeriesId:          capitalizationTitleSeriesID1,
+					Modality:          api.CapitalizationTitleSeriesModalityPOPULAR,
+					UpdateIndex:       api.CapitalizationTitleSeriesUpdateIndexIGPM,
+					ReadjustmentIndex: api.CapitalizationTitleSeriesReadjustmentIndexIPCA,
 				},
 			},
 		},
@@ -138,10 +140,10 @@ func loadMocks(
 			SettlementId:          "random_settlement",
 			SettlementDueDate:     api.DateNow(),
 			SettlementPaymentDate: api.DateNow(),
-			// SettlementFinancialAmount: api.AmountDetails{
-			// 	Amount:   100.0,
-			// 	Currency: "BRL",
-			// },
+			SettlementFinancialAmount: api.AmountNumberDetails{
+				Amount:   100.0,
+				Currency: "BRL",
+			},
 		},
 	)
 

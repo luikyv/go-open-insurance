@@ -2,12 +2,14 @@
 
 setup:
 	@make keys
+	@make cs-config
 	@make setup-cs
 
 setup-dev:
 	@go mod download
 	@pre-commit install
 	@make keys
+	@make cs-config
 	@make setup-cs
 
 # Clone and build the Open Insurance Conformance Suite.

@@ -100,7 +100,7 @@ func (s Service) Reject(
 		return err
 	}
 
-	return s.reject(ctx, consent, info)
+	return s.reject(ctx, &consent, info)
 }
 
 // Verify checks if the consent with the given ID is authorized
@@ -178,7 +178,7 @@ func (s Service) delete(
 		reason = api.ConsentRejectedReasonCodeCUSTOMERMANUALLYREVOKED
 	}
 
-	if err := s.reject(ctx, c, RejectionInfo{
+	if err := s.reject(ctx, &c, RejectionInfo{
 		RejectedBy: api.ConsentRejectedByUSER,
 		Reason:     reason,
 	}); err != nil {
@@ -190,7 +190,7 @@ func (s Service) delete(
 
 func (s Service) reject(
 	ctx context.Context,
-	consent Consent,
+	consent *Consent,
 	info RejectionInfo,
 ) error {
 	if consent.Status == api.ConsentStatusREJECTED {
@@ -200,7 +200,7 @@ func (s Service) reject(
 
 	consent.Status = api.ConsentStatusREJECTED
 	consent.RejectionInfo = &info
-	return s.save(ctx, consent)
+	return s.save(ctx, *consent)
 }
 
 func (s Service) save(

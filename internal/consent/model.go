@@ -8,17 +8,17 @@ import (
 )
 
 type Consent struct {
-	ID              string                  `bson:"_id"`
-	Status          api.ConsentStatus       `bson:"status"`
-	UserCPF         string                  `bson:"user_cpf"`
-	BusinessCNPJ    string                  `bson:"business_cnpj,omitempty"`
-	ClientId        string                  `bson:"client_id"`
-	Permissions     []api.ConsentPermission `bson:"permissions"`
-	CreatedAt       time.Time               `bson:"created_at"`
-	UpdatedAt       time.Time               `bson:"updated_at"`
-	ExpiresAt       time.Time               `bson:"expires_at"`
-	RejectionInfo   *RejectionInfo          `bson:"rejection,omitempty"`
-	EndorsementInfo *EndorsementInfo        `bson:"endorsement,omitempty"`
+	ID            string                  `bson:"_id"`
+	Status        api.ConsentStatus       `bson:"status"`
+	UserCPF       string                  `bson:"user_cpf"`
+	BusinessCNPJ  string                  `bson:"business_cnpj,omitempty"`
+	ClientId      string                  `bson:"client_id"`
+	Permissions   []api.ConsentPermission `bson:"permissions"`
+	CreatedAt     time.Time               `bson:"created_at"`
+	UpdatedAt     time.Time               `bson:"updated_at"`
+	ExpiresAt     time.Time               `bson:"expires_at"`
+	RejectionInfo *RejectionInfo          `bson:"rejection,omitempty"`
+	Data          api.ConsentData         `json:"data"`
 }
 
 // HasAuthExpired returns true if the status is [StatusAwaitingAuthorisation] and
@@ -73,53 +73,18 @@ func newConsent(
 		CreatedAt:   now,
 		UpdatedAt:   now,
 		ExpiresAt:   req.Data.ExpirationDateTime.Time,
+		Data:        req.Data,
 	}
 
 	if req.Data.BusinessEntity != nil {
 		c.BusinessCNPJ = req.Data.BusinessEntity.Document.Identification
 	}
 
-	if req.Data.EndorsementInformation != nil {
-		c.EndorsementInfo = &EndorsementInfo{
-			PolicyNumber: req.Data.EndorsementInformation.PolicyNumber,
-			Type:         req.Data.EndorsementInformation.EndorsementType,
-			Description:  req.Data.EndorsementInformation.RequestDescription,
-		}
-	}
-
 	return c
 }
 
 func newResponse(meta api.RequestMeta, consent Consent) api.ConsentResponse {
-
-	data := api.ConsentDataV2{
-		ConsentId:            consent.ID,
-		Status:               consent.Status,
-		Permissions:          consent.Permissions,
-		CreationDateTime:     api.NewDateTime(consent.CreatedAt),
-		StatusUpdateDateTime: api.NewDateTime(consent.CreatedAt),
-		ExpirationDateTime:   api.NewDateTime(consent.ExpiresAt),
-	}
-
-	if consent.RejectionInfo != nil {
-		data.Rejection = &api.ConsentRejection{
-			RejectedBy: consent.RejectionInfo.RejectedBy,
-			Reason: api.ConsentRejectedReason{
-				Code: consent.RejectionInfo.Reason,
-			},
-		}
-	}
-
-	if consent.EndorsementInfo != nil {
-		data.EndorsementInformation = &api.EndorsementInfo{
-			PolicyNumber:       consent.EndorsementInfo.PolicyNumber,
-			EndorsementType:    consent.EndorsementInfo.Type,
-			RequestDescription: consent.EndorsementInfo.Description,
-		}
-	}
-
-	return api.ConsentResponse{
-		Data: data,
+	resp := api.ConsentResponse{
 		Meta: &api.Meta{
 			TotalRecords: 1,
 			TotalPages:   1,
@@ -128,4 +93,26 @@ func newResponse(meta api.RequestMeta, consent Consent) api.ConsentResponse {
 			Self: fmt.Sprintf("%s/open-insurance/consents/v2/consents/%s", meta.Host, consent.ID),
 		},
 	}
+
+	resp.Data.ConsentId = consent.ID
+	resp.Data.Status = consent.Status
+	resp.Data.Permissions = consent.Permissions
+	resp.Data.CreationDateTime = api.NewDateTime(consent.CreatedAt)
+	resp.Data.StatusUpdateDateTime = api.NewDateTime(consent.UpdatedAt)
+	resp.Data.ExpirationDateTime = api.NewDateTime(consent.ExpiresAt)
+	resp.Data.EndorsementInformation = consent.Data.EndorsementInformation
+
+	if consent.RejectionInfo != nil {
+		resp.Data.Rejection = &struct {
+			Reason     api.ConsentRejectedReason "json:\"reason\""
+			RejectedBy api.ConsentRejectedBy     "json:\"rejectedBy\""
+		}{
+			RejectedBy: consent.RejectionInfo.RejectedBy,
+			Reason: api.ConsentRejectedReason{
+				Code: consent.RejectionInfo.Reason,
+			},
+		}
+	}
+
+	return resp
 }

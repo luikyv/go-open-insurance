@@ -32,7 +32,7 @@ func validate(ctx context.Context, consent Consent) error {
 	}
 
 	if slices.Contains(consent.Permissions, api.ConsentPermissionENDORSEMENTREQUESTCREATE) &&
-		consent.EndorsementInfo == nil {
+		consent.Data.EndorsementInformation == nil {
 		return api.NewError("INVALID_REQUEST", http.StatusBadRequest,
 			"endorsement information is missing")
 	}

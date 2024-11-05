@@ -64,12 +64,12 @@ func (s Service) validate(
 			meta.Error.Error())
 	}
 
-	info := *consent.EndorsementInfo
+	info := *consent.Data.EndorsementInformation
 	if endorsement.PolicyNumber != info.PolicyNumber {
 		return api.NewError("NAO_INFORMADO", http.StatusUnprocessableEntity,
 			"policy number not consented")
 	}
-	if endorsement.Type != info.Type {
+	if endorsement.Type != info.EndorsementType {
 		return api.NewError("NAO_INFORMADO", http.StatusUnprocessableEntity,
 			"endorsement type not consented")
 	}

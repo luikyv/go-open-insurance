@@ -77,6 +77,9 @@ Build the Conformance Suite JAR file.
 `make keys` \
 Generates certificates, private keys, and JWKS files for both the server and clients.
 
+`make cs-config` \
+Create a Conformance Suite configuration file using the client keys created by `make keys`.
+
 `make models` \
 Generates API models from the Open Insurance OpenAPI specification.
 
@@ -96,6 +99,5 @@ The configurations for this module are located in `tools/oapi-config.yml`.
 * Env
 * Dynamic fields.
 * Implement user session.
-* Generate cs config file.
 * Data generators.
 * Business.

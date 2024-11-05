@@ -13,7 +13,11 @@ type operationOptions struct {
 
 func newOperationOptions(operationID string) operationOptions {
 	switch operationID {
-	case "CreateConsentV2", "ConsentV2", "DeleteConsentV2":
+	case "CreateConsentV2":
+		return operationOptions{
+			scopes: []goidc.Scope{ScopeConsents},
+		}
+	case "ConsentV2", "DeleteConsentV2":
 		return operationOptions{
 			scopes: []goidc.Scope{ScopeConsents},
 		}
