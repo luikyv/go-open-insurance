@@ -57,7 +57,6 @@ run-cs:
 # Generate certificates, private keys, and JWKS files for both the server and clients.
 keys:
 	@go run cmd/keymaker/main.go
-	@make cs-config
 
 # Generate API models from the Open Insurance OpenAPI Specification.
 models:

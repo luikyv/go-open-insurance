@@ -49,6 +49,11 @@ func (s Service) resources(
 	api.GetResourcesResponse,
 	error,
 ) {
+	if meta.Error != nil {
+		return api.GetResourcesResponse{}, api.NewError("NAO_INFORMADO", http.StatusUnprocessableEntity,
+			meta.Error.Error())
+	}
+
 	consent, err := s.consentService.Fetch(ctx, meta, meta.ConsentID)
 	if err != nil {
 		return api.GetResourcesResponse{}, err

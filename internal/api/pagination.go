@@ -27,6 +27,7 @@ func NewPagination(p *PageNumber, ps *PageSize) Pagination {
 		Number: 1,
 		Size:   25,
 	}
+
 	if p != nil {
 		pagination.Number = int(*p)
 	}

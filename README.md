@@ -51,9 +51,10 @@ The configurations for this module are located in `tools/oapi-config.yml`.
 
 ## TODOs
 * Make mongo db remove expired records.
-* Env
+* Env. Defaults to DEV a log warning?
 * Dynamic fields.
 * Implement user session.
 * Data generators.
 * Business.
 * Add more logs.
+* Better way to generated the software statement assertion.

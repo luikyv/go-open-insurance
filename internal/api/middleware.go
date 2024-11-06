@@ -262,6 +262,7 @@ func newResponseError(err Error) ResponseError {
 	if err.StatusCode == http.StatusUnprocessableEntity {
 		_ = respErr.Errors.FromErrorInfo(errData)
 	} else {
+		errData.RequestDateTime = DateTimeNow()
 		_ = respErr.Errors.FromErrorInfos([]ErrorInfo{errData})
 	}
 
