@@ -90,28 +90,28 @@ func (a authenticator) authenticate(
 		ClientID: session.ClientID,
 	}
 
-	if session.Parameter(paramStepID) == stepIDSetUp {
+	if session.StoredParameter(paramStepID) == stepIDSetUp {
 		if status, err := a.setUp(r, meta, session); status != goidc.StatusSuccess {
 			return status, err
 		}
 		session.StoreParameter(paramStepID, stepIDLogin)
 	}
 
-	if session.Parameter(paramStepID) == stepIDLogin {
+	if session.StoredParameter(paramStepID) == stepIDLogin {
 		if status, err := a.login(w, r, meta, session); status != goidc.StatusSuccess {
 			return status, err
 		}
 		session.StoreParameter(paramStepID, stepIDConsent)
 	}
 
-	if session.Parameter(paramStepID) == stepIDConsent {
+	if session.StoredParameter(paramStepID) == stepIDConsent {
 		if status, err := a.grantConsent(w, r, meta, session); status != goidc.StatusSuccess {
 			return status, err
 		}
 		session.StoreParameter(paramStepID, stepIDFinishFlow)
 	}
 
-	if session.Parameter(paramStepID) == stepIDFinishFlow {
+	if session.StoredParameter(paramStepID) == stepIDFinishFlow {
 		return a.finishFlow(session)
 	}
 
@@ -176,7 +176,7 @@ func (a authenticator) login(
 	}
 
 	if isLogin != "true" {
-		consentID := session.Parameter(paramConsentID).(string)
+		consentID := session.StoredParameter(paramConsentID).(string)
 		_ = a.consentService.Reject(
 			r.Context(),
 			meta,
@@ -200,7 +200,7 @@ func (a authenticator) login(
 	}
 
 	password := r.PostFormValue(passwordFormParam)
-	if user.CPF != session.Parameter(paramConsentCPF) || password != correctPassword {
+	if user.CPF != session.StoredParameter(paramConsentCPF) || password != correctPassword {
 		return a.executeTemplate(w, "login.html", authnPage{
 			CallbackID: session.CallbackID,
 			Error:      "invalid credentials",
@@ -224,7 +224,7 @@ func (a authenticator) grantConsent(
 	_ = r.ParseForm()
 
 	var permissions []api.ConsentPermission
-	for _, p := range strings.Split(session.Parameter(paramPermissions).(string), " ") {
+	for _, p := range strings.Split(session.StoredParameter(paramPermissions).(string), " ") {
 		permissions = append(permissions, api.ConsentPermission(p))
 	}
 	isConsented := r.PostFormValue(consentFormParam)
@@ -235,7 +235,7 @@ func (a authenticator) grantConsent(
 		})
 	}
 
-	consentID := session.Parameter(paramConsentID).(string)
+	consentID := session.StoredParameter(paramConsentID).(string)
 
 	if isConsented != "true" {
 		_ = a.consentService.Reject(
@@ -262,7 +262,7 @@ func (a authenticator) finishFlow(
 	goidc.AuthnStatus,
 	error,
 ) {
-	session.SetUserID(session.Parameter(paramUserID).(string))
+	session.SetUserID(session.StoredParameter(paramUserID).(string))
 	// TODO: Grant scopes based on permissions.
 	session.GrantScopes(session.Scopes)
 	session.SetIDTokenClaimACR(api.ACROpenInsuranceLOA2)

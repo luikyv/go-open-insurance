@@ -50,11 +50,12 @@ The configurations for this module are located in `tools/oapi-config.yml`.
 [go-oidc](https://github.com/luikyv/go-oidc) is a configurable OpenID provider written in Go. It handles OAuth-related functionalities, including authentication, token issuance, and scopes. Familiarity with this library's concepts is important for understanding the project's implementation of these aspects.
 
 ## TODOs
+* Update go-oidc version.
 * Make mongo db remove expired records.
-* Env. Defaults to DEV a log warning?
+* Env. Defaults to DEV and log warning?
 * Dynamic fields.
 * Implement user session.
 * Data generators.
 * Business.
 * Add more logs.
-* Better way to generated the software statement assertion.
+* Better way to generate the software statement assertion.

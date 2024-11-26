@@ -4,6 +4,7 @@
 # Conformance Suite.
 setup:
 	@make keys
+	@make setup-localstack
 
 # Sets up the development environment by downloading dependencies installing
 # pre-commit hooks, generating keys, and setting up the Open Insurance
@@ -13,6 +14,7 @@ setup-dev:
 	@pre-commit install
 	@make keys
 	@make setup-cs
+	@make setup-localstack
 
 # Clone and build the Open Insurance Conformance Suite.
 # Also, generate a configuration file for the suite using files in /keys.
@@ -30,6 +32,9 @@ setup-cs:
 	@make build-cs
 
 	@make cs-config
+
+setup-localstack:
+	chmod +x init_aws.sh
 
 # Runs the main MockIn components using Docker Compose.
 run:

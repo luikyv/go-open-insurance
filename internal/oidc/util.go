@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"context"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
@@ -11,6 +12,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/go-jose/go-jose/v4"
 	"github.com/luikyv/go-oidc/pkg/goidc"
 	"github.com/luikyv/go-open-insurance/internal/api"
 	"github.com/luikyv/go-open-insurance/internal/consent"
@@ -79,10 +81,9 @@ func ClientCertFunc() goidc.ClientCertFunc {
 }
 
 func LogErrorFunc() goidc.NotifyErrorFunc {
-	return func(r *http.Request, err error) {
-		api.Logger(r.Context()).Info(
+	return func(ctx context.Context, err error) {
+		api.Logger(ctx).Info(
 			"error during request",
-			slog.String("uri", r.URL.RequestURI()),
 			slog.String("error", err.Error()),
 		)
 	}
@@ -97,5 +98,11 @@ func DCRFunc(scopes []goidc.Scope) goidc.HandleDynamicClientFunc {
 	return func(r *http.Request, c *goidc.ClientMetaInfo) error {
 		c.ScopeIDs = scopeIDsStr
 		return nil
+	}
+}
+
+func TokenOptionsFunc() goidc.TokenOptionsFunc {
+	return func(gi goidc.GrantInfo, c *goidc.Client) goidc.TokenOptions {
+		return goidc.NewJWTTokenOptions(jose.PS256, 300)
 	}
 }

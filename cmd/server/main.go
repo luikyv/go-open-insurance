@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/aws/aws-sdk-go-v2/service/kms"
 	"github.com/getkin/kin-openapi/routers/gorillamux"
 	"github.com/go-jose/go-jose/v4"
 	"github.com/luikyv/go-oidc/pkg/goidc"
@@ -34,13 +35,16 @@ import (
 )
 
 var (
-	dbSchema           = getEnv("MOCKIN_DB_SCHEMA", "mockin")
-	dbStringConnection = getEnv("MOCKIN_DB_CONNECTION", "mongodb://localhost:27017/mockin")
-	port               = getEnv("MOCKIN_PORT", "80")
-	host               = getEnv("MOCKIN_HOST", "https://mockin.local")
-	mtlsHost           = getEnv("MOCKIN_MTLS_HOST", "https://matls-mockin.local")
-	apiPrefixOIDC      = "/auth"
-	apiPrefixOPIN      = "/open-insurance"
+	dbSchema              = getEnv("MOCKIN_DB_SCHEMA", "mockin")
+	dbStringConnection    = getEnv("MOCKIN_DB_CONNECTION", "mongodb://localhost:27017/mockin")
+	port                  = getEnv("MOCKIN_PORT", "80")
+	awsBaseEndpoint       = getEnv("MOCKIN_AWS_BASE_ENDPOINT", "http://localhost:4566")
+	host                  = getEnv("MOCKIN_HOST", "https://mockin.local")
+	mtlsHost              = getEnv("MOCKIN_MTLS_HOST", "https://matls-mockin.local")
+	kmsSigningKeyAlias    = getEnv("MOCKIN_KMS_SIGNING_KEY_ALIAS", "alias/mockin/signing-key")
+	kmsEncryptionKeyAlias = getEnv("MOCKIN_KMS_ENCRYPTION_KEY_ALIAS", "alias/mockin/encryption-key")
+	apiPrefixOIDC         = "/auth"
+	apiPrefixOPIN         = "/open-insurance"
 )
 
 type ConsentServerV2 = consent.ServerV2
@@ -59,6 +63,7 @@ type opinServer struct {
 }
 
 func main() {
+	kmsClient := kmsClient()
 	db, err := dbConnection()
 	if err != nil {
 		log.Fatal(err)
@@ -77,7 +82,7 @@ func main() {
 	userService := user.NewService(userStorage)
 	consentService := consent.NewService(consentStorage, userService)
 	// OpenID Provider.
-	op, err := openidProvider(db, userService, consentService)
+	op, err := openidProvider(db, kmsClient, userService, consentService)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -174,6 +179,7 @@ func dbConnection() (*mongo.Database, error) {
 
 func openidProvider(
 	db *mongo.Database,
+	kmsClient *kms.Client,
 	userService user.Service,
 	consentService consent.Service,
 ) (
@@ -192,12 +198,15 @@ func openidProvider(
 	return provider.New(
 		goidc.ProfileOpenID,
 		host,
-		privateJWKS(filepath.Join(keysDir, "server.jwks")),
+		oidc.JWKSFunc(kmsClient, kmsSigningKeyAlias, kmsEncryptionKeyAlias),
+		provider.WithSignFunc(oidc.SignFunc(kmsClient, kmsSigningKeyAlias)),
+		provider.WithDecryptFunc(oidc.DecryptFunc(kmsClient, kmsEncryptionKeyAlias)),
 		provider.WithPathPrefix(apiPrefixOIDC),
 		provider.WithClientStorage(oidc.NewClientManager(db)),
 		provider.WithAuthnSessionStorage(oidc.NewAuthnSessionManager(db)),
 		provider.WithGrantSessionStorage(oidc.NewGrantSessionManager(db)),
 		provider.WithScopes(api.Scopes...),
+		provider.WithTokenOptions(oidc.TokenOptionsFunc()),
 		provider.WithAuthorizationCodeGrant(),
 		provider.WithImplicitGrant(),
 		provider.WithRefreshTokenGrant(oidc.ShoudIssueRefreshTokenFunc(), 600),
@@ -214,6 +223,7 @@ func openidProvider(
 		provider.WithIssuerResponseParameter(),
 		provider.WithPKCE(goidc.CodeChallengeMethodSHA256),
 		provider.WithACRs(api.ACROpenInsuranceLOA2, api.ACROpenInsuranceLOA3),
+		provider.WithUserSignatureAlgs(jose.PS256),
 		provider.WithUserInfoEncryption(jose.RSA_OAEP),
 		provider.WithStaticClient(client("client_one", keysDir)),
 		provider.WithStaticClient(client("client_two", keysDir)),
@@ -301,6 +311,12 @@ func httpClientFunc() goidc.HTTPClientFunc {
 	return func(ctx context.Context) *http.Client {
 		return client
 	}
+}
+
+func kmsClient() *kms.Client {
+	return kms.New(kms.Options{
+		BaseEndpoint: &awsBaseEndpoint,
+	})
 }
 
 // getEnv retrieves an environment variable or returns a fallback value if not found

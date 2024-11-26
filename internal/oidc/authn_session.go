@@ -2,6 +2,7 @@ package oidc
 
 import (
 	"context"
+	"errors"
 
 	"github.com/luikyv/go-oidc/pkg/goidc"
 	"go.mongodb.org/mongo-driver/bson"
@@ -50,7 +51,7 @@ func (manager AuthnSessionManager) SessionByCallbackID(
 	)
 }
 
-func (manager AuthnSessionManager) SessionByAuthorizationCode(
+func (manager AuthnSessionManager) SessionByAuthCode(
 	ctx context.Context,
 	authorizationCode string,
 ) (
@@ -59,18 +60,28 @@ func (manager AuthnSessionManager) SessionByAuthorizationCode(
 ) {
 	return manager.getWithFilter(
 		ctx,
-		bson.D{{Key: "authorization_code", Value: authorizationCode}},
+		bson.D{{Key: "auth_code", Value: authorizationCode}},
 	)
 }
 
-func (manager AuthnSessionManager) SessionByReferenceID(
+func (manager AuthnSessionManager) SessionByPushedAuthReqID(
 	ctx context.Context,
 	id string,
 ) (
 	*goidc.AuthnSession,
 	error,
 ) {
-	return manager.getWithFilter(ctx, bson.D{{Key: "reference_id", Value: id}})
+	return manager.getWithFilter(ctx, bson.D{{Key: "pushed_auth_req_id", Value: id}})
+}
+
+func (manager AuthnSessionManager) SessionByCIBAAuthID(
+	ctx context.Context,
+	id string,
+) (
+	*goidc.AuthnSession,
+	error,
+) {
+	return nil, errors.ErrUnsupported
 }
 
 func (manager AuthnSessionManager) Delete(
